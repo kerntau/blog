@@ -15,6 +15,7 @@ _site
 node_modules
 package-lock.json
 dist
+src/content
 
 # IDE configurations
 .idea
