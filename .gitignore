@@ -11,9 +11,10 @@ _site
 # RubyGems
 *.gem
 
-# NPM dependencies
+# NPM dependencies & build output
 node_modules
 package-lock.json
+dist
 
 # IDE configurations
 .idea
