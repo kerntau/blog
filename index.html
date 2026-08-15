@@ -1,4 +1,30 @@
----
-layout: home
-# Index page
----
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+    <title>Chirpy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Source+Sans+Pro:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" />
+    <link rel="icon" href="/assets/img/favicons/favicon.ico" />
+    <script>
+      // 预先检测并设置暗黑/明亮主题，避免闪烁
+      (function () {
+        var mode = localStorage.getItem('mode');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (mode === 'dark' || (!mode && prefersDark) || mode === 'system' && prefersDark) {
+          document.documentElement.setAttribute('data-mode', 'dark');
+        } else {
+          document.documentElement.setAttribute('data-mode', 'light');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
