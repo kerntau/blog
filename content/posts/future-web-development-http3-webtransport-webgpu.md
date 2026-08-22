@@ -2,6 +2,7 @@
 title: "未来 Web 开发新纪元：HTTP/3、WebTransport 与 WebGPU 展望"
 url: "future-web-development-http3-webtransport-webgpu"
 date: "2026-07-21"
+recommend: 50
 draft: false
 authors:
   - default

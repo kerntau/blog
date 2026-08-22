@@ -2,6 +2,7 @@
 title: "Docker 与 Kubernetes 容器可观测性架构设计"
 url: "kubernetes-container-observability-architecture"
 date: "2025-02-16"
+recommend: 70
 draft: false
 authors:
   - default

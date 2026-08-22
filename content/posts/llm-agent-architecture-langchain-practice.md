@@ -2,6 +2,7 @@
 title: "LLM 大语言模型 Agent 智能体架构设计与 LangChain 最佳实践"
 url: "llm-agent-architecture-langchain-practice"
 date: "2025-05-31"
+recommend: 90
 draft: false
 authors:
   - default

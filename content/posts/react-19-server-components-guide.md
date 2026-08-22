@@ -2,6 +2,7 @@
 title: "React 19 Server Components 架构落地指南"
 url: "react-19-server-components-guide"
 date: "2025-01-24"
+recommend: 100
 draft: false
 authors:
   - default

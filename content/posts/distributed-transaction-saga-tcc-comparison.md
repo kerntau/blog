@@ -2,6 +2,7 @@
 title: "分布式事务最终一致性方案：Saga 与 TCC 模式对比"
 url: "distributed-transaction-saga-tcc-comparison"
 date: "2025-05-08"
+recommend: 60
 draft: false
 authors:
   - default

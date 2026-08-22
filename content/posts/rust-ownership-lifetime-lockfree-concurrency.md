@@ -2,6 +2,7 @@
 title: "Rust 所有权模型、生命周期与无锁并发数据结构探秘"
 url: "rust-ownership-lifetime-lockfree-concurrency"
 date: "2025-10-05"
+recommend: 80
 draft: false
 authors:
   - default
