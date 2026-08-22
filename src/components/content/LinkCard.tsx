@@ -3,6 +3,8 @@ import Pic from './Pic'
 import styles from './LinkCard.module.scss'
 
 import { useMemo } from 'react'
+import { getDomain } from '../../utils/link'
+import { joinWith } from '../../utils/str'
 
 interface LinkCardProps {
 	link: string
@@ -12,19 +14,15 @@ interface LinkCardProps {
 }
 
 export default function LinkCard({ link, title, description, icon }: LinkCardProps) {
-	const domain = useMemo(() => {
-		try {
-			return new URL(link).hostname
-		} catch {
-			return link
-		}
-	}, [link])
-
 	return (
-		<UtilLink to={link} className={`${styles.linkCard} gradient-card`}>
+		<UtilLink
+			to={link}
+			className={`${styles.linkCard} card`}
+			title={joinWith([title, description, link])}
+		>
 			<div className={styles.info}>
 				<div className={styles.title}>{title}</div>
-				<div className={styles.description}>{description ?? domain}</div>
+				<div className={styles.description}>{description ?? getDomain(link)}</div>
 			</div>
 			{icon && <Pic src={icon} className={styles.icon} />}
 		</UtilLink>

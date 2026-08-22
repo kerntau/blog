@@ -1,48 +1,48 @@
-.tableContainer {
-	width: 100%;
-	overflow-x: auto;
-	margin: 1.5rem 0;
-	border-radius: 0.8rem;
-	border: 1px solid var(--c-border);
-	background-color: var(--c-bg-card);
-
-	/* 优化滚动条样式 */
-	&::-webkit-scrollbar {
-		height: 6px;
-	}
-	&::-webkit-scrollbar-thumb {
-		background: var(--c-border);
-		border-radius: 10px;
-	}
-}
-
-.table {
-	width: 100%;
-	min-width: 600px; /* 防止在窄屏下过于拥挤 */
-	border-collapse: collapse;
+.mdTable {
+	position: relative;
+	margin: 1rem 0;
+	font-variant-numeric: tabular-nums;
 	font-size: 0.9em;
-	line-height: 1.5;
+	line-height: 1.4;
+	word-break: break-all;
 
-	:global(th), :global(td) {
-		padding: 1rem 1.2rem;
-		border-bottom: 1px solid var(--c-border);
-		text-align: left;
+	table.scroll {
+		contain: layout;
+		display: block;
+		white-space: nowrap;
+		word-break: normal;
 	}
 
-	:global(th) {
-		background-color: var(--c-bg-2);
-		color: var(--c-text);
-		font-weight: 600;
-		text-transform: uppercase;
-		font-size: 0.85em;
-		letter-spacing: 0.05em;
-	}
+	:global(table) {
+		max-height: 80vh;
+		max-height: 80dvh;
+		margin: auto;
+		border-collapse: collapse;
 
-	:global(tr:last-child td) {
-		border-bottom: none;
-	}
+		> :global(thead) {
+			position: sticky;
+			z-index: 1;
+			top: 0;
+		}
 
-	:global(tr:hover) {
-		background-color: var(--c-bg-soft);
+		:global(th) {
+			background-color: var(--c-bg-2);
+			font-weight: bold;
+			text-align: center;
+		}
+
+		:global(tr) {
+			transition: background-color 0.2s;
+
+			&:hover {
+				background-color: var(--c-bg-2);
+			}
+		}
+
+		:global(th),
+		:global(td) {
+			padding: 0.5em 0.8em;
+			border: 1px solid var(--c-border);
+		}
 	}
 }

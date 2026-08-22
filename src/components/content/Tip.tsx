@@ -2,6 +2,7 @@
 
 import { Icon } from '@iconify/react'
 import useCopy from '../../hooks/useCopy'
+import ZTooltip from '../partial/ZTooltip'
 import styles from './Tip.module.scss'
 
 export default function Tip({
@@ -16,15 +17,26 @@ export default function Tip({
 	
 	const icon = propsIcon ?? (isCopied ? 'tabler:check' : isCopyMode && 'tabler:copy')
 
-	return (
+	const inner = (
 		<span
 			className={styles.tip}
 			tabIndex={0}
 			onClick={() => isCopyMode && copy()}
-			title={tip}
+			onKeyDown={(e) => {
+				if (e.key === 'Enter') {
+					isCopyMode && copy()
+				}
+			}}
 		>
 			{children || text}
 			{typeof icon === 'string' && <Icon icon={icon} className={styles.tipIcon} />}
 		</span>
 	)
+
+	const tipText = tip || (isCopyMode ? '复制' : '')
+	if (tipText) {
+		return <ZTooltip content={tipText}>{inner}</ZTooltip>
+	}
+
+	return inner
 }

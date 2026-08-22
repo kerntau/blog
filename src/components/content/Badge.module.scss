@@ -1,15 +1,48 @@
 .badge {
-	display: inline-block;
-	padding: 0.1em 0.4em;
-	border-radius: 0.3em;
-	font-size: 0.8em;
-	vertical-align: middle;
+	display: inline-flex;
+	align-items: baseline;
+	margin: 0.1em;
+	border: 1px solid var(--c-border);
+	border-radius: 4px;
+	box-sizing: content-box;
 	background-color: var(--c-bg-2);
-	color: var(--c-text-2);
+	font-size: 0.875em;
+	transition: color 0.2s;
+	text-decoration: none;
+	color: inherit;
 
-	&.primary { background-color: var(--c-primary-soft); color: var(--c-primary); }
-	&.tip { background-color: #3A72; color: #3A7; }
-	&.info { background-color: var(--c-bg-soft); color: var(--c-text-1); }
-	&.warning { background-color: #F802; color: #F80; }
-	&.error { background-color: #F332; color: #F33; }
+	@supports (color: color-mix(in srgb, transparent, transparent)) {
+		border-color: color-mix(in srgb, currentcolor 10%, transparent);
+		background-color: color-mix(in srgb, currentcolor 5%, transparent);
+		color: color-mix(in srgb, currentcolor 80%, transparent);
+	}
+
+	&[href]:hover, &[href]:global(:hover) {
+		color: var(--c-text);
+	}
+
+	&.round, &.round > .badgeIcon {
+		border-radius: 0.8em;
+	}
+}
+
+.badgeIcon {
+	align-self: normal;
+	height: 1.6em;
+	width: auto;
+	border-radius: 3.5px;
+	object-fit: contain;
+
+	+ .badgeText {
+		margin-inline-start: -0.1em;
+	}
+}
+
+.badgeText {
+	padding: 0.2em 0.4em;
+	line-height: 1.2;
+
+	&:empty {
+		display: none;
+	}
 }

@@ -4,6 +4,7 @@ import { Temporal } from 'temporal-polyfill'
 import type { FeedEntry } from '../../types/feed'
 import appConfig from '../../app.config'
 import UtilLink from '../util/UtilLink'
+import ZTooltip from '../partial/ZTooltip'
 import { getArchIcon, getDomainIcon } from '../../utils/icon'
 import { getDomain, getDomainType, getMainDomain } from '../../utils/link'
 import styles from './FeedCard.module.scss'
@@ -14,8 +15,37 @@ export default function FeedCard(props: FeedEntry) {
 	const domainIcon = getDomainIcon(link)
 	const domainTip = getDomainType(getMainDomain(link, true))
 
+	const tooltipContent = (
+		<>
+			<div className={styles.siteContent}>
+				<Image className={styles.siteIcon} src={icon} alt={title} width={24} height={24} unoptimized />
+				<div className={styles.siteInfo}>
+					<h3 className="text-creative">{title}</h3>
+					<code className={styles.domain} title={domainTip}>
+						<span>{getDomain(link)}</span>
+						{domainIcon && <Icon className={styles.domainMark} icon={domainIcon} />}
+					</code>
+				</div>
+				{archs?.map(arch => (
+					<span key={arch} className={styles.arch} title={arch}>
+						<Icon icon={getArchIcon(arch)} />
+					</span>
+				))}
+			</div>
+			<div className={styles.descContent}>
+				<div className={styles.date}>{Temporal.PlainDate.from(date).toLocaleString()}</div>
+				<p>{error ?? desc}</p>
+				{comment && (
+					<p>
+						<Icon icon="tabler:message-dots" /> {comment}
+					</p>
+				)}
+			</div>
+		</>
+	)
+
 	return (
-		<span className={styles.feedCardWrap}>
+		<ZTooltip content={tooltipContent} placement="top" interactive delay={200}>
 			<UtilLink
 				to={error ? undefined : link}
 				rel="noopener"
@@ -40,33 +70,6 @@ export default function FeedCard(props: FeedEntry) {
 				<span className={styles.author}>{author}</span>
 				<span className={styles.sitenick}>{sitenick}</span>
 			</UtilLink>
-
-			<span className={styles.tooltip} role="tooltip">
-				<span className={styles.siteContent}>
-					<Image className={styles.siteIcon} src={icon} alt={title} width={24} height={24} unoptimized />
-					<span className={styles.siteInfo}>
-						<strong className="text-creative">{title}</strong>
-						<code className={styles.domain} title={domainTip}>
-							<span>{getDomain(link)}</span>
-							{domainIcon && <Icon className={styles.domainMark} icon={domainIcon} />}
-						</code>
-					</span>
-					{archs?.map(arch => (
-						<span key={arch} className={styles.arch} title={arch}>
-							<Icon icon={getArchIcon(arch)} />
-						</span>
-					))}
-				</span>
-				<span className={styles.descContent}>
-					<span className={styles.date}>{Temporal.PlainDate.from(date).toLocaleString()}</span>
-					<span>{error ?? desc}</span>
-					{comment && (
-						<span>
-							<Icon icon="tabler:message-dots" /> {comment}
-						</span>
-					)}
-				</span>
-			</span>
-		</span>
+		</ZTooltip>
 	)
 }

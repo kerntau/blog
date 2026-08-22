@@ -7,8 +7,30 @@
 	font-size: 0.85em;
 	white-space: break-spaces;
 
+	&.copyable {
+		padding-inline-end: 0.1em;
+	}
+
 	@supports (color: color-mix(in srgb, transparent, transparent)) {
 		border-color: color-mix(in srgb, currentcolor 10%, transparent);
 		background-color: color-mix(in srgb, currentcolor 5%, transparent);
+	}
+}
+
+.copyButton {
+	display: inline-flex;
+	margin-inline-start: 0.2em;
+	vertical-align: -0.2em;
+	color: var(--c-text-3);
+	transition: color 0.2s;
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+
+	&:hover,
+	&:focus-visible {
+		opacity: 1;
+		color: var(--c-primary);
 	}
 }

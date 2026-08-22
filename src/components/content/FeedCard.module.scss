@@ -1,7 +1,3 @@
-.feedCardWrap {
-	position: relative;
-	display: block;
-}
 
 .feedCard {
 	display: flex;
@@ -24,33 +20,6 @@
 	}
 }
 
-.tooltip {
-	position: absolute;
-	overflow: hidden;
-	overflow: clip;
-	inset-inline-start: 50%;
-	bottom: calc(100% + 0.5em);
-	width: max-content;
-	max-width: min(24rem, 90vw);
-	border-radius: 0.4rem;
-	box-shadow: var(--box-shadow-2);
-	background-color: var(--c-bg-2);
-	color: var(--c-text);
-	font-size: 0.9rem;
-	line-height: 1.4;
-	opacity: 0;
-	pointer-events: none;
-	transform: translate(-50%, 0.5em);
-	transition: opacity 0.2s, transform 0.2s;
-	z-index: 20;
-}
-
-.feedCardWrap:hover .tooltip,
-.feedCardWrap:focus-within .tooltip {
-	opacity: 1;
-	pointer-events: auto;
-	transform: translate(-50%, 0);
-}
 
 .siteContent {
 	display: flex;
