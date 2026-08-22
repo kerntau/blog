@@ -1,29 +1,43 @@
 import type {
 	AssetFile,
 	AssetReferenceData,
+	AuditLogItem,
+	CategoryItem,
 	FeedCheckResult,
 	FeedGroup,
 	FeedItem,
 	GitStatusData,
 	HealthData,
+	IntegrityCheckResult,
+	NavConfigData,
+	PostCompileResult,
 	PostDetail,
 	PostMeta,
+	PostSnapshot,
 	SniffResult,
 	StatsData,
+	TagItem,
 	ValidationResult,
+	WidgetConfigData,
+	SiteInfoData,
+	AppearanceConfigData,
 } from './types'
 
-// 本地开发代理到 /api，如果独立访问可通过 http://localhost:3001
 const API_BASE = '/api'
 
 async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
-	const res = await fetch(`${API_BASE}${url}`, {
-		headers: {
-			'Content-Type': 'application/json',
-			...(options.headers || {}),
-		},
-		...options,
-	})
+	let res: Response
+	try {
+		res = await fetch(`${API_BASE}${url}`, {
+			headers: {
+				'Content-Type': 'application/json',
+				...(options.headers || {}),
+			},
+			...options,
+		})
+	} catch (networkErr: any) {
+		throw new Error(`无法连接到后台管理服务 (${networkErr.message || '网络连接失败'})，请确认后台服务已启动`)
+	}
 
 	if (!res.ok) {
 		const errData = await res.json().catch(() => ({ message: `HTTP ${res.status}` }))
@@ -82,15 +96,73 @@ export const adminApi = {
 			method: 'POST',
 			body: JSON.stringify(params),
 		}),
+	compilePostMdx: (content: string, title?: string) =>
+		request<PostCompileResult>('/posts/compile', {
+			method: 'POST',
+			body: JSON.stringify({ content, title }),
+		}),
 	validatePostMdx: (content: string) =>
 		request<ValidationResult>('/posts/validate', {
 			method: 'POST',
 			body: JSON.stringify({ content }),
 		}),
+	getPostHistory: (slug: string) =>
+		request<PostSnapshot[]>(`/posts/history?slug=${encodeURIComponent(slug)}`),
+	restorePostHistory: (slug: string, snapshotFileName: string) =>
+		request<PostSnapshot>('/posts/history/restore', {
+			method: 'POST',
+			body: JSON.stringify({ slug, snapshotFileName }),
+		}),
 	openVsCode: (postPath?: string) =>
 		request<{ message: string }>('/posts/open-vscode', {
 			method: 'POST',
 			body: JSON.stringify({ path: postPath }),
+		}),
+
+	// 分类与标签管理
+	getCategories: () => request<CategoryItem[]>('/categories'),
+	saveCategories: (categories: Array<{ name: string, icon: string, color: string }>) =>
+		request<{ message: string }>('/categories/save', {
+			method: 'POST',
+			body: JSON.stringify({ categories }),
+		}),
+	getTags: () => request<TagItem[]>('/tags'),
+	renameTag: (oldName: string, newName: string) =>
+		request<{ message: string }>('/tags/rename', {
+			method: 'POST',
+			body: JSON.stringify({ oldName, newName }),
+		}),
+
+	// 导航管理
+	getNav: () => request<NavConfigData>('/nav'),
+	saveNav: (data: { nav?: any[], footerNav?: any[], iconNav?: any[] }) =>
+		request<{ message: string }>('/nav/save', {
+			method: 'POST',
+			body: JSON.stringify(data),
+		}),
+
+	// 挂件管理
+	getWidgets: () => request<WidgetConfigData>('/widgets'),
+	saveWidgets: (data: any) =>
+		request<{ message: string }>('/widgets/save', {
+			method: 'POST',
+			body: JSON.stringify(data),
+		}),
+
+	// 站点身份与品牌工坊
+	getSiteInfo: () => request<SiteInfoData>('/site-info'),
+	saveSiteInfo: (data: Partial<SiteInfoData>) =>
+		request<{ message: string }>('/site-info/save', {
+			method: 'POST',
+			body: JSON.stringify(data),
+		}),
+
+	// 主题外观与排版工坊
+	getAppearance: () => request<AppearanceConfigData>('/appearance'),
+	saveAppearance: (data: Partial<AppearanceConfigData>) =>
+		request<{ message: string }>('/appearance/save', {
+			method: 'POST',
+			body: JSON.stringify(data),
 		}),
 
 	// 友链管理
@@ -143,7 +215,15 @@ export const adminApi = {
 			body: JSON.stringify({ path: assetPath }),
 		}),
 
-	// 系统与运维
+	// 系统与备份与审计
+	getAuditLogs: () => request<AuditLogItem[]>('/system/audit-logs'),
+	getBackup: () => request<any>('/system/backup'),
+	restoreBackup: (backup: any) =>
+		request<{ message: string }>('/system/restore', {
+			method: 'POST',
+			body: JSON.stringify({ backup }),
+		}),
+	checkIntegrity: () => request<IntegrityCheckResult>('/system/integrity-check'),
 	getGitStatus: () => request<GitStatusData>('/system/git'),
 	createBuildEventSource: () => {
 		return new EventSource(`${API_BASE}/system/build-stream`)

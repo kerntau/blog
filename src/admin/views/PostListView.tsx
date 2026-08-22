@@ -130,11 +130,15 @@ export const PostListView: React.FC<PostListViewProps> = ({ onEditPost, onNewPos
 		}
 	}
 
+	const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all')
+
 	const categories = Array.from(new Set(posts.flatMap(p => p.categories || []))).filter(Boolean)
 	const years = Array.from(new Set(posts.map(p => p.date?.slice(0, 4)).filter(Boolean))).sort().reverse()
 
 	const filteredPosts = posts
 		.filter((p) => {
+			if (statusFilter === 'published' && p.draft) return false
+			if (statusFilter === 'draft' && !p.draft) return false
 			if (search) {
 				const q = search.toLowerCase()
 				const matchTitle = p.title.toLowerCase().includes(q)
@@ -158,6 +162,11 @@ export const PostListView: React.FC<PostListViewProps> = ({ onEditPost, onNewPos
 			if (sortBy === 'wordCount') return b.wordCount - a.wordCount
 			return 0
 		})
+
+	const handleCopyPath = (relPath: string) => {
+		navigator.clipboard.writeText(relPath)
+		showToast(`已复制路径: ${relPath}`, 'info')
+	}
 
 	const handleSelectAll = (checked: boolean) => {
 		if (checked) {
@@ -201,7 +210,35 @@ export const PostListView: React.FC<PostListViewProps> = ({ onEditPost, onNewPos
 					</div>
 
 					{/* 筛选与排序 */}
-					<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+					<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+						{/* 状态快捷胶囊 */}
+						<div style={{ display: 'flex', background: 'var(--admin-bg-subtle)', padding: 2, borderRadius: 6, border: '1px solid var(--admin-border)', gap: 2 }}>
+							<button
+								type="button"
+								className={`admin-btn ${statusFilter === 'all' ? 'btn-primary' : 'btn-ghost'} btn-sm`}
+								onClick={() => setStatusFilter('all')}
+								style={{ height: 24, fontSize: 11, padding: '0 8px' }}
+							>
+								全部 ({posts.length})
+							</button>
+							<button
+								type="button"
+								className={`admin-btn ${statusFilter === 'published' ? 'btn-primary' : 'btn-ghost'} btn-sm`}
+								onClick={() => setStatusFilter('published')}
+								style={{ height: 24, fontSize: 11, padding: '0 8px' }}
+							>
+								已发布 ({posts.filter(p => !p.draft).length})
+							</button>
+							<button
+								type="button"
+								className={`admin-btn ${statusFilter === 'draft' ? 'btn-primary' : 'btn-ghost'} btn-sm`}
+								onClick={() => setStatusFilter('draft')}
+								style={{ height: 24, fontSize: 11, padding: '0 8px' }}
+							>
+								草稿 ({posts.filter(p => p.draft).length})
+							</button>
+						</div>
+
 						<select
 							className="admin-select"
 							value={selectedCategory}
@@ -401,6 +438,15 @@ export const PostListView: React.FC<PostListViewProps> = ({ onEditPost, onNewPos
 							</div>
 
 							<div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+								<button
+									type="button"
+									className="admin-btn btn-ghost btn-sm"
+									title="复制相对路径"
+									onClick={() => handleCopyPath(post.relativePath)}
+								>
+									<Icon icon="tabler:copy" style={{ fontSize: 14 }} />
+								</button>
+
 								<button
 									type="button"
 									className="admin-btn btn-secondary btn-sm"

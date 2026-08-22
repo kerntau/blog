@@ -32,6 +32,13 @@ const SNIPPETS: MdcSnippet[] = [
 		template: `:badge[标签内容]{color="#33aaff"}`,
 	},
 	{
+		name: 'blur',
+		label: '模糊文字 (Blur)',
+		icon: 'tabler:eye-off',
+		desc: '鼠标悬停或点击后解除模糊',
+		template: `::blur\n这里是被模糊隐藏的剧透或敏感内容\n::\n`,
+	},
+	{
 		name: 'folding',
 		label: '折叠内容 (Folding)',
 		icon: 'tabler:chevron-down',
@@ -60,6 +67,13 @@ const SNIPPETS: MdcSnippet[] = [
 		template: `::chat{name="AI Assistant" avatar="/avatar.png" role="left"}\n你好！有什么我可以协助你的吗？\n::\n`,
 	},
 	{
+		name: 'pic',
+		label: '高级图片画廊 (Pic)',
+		icon: 'tabler:photo',
+		desc: '支持阴影、圆角、标题与并排画廊',
+		template: `::pic{src="/og-image.jpg" caption="图片说明文字" width="100%"}\n`,
+	},
+	{
 		name: 'music-score',
 		label: '简谱/五线谱 (Music)',
 		icon: 'tabler:music',
@@ -72,6 +86,13 @@ const SNIPPETS: MdcSnippet[] = [
 		icon: 'tabler:external-link',
 		desc: '高质感外链卡片',
 		template: `::link-card{title="示例网站" link="https://example.com" desc="这是一个很有价值的技术站点" icon="tabler:world"}\n`,
+	},
+	{
+		name: 'link-banner',
+		label: '大型外链横幅 (LinkBanner)',
+		icon: 'tabler:layout-bottombar',
+		desc: '带大图封面的推荐外链 Banner',
+		template: `::link-banner{title="推荐阅读" link="https://example.com" desc="深入解析现代前端架构" image="/og-image.jpg"}\n`,
 	},
 	{
 		name: 'poetry',
@@ -96,10 +117,17 @@ const SNIPPETS: MdcSnippet[] = [
 	},
 	{
 		name: 'copy',
-		label: '一键复制 Copy',
+		label: '一键复制 (Copy)',
 		icon: 'tabler:copy',
-		desc: '互动',
+		desc: '带复制按钮的互动文本',
 		template: `:copy[pnpm install]`,
+	},
+	{
+		name: 'emoji-clock',
+		label: 'Emoji 时钟 (EmojiClock)',
+		icon: 'tabler:clock',
+		desc: '根据时间动态渲染 Emoji 表盘',
+		template: `:emoji-clock{time="14:30"}`,
 	},
 	{
 		name: 'quote',
@@ -114,6 +142,13 @@ const SNIPPETS: MdcSnippet[] = [
 		icon: 'tabler:grid-dots',
 		desc: '多列响应式卡片网格',
 		template: `::card-list\n- [核心功能](/link): 支持实时预览与快速发布\n- [智能嗅探](/link): 自动抓取站点元数据\n- [本地安全](/link): 文件系统原子级写入\n::\n`,
+	},
+	{
+		name: 'md-title',
+		label: '带图标大标题 (MdTitle)',
+		icon: 'tabler:heading',
+		desc: '带自定义图标的文章分节标题',
+		template: `::md-title{title="架构设计" icon="tabler:stack-2" level="2"}\n`,
 	},
 ]
 
@@ -138,10 +173,10 @@ export const MdcSnippetsPicker: React.FC<MdcSnippetsPickerProps> = ({ onInsert }
 				type="button"
 				className="admin-btn btn-secondary btn-sm"
 				onClick={() => setIsOpen(!isOpen)}
-				style={{ gap: 6, borderColor: 'var(--c-primary-soft)' }}
+				style={{ gap: 6 }}
 			>
-				<Icon icon="tabler:components" style={{ color: 'var(--c-primary)' }} />
-				<span>插入 MDC 短代码 / 特色组件</span>
+				<Icon icon="tabler:components" style={{ color: 'var(--admin-accent)' }} />
+				<span>插入 MDX 富文本组件 ({SNIPPETS.length})</span>
 				<Icon icon={isOpen ? 'tabler:chevron-up' : 'tabler:chevron-down'} style={{ fontSize: 12 }} />
 			</button>
 
@@ -152,39 +187,39 @@ export const MdcSnippetsPicker: React.FC<MdcSnippetsPickerProps> = ({ onInsert }
 						onClick={() => setIsOpen(false)}
 					/>
 					<div
-						className="glass-card"
+						className="admin-card"
 						style={{
 							position: 'absolute',
 							top: '100%',
 							left: 0,
-							marginTop: 8,
-							width: 360,
+							marginTop: 6,
+							width: 380,
 							maxHeight: 460,
 							zIndex: 95,
-							padding: 12,
+							padding: 10,
 							display: 'flex',
 							flexDirection: 'column',
 							gap: 8,
-							boxShadow: '0 16px 40px rgba(0,0,0,0.3)',
+							boxShadow: '0 16px 40px rgba(0,0,0,0.25)',
 						}}
 					>
 						<div style={{ position: 'relative' }}>
 							<input
 								type="text"
 								className="admin-input"
-								placeholder="搜索 MDC 组件 (如 alert, tab, chat)..."
+								placeholder="搜索组件 (如 alert, pic, tab, chat, timeline)..."
 								value={search}
 								onChange={e => setSearch(e.target.value)}
-								style={{ paddingLeft: 32, fontSize: 13, height: 36 }}
+								style={{ paddingLeft: 30, fontSize: 12, height: 32 }}
 								autoFocus
 							/>
 							<Icon
 								icon="tabler:search"
-								style={{ position: 'absolute', left: 10, top: 10, color: 'var(--c-text-3)' }}
+								style={{ position: 'absolute', left: 9, top: 8, color: 'var(--admin-text-3)', fontSize: 14 }}
 							/>
 						</div>
 
-						<div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 380 }}>
+						<div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: 3, maxHeight: 360 }}>
 							{filtered.map(s => (
 								<div
 									key={s.name}
@@ -193,36 +228,36 @@ export const MdcSnippetsPicker: React.FC<MdcSnippetsPickerProps> = ({ onInsert }
 										setIsOpen(false)
 									}}
 									style={{
-										padding: '8px 10px',
-										borderRadius: 8,
+										padding: '6px 8px',
+										borderRadius: 6,
 										cursor: 'pointer',
 										display: 'flex',
 										alignItems: 'center',
 										gap: 10,
-										transition: 'background 0.2s',
+										transition: 'background 0.15s ease',
 									}}
-									onMouseEnter={e => e.currentTarget.style.background = 'var(--c-bg-soft)'}
+									onMouseEnter={e => e.currentTarget.style.background = 'var(--admin-surface-hover)'}
 									onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
 								>
 									<div
 										style={{
-											width: 32,
-											height: 32,
-											borderRadius: 8,
-											background: 'var(--c-primary-soft)',
-											color: 'var(--c-primary)',
+											width: 28,
+											height: 28,
+											borderRadius: 6,
+											background: 'var(--admin-accent-soft)',
+											color: 'var(--admin-accent)',
 											display: 'flex',
 											alignItems: 'center',
 											justifyContent: 'center',
-											fontSize: 18,
+											fontSize: 16,
 											flexShrink: 0,
 										}}
 									>
 										<Icon icon={s.icon} />
 									</div>
 									<div style={{ flex: 1, minWidth: 0 }}>
-										<div style={{ fontSize: 13, fontWeight: 600 }}>{s.label}</div>
-										<div style={{ fontSize: 11, color: 'var(--c-text-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+										<div style={{ fontSize: 12, fontWeight: 600, color: 'var(--admin-text-1)' }}>{s.label}</div>
+										<div style={{ fontSize: 11, color: 'var(--admin-text-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
 											{s.desc}
 										</div>
 									</div>

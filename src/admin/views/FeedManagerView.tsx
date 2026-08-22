@@ -5,6 +5,7 @@ import type { FeedGroup, FeedItem, SniffResult } from '../types'
 import { FeedCheckModal } from '../components/FeedCheckModal'
 import { OpmlImportModal } from '../components/OpmlImportModal'
 import { useToast } from '../components/Toast'
+import FeedCard from '../../components/content/FeedCard'
 
 export const FeedManagerView: React.FC = () => {
 	const { showToast } = useToast()
@@ -732,6 +733,24 @@ export const FeedManagerView: React.FC = () => {
 									placeholder="如：技术博客"
 									value={editingItem.comment || ''}
 									onChange={e => setEditingItem({ ...editingItem, comment: e.target.value })}
+								/>
+							</div>
+
+							{/* 前台真实 FeedCard 实时预览 */}
+							<div style={{ marginTop: 4, padding: '10px 12px', background: 'var(--admin-bg)', borderRadius: 8, border: '1px solid var(--admin-border)' }}>
+								<div style={{ fontSize: 11, fontWeight: 600, color: 'var(--admin-text-3)', marginBottom: 8 }}>前台 FeedCard 实时效果预览:</div>
+								<FeedCard
+									author={editingItem.author || '新博友'}
+									sitenick={editingItem.sitenick}
+									title={editingItem.title}
+									desc={editingItem.desc}
+									link={editingItem.link || 'https://example.com'}
+									avatar={editingItem.avatar || ''}
+									icon={editingItem.icon || ''}
+									feed={editingItem.feed}
+									archs={editingItem.archs as any}
+									date={editingItem.date || ''}
+									comment={editingItem.comment}
 								/>
 							</div>
 						</div>

@@ -478,6 +478,133 @@ html.dark {
 		color: var(--admin-danger);
 		border: 1px solid rgba(239, 68, 68, 0.15);
 	}
+
+	&.badge-secondary {
+		background: var(--admin-bg-subtle);
+		color: var(--admin-text-3);
+		border: 1px solid var(--admin-border);
+	}
+}
+
+// iOS 风格滑动开关 (Switch)
+.admin-switch {
+	position: relative;
+	display: inline-block;
+	width: 36px;
+	height: 20px;
+	flex-shrink: 0;
+
+	input {
+		opacity: 0;
+		width: 0;
+		height: 0;
+
+		&:checked + .switch-slider {
+			background-color: var(--admin-accent);
+
+			&:before {
+				transform: translateX(16px);
+			}
+		}
+	}
+
+	.switch-slider {
+		position: absolute;
+		cursor: pointer;
+		inset: 0;
+		background-color: var(--admin-border);
+		transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+		border-radius: 20px;
+
+		&:before {
+			position: absolute;
+			content: "";
+			height: 14px;
+			width: 14px;
+			left: 3px;
+			bottom: 3px;
+			background-color: white;
+			transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+			border-radius: 50%;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+		}
+	}
+}
+
+// 色盘预设圆点
+.color-preset-dot {
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	cursor: pointer;
+	border: 2px solid transparent;
+	transition: transform 0.15s ease, border-color 0.15s ease;
+
+	&:hover {
+		transform: scale(1.18);
+	}
+
+	&.active {
+		border-color: var(--admin-text-1);
+		transform: scale(1.1);
+	}
+}
+
+// 状态呼吸灯
+.pulse-indicator {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	display: inline-block;
+	position: relative;
+
+	&.online {
+		background: var(--admin-success);
+		box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+		animation: pulseGreen 2s infinite;
+	}
+
+	&.dirty {
+		background: var(--admin-warning);
+		box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+		animation: pulseYellow 2s infinite;
+	}
+}
+
+@keyframes pulseGreen {
+	0% {
+		box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+	}
+	70% {
+		box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+	}
+}
+
+@keyframes pulseYellow {
+	0% {
+		box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6);
+	}
+	70% {
+		box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+	}
+}
+
+// 快捷键 KBD 样式
+kbd.admin-kbd {
+	font-family: var(--admin-font-mono);
+	font-size: 11px;
+	background: var(--admin-surface);
+	border: 1px solid var(--admin-border);
+	border-radius: 4px;
+	padding: 1px 5px;
+	color: var(--admin-text-2);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 // 模态弹窗 (Modal)
@@ -605,5 +732,47 @@ html.dark {
 
 	&:hover {
 		background: var(--admin-text-3);
+	}
+}
+
+// 响应式移动端与平板适配
+.mobile-only {
+	display: none !important;
+}
+
+@media (max-width: 768px) {
+	.mobile-only {
+		display: inline-flex !important;
+	}
+
+	.admin-sidebar {
+		position: fixed;
+		left: -240px;
+		top: 0;
+		bottom: 0;
+		width: 230px;
+		transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+		z-index: 100;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+		&.open {
+			left: 0;
+		}
+	}
+
+	.admin-main {
+		width: 100vw;
+	}
+
+	.admin-topbar {
+		padding: 0 12px;
+
+		.page-title {
+			font-size: 13px;
+		}
+	}
+
+	.admin-content {
+		padding: 10px;
 	}
 }

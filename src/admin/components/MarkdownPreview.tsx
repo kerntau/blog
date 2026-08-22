@@ -1,195 +1,183 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { Icon } from '@iconify/react'
+import { adminApi } from '../api'
+import { renderCompiledMdx } from '../../lib/mdx'
+import PostHeader from '../../components/post/PostHeader'
+import PostFooter from '../../components/post/PostFooter'
+import PostExcerpt from '../../components/post/PostExcerpt'
+import { getPostTypeClassName } from '../../utils/article'
+import type { ArticleProps } from '../../types/article'
 
 interface MarkdownPreviewProps {
 	content: string
+	frontmatter?: Partial<ArticleProps>
+	showChrome?: boolean
 }
 
-export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content }) => {
-	// 100ms 优雅轻量防抖，提升长文本打字时的交互帧率
+export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
+	content,
+	frontmatter = {},
+	showChrome = true,
+}) => {
 	const [debouncedContent, setDebouncedContent] = useState(content)
+	const [compiledCode, setCompiledCode] = useState<string>('')
+	const [compileError, setCompileError] = useState<string | null>(null)
+	const [compiling, setCompiling] = useState(false)
+	const latestReqId = useRef(0)
 
+	// 150ms 防抖更新
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setDebouncedContent(content)
-		}, 100)
+		}, 150)
 		return () => clearTimeout(timer)
 	}, [content])
 
-	// 轻量高效 Markdown / MDC 快速解析器，供双栏实时预览使用
-	const renderContent = (raw: string) => {
-		const lines = raw.split('\n')
-		const elements: React.ReactNode[] = []
-		let inCodeBlock = false
-		let codeLang = ''
-		let codeBuffer: string[] = []
-
-		let inMdcBlock = false
-		let mdcType = ''
-		let mdcBuffer: string[] = []
-
-		for (let i = 0; i < lines.length; i++) {
-			const line = lines[i]!
-
-			// 代码块判定
-			if (line.startsWith('```')) {
-				if (!inCodeBlock) {
-					inCodeBlock = true
-					codeLang = line.slice(3).trim()
-					codeBuffer = []
-				}
-				else {
-					inCodeBlock = false
-					elements.push(
-						<div
-							key={`code-${i}`}
-							style={{
-								background: '#0d1117',
-								border: '1px solid var(--admin-border)',
-								borderRadius: 6,
-								margin: '10px 0',
-								overflow: 'hidden',
-							}}
-						>
-							{codeLang && (
-								<div
-									style={{
-										padding: '4px 10px',
-										fontSize: 11,
-										color: '#8b949e',
-										background: '#161b22',
-										borderBottom: '1px solid #30363d',
-										fontWeight: 600,
-										fontFamily: 'var(--admin-font-mono)',
-									}}
-								>
-									{codeLang}
-								</div>
-							)}
-							<pre style={{ margin: 0, padding: 10, overflowX: 'auto', fontSize: 12, lineHeight: 1.5, color: '#c9d1d9', fontFamily: 'var(--admin-font-mono)' }}>
-								<code>{codeBuffer.join('\n')}</code>
-							</pre>
-						</div>,
-					)
-				}
-				continue
-			}
-
-			if (inCodeBlock) {
-				codeBuffer.push(line)
-				continue
-			}
-
-			// MDC 自定义块判定 (::alert, ::folding, ::timeline 等)
-			if (line.startsWith('::') && !line.startsWith(':: ')) {
-				const match = line.match(/^::([\w-]+)/)
-				if (match) {
-					inMdcBlock = true
-					mdcType = match[1] || 'block'
-					mdcBuffer = []
-					continue
-				}
-			}
-
-			if (inMdcBlock) {
-				if (/^::\s*$/.test(line)) {
-					inMdcBlock = false
-					elements.push(
-						<div
-							key={`mdc-${i}`}
-							style={{
-								borderLeft: '3px solid var(--admin-accent)',
-								background: 'var(--admin-accent-soft)',
-								padding: '8px 12px',
-								borderRadius: '0 6px 6px 0',
-								margin: '10px 0',
-							}}
-						>
-							<div style={{ fontSize: 11, fontWeight: 700, color: 'var(--admin-accent)', marginBottom: 4, textTransform: 'uppercase' }}>
-								MDC 组件: {mdcType}
-							</div>
-							<div style={{ fontSize: 12, color: 'var(--admin-text-1)', whiteSpace: 'pre-wrap' }}>
-								{mdcBuffer.join('\n')}
-							</div>
-						</div>,
-					)
-					continue
-				}
-				mdcBuffer.push(line)
-				continue
-			}
-
-			// 图片渲染
-			const imgMatch = line.match(/^!\[(.*?)\]\((.*?)\)/)
-			if (imgMatch) {
-				elements.push(
-					<div key={`img-${i}`} style={{ margin: '10px 0', textAlign: 'center' }}>
-						<img
-							src={imgMatch[2]}
-							alt={imgMatch[1]}
-							style={{ maxWidth: '100%', maxHeight: 300, objectFit: 'contain', borderRadius: 6, border: '1px solid var(--admin-border)' }}
-						/>
-						{imgMatch[1] && <div style={{ fontSize: 11, color: 'var(--admin-text-3)', marginTop: 4 }}>{imgMatch[1]}</div>}
-					</div>,
-				)
-				continue
-			}
-
-			// 标题判定
-			if (line.startsWith('# ')) {
-				elements.push(<h1 key={i} style={{ fontSize: 18, fontWeight: 700, margin: '16px 0 8px', borderBottom: '1px solid var(--admin-border)', paddingBottom: 6 }}>{line.slice(2)}</h1>)
-			}
-			else if (line.startsWith('## ')) {
-				elements.push(<h2 key={i} style={{ fontSize: 15, fontWeight: 700, margin: '14px 0 6px' }}>{line.slice(3)}</h2>)
-			}
-			else if (line.startsWith('### ')) {
-				elements.push(<h3 key={i} style={{ fontSize: 13, fontWeight: 600, margin: '12px 0 4px' }}>{line.slice(4)}</h3>)
-			}
-			else if (line.startsWith('- ')) {
-				elements.push(
-					<li key={i} style={{ marginLeft: 18, marginBlock: 2, fontSize: 12, color: 'var(--admin-text-1)' }}>
-						{line.slice(2)}
-					</li>,
-				)
-			}
-			else if (line.startsWith('> ')) {
-				elements.push(
-					<blockquote
-						key={i}
-						style={{
-							margin: '8px 0',
-							padding: '6px 10px',
-							borderLeft: '3px solid var(--admin-text-3)',
-							background: 'var(--admin-bg-subtle)',
-							color: 'var(--admin-text-2)',
-							borderRadius: '0 4px 4px 0',
-							fontSize: 12,
-						}}
-					>
-						{line.slice(2)}
-					</blockquote>,
-				)
-			}
-			else if (line.trim()) {
-				elements.push(
-					<p key={i} style={{ margin: '6px 0', fontSize: 12, lineHeight: 1.6, color: 'var(--admin-text-1)' }}>
-						{line}
-					</p>,
-				)
-			}
+	// 触发后端同源 MDX 编译管道
+	useEffect(() => {
+		if (!debouncedContent.trim()) {
+			setCompiledCode('')
+			setCompileError(null)
+			return
 		}
 
-		return elements
-	}
+		const reqId = ++latestReqId.current
+		setCompiling(true)
+
+		adminApi.compilePostMdx(debouncedContent, frontmatter.title)
+			.then((res) => {
+				if (reqId === latestReqId.current) {
+					if (res && res.compiledCode) {
+						setCompiledCode(res.compiledCode)
+						setCompileError(null)
+					}
+					else {
+						setCompiledCode('')
+					}
+				}
+			})
+			.catch((err) => {
+				if (reqId === latestReqId.current) {
+					setCompileError(err.message || 'MDX 编译异常')
+				}
+			})
+			.finally(() => {
+				if (reqId === latestReqId.current) {
+					setCompiling(false)
+				}
+			})
+	}, [debouncedContent, frontmatter.title])
+
+	// 使用前台同源 renderCompiledMdx 运行 React JSX runner
+	const renderedMdxContent = renderCompiledMdx(compiledCode, debouncedContent)
+
+	const postTypeClass = getPostTypeClassName(frontmatter.type, { prefix: 'md' })
 
 	return (
-		<div style={{ height: '100%', overflowY: 'auto', padding: 16, lineHeight: 1.5 }}>
-			{debouncedContent.trim() ? (
-				renderContent(debouncedContent)
-			) : (
-				<div style={{ color: 'var(--admin-text-3)', textAlign: 'center', marginTop: 60, fontSize: 12 }}>
-					暂无预览内容，在左侧输入 Markdown 正文...
+		<div className="admin-live-preview-container" style={{ position: 'relative', width: '100%', minHeight: '100%' }}>
+			{/* 编译中与错误指示微标 */}
+			<div
+				style={{
+					position: 'sticky',
+					top: 8,
+					right: 8,
+					zIndex: 10,
+					display: 'flex',
+					justifyContent: 'flex-end',
+					pointerEvents: 'none',
+					paddingRight: 10,
+				}}
+			>
+				{compiling && (
+					<div
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							gap: 4,
+							background: 'var(--admin-surface)',
+							border: '1px solid var(--admin-border)',
+							padding: '3px 8px',
+							borderRadius: 12,
+							fontSize: 11,
+							color: 'var(--admin-text-3)',
+							boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)',
+						}}
+					>
+						<Icon icon="tabler:loader-2" style={{ animation: 'spin 1s linear infinite' }} />
+						<span>同源编译中...</span>
+					</div>
+				)}
+			</div>
+
+			{/* MDX 语法错误横条 */}
+			{compileError && (
+				<div
+					style={{
+						margin: '8px 16px',
+						padding: '8px 12px',
+						background: 'var(--admin-danger-soft)',
+						border: '1px solid var(--admin-danger)',
+						borderRadius: 6,
+						color: 'var(--admin-danger)',
+						fontSize: 12,
+					}}
+				>
+					<div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
+						<Icon icon="tabler:alert-triangle" />
+						<span>MDX 语法解析提示（正在展示回退视图）</span>
+					</div>
+					<div style={{ marginTop: 4, fontSize: 11, fontFamily: 'var(--admin-font-mono)' }}>
+						{compileError}
+					</div>
 				</div>
 			)}
+
+			{/* 前台真实文章容器 (100% 像素级复用) */}
+			<div style={{ padding: '24px 20px', maxWidth: 840, margin: '0 auto', width: '100%' }}>
+				{showChrome && (
+					<>
+						{/* 真实 PostHeader */}
+						<PostHeader
+							path={frontmatter.path || ''}
+							title={frontmatter.title || '文章标题'}
+							date={frontmatter.date}
+							updated={frontmatter.updated}
+							categories={frontmatter.categories}
+							tags={frontmatter.tags}
+							readingTime={{
+								text: `${Math.ceil(debouncedContent.length / 400)} min read`,
+								minutes: Math.ceil(debouncedContent.length / 400),
+								time: Math.ceil(debouncedContent.length / 400) * 60000,
+								words: debouncedContent.length,
+							}}
+							image={frontmatter.image}
+						/>
+
+						{/* 真实 PostExcerpt */}
+						{frontmatter.description && (
+							<PostExcerpt excerpt={frontmatter.description} />
+						)}
+					</>
+				)}
+
+				{/* 真实 PostArticle 样式上下文 */}
+				<article className={`article ${postTypeClass}`} style={{ marginTop: showChrome ? 16 : 0 }}>
+					{renderedMdxContent}
+				</article>
+
+				{showChrome && frontmatter.title && (
+					<div style={{ marginTop: 32 }}>
+						<PostFooter
+							path={frontmatter.path || ''}
+							title={frontmatter.title}
+							date={frontmatter.date}
+							updated={frontmatter.updated}
+							categories={frontmatter.categories}
+							tags={frontmatter.tags}
+						/>
+					</div>
+				)}
+			</div>
 		</div>
 	)
 }

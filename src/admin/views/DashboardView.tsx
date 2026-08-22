@@ -4,6 +4,8 @@ import { adminApi } from '../api'
 import type { GitStatusData, PostMeta, StatsData } from '../types'
 import { useToast } from '../components/Toast'
 
+import appConfig from '../../app.config'
+
 interface DashboardViewProps {
 	onNavigate: (tab: string, params?: any) => void
 }
@@ -15,17 +17,35 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 	const [recentPosts, setRecentPosts] = useState<PostMeta[]>([])
 	const [loading, setLoading] = useState(true)
 
+	// 统一博主身份与头像数据源
+	const [authorProfile, setAuthorProfile] = useState({
+		name: appConfig.author.name || 'kerntau',
+		avatar: appConfig.author.avatar || '/avatar.webp',
+		title: appConfig.title || 'kerntau',
+		subtitle: appConfig.subtitle || '',
+	})
+
 	const loadData = async () => {
 		setLoading(true)
 		try {
-			const [statsData, gitData, postsData] = await Promise.all([
+			const [statsData, gitData, postsData, siteInfoData] = await Promise.all([
 				adminApi.getStats(),
 				adminApi.getGitStatus().catch(() => null),
 				adminApi.getPosts().catch(() => []),
+				adminApi.getSiteInfo().catch(() => null),
 			])
 			setStats(statsData)
 			setGitStatus(gitData)
-			setRecentPosts(postsData.slice(0, 5))
+			setRecentPosts(postsData.slice(0, 6))
+
+			if (siteInfoData && siteInfoData.authorAvatar) {
+				setAuthorProfile({
+					name: siteInfoData.authorName || appConfig.author.name,
+					avatar: siteInfoData.authorAvatar || appConfig.author.avatar,
+					title: siteInfoData.title || appConfig.title,
+					subtitle: siteInfoData.subtitle || appConfig.subtitle,
+				})
+			}
 		}
 		catch (err: any) {
 			showToast(`加载仪表盘数据失败: ${err.message}`, 'error')
@@ -48,6 +68,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 	}
 
 	const totalPosts = stats?.postCount || 0
+	const publishedCount = stats?.publishedCount || (totalPosts - (stats?.draftCount || 0))
+	const draftCount = stats?.draftCount || 0
 	const totalWords = stats?.totalWords || 0
 	const totalFriends = stats?.friendCount || 0
 	const totalCategories = stats?.categoryCount || 0
@@ -58,28 +80,64 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column', gap: 14, width: '100%' }}>
-			{/* 顶部紧凑操作卡 */}
+			{/* 顶部：原生博主身份与站点运行横幅 */}
 			<div
 				className="admin-card"
 				style={{
-					padding: '12px 16px',
+					padding: '20px 24px',
+					background: 'var(--admin-surface)',
+					position: 'relative',
+					overflow: 'hidden',
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'space-between',
 					flexWrap: 'wrap',
-					gap: 10,
+					gap: 16,
 				}}
 			>
-				<div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-					<div style={{ fontSize: 14, fontWeight: 600, color: 'var(--admin-text-1)' }}>
-						博客内容控制台
-					</div>
-					<div style={{ fontSize: 11, color: 'var(--admin-text-3)', borderLeft: '1px solid var(--admin-border)', paddingLeft: 12 }}>
-						最近更新：{stats?.lastUpdated || '无记录'}
+				{/* 装饰性背景微光 */}
+				<div
+					style={{
+						position: 'absolute',
+						right: -40,
+						top: -40,
+						width: 220,
+						height: 220,
+						background: 'var(--admin-accent-soft)',
+						borderRadius: '50%',
+						filter: 'blur(40px)',
+						pointerEvents: 'none',
+					}}
+				/>
+
+				<div style={{ display: 'flex', alignItems: 'center', gap: 16, zIndex: 1 }}>
+					<img
+						src={authorProfile.avatar}
+						alt={authorProfile.name}
+						style={{
+							width: 56,
+							height: 56,
+							borderRadius: '50%',
+							objectFit: 'cover',
+							border: '2px solid var(--admin-accent)',
+							boxShadow: '0 0 16px var(--admin-accent-soft)',
+						}}
+						onError={e => (e.currentTarget.src = '/favicon.ico')}
+					/>
+					<div>
+						<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+							<span style={{ fontSize: 18, fontWeight: 700, color: 'var(--admin-text-1)', letterSpacing: '-0.02em' }}>
+								{authorProfile.name} 的内容管理工坊
+							</span>
+							<span className="admin-badge badge-primary">Local CMS</span>
+						</div>
+						<div style={{ fontSize: 12, color: 'var(--admin-text-3)', marginTop: 4 }}>
+							欢迎回来！所有内容编辑均支持前台像素级同源实时渲染与原子备份。
+						</div>
 					</div>
 				</div>
 
-				<div style={{ display: 'flex', gap: 6 }}>
+				<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', zIndex: 1 }}>
 					<button
 						type="button"
 						className="admin-btn btn-primary btn-sm"
@@ -91,33 +149,49 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 					<button
 						type="button"
 						className="admin-btn btn-secondary btn-sm"
-						onClick={() => onNavigate('console')}
+						onClick={() => onNavigate('preview-center')}
 					>
-						<Icon icon="tabler:player-play" />
-						<span>构建刷新</span>
+						<Icon icon="tabler:device-laptop" />
+						<span>预览中心</span>
+					</button>
+					<button
+						type="button"
+						className="admin-btn btn-secondary btn-sm"
+						onClick={() => onNavigate('seo')}
+					>
+						<Icon icon="tabler:world-cog" />
+						<span>站点与头像</span>
+					</button>
+					<button
+						type="button"
+						className="admin-btn btn-secondary btn-sm"
+						onClick={() => onNavigate('backup')}
+					>
+						<Icon icon="tabler:database" />
+						<span>全量快照</span>
 					</button>
 				</div>
 			</div>
 
-			{/* 5 格横向饱满指标网格 */}
-			<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
+			{/* 6 格横向饱满指标网格 */}
+			<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10 }}>
 				<div className="admin-card" style={{ padding: '12px 14px' }}>
 					<div style={{ fontSize: 11, color: 'var(--admin-text-3)', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-						<span>全部博文</span>
-						<Icon icon="tabler:file-text" style={{ fontSize: 14 }} />
+						<span>已发布博文</span>
+						<Icon icon="tabler:file-text" style={{ fontSize: 14, color: 'var(--admin-success)' }} />
 					</div>
 					<div style={{ fontSize: 20, fontWeight: 700, marginTop: 4, color: 'var(--admin-text-1)', letterSpacing: '-0.02em' }}>
-						{totalPosts.toLocaleString()}
+						{publishedCount.toLocaleString()}
 					</div>
 					<div style={{ fontSize: 10, color: 'var(--admin-text-4)', marginTop: 2 }}>
-						跨越 {yearEntries.length} 个年份
+						草稿箱 {draftCount} 篇
 					</div>
 				</div>
 
 				<div className="admin-card" style={{ padding: '12px 14px' }}>
 					<div style={{ fontSize: 11, color: 'var(--admin-text-3)', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 						<span>全站字数</span>
-						<Icon icon="tabler:writing" style={{ fontSize: 14 }} />
+						<Icon icon="tabler:writing" style={{ fontSize: 14, color: 'var(--admin-accent)' }} />
 					</div>
 					<div style={{ fontSize: 20, fontWeight: 700, marginTop: 4, color: 'var(--admin-text-1)', letterSpacing: '-0.02em' }}>
 						{totalWords.toLocaleString()}
@@ -130,7 +204,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 				<div className="admin-card" style={{ padding: '12px 14px' }}>
 					<div style={{ fontSize: 11, color: 'var(--admin-text-3)', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 						<span>友链订阅</span>
-						<Icon icon="tabler:users-group" style={{ fontSize: 14 }} />
+						<Icon icon="tabler:users-group" style={{ fontSize: 14, color: '#33bbaa' }} />
 					</div>
 					<div style={{ fontSize: 20, fontWeight: 700, marginTop: 4, color: 'var(--admin-text-1)', letterSpacing: '-0.02em' }}>
 						{totalFriends.toLocaleString()}
@@ -143,26 +217,39 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 				<div className="admin-card" style={{ padding: '12px 14px' }}>
 					<div style={{ fontSize: 11, color: 'var(--admin-text-3)', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 						<span>分类专栏</span>
-						<Icon icon="tabler:category" style={{ fontSize: 14 }} />
+						<Icon icon="tabler:category" style={{ fontSize: 14, color: '#ffaa33' }} />
 					</div>
 					<div style={{ fontSize: 20, fontWeight: 700, marginTop: 4, color: 'var(--admin-text-1)', letterSpacing: '-0.02em' }}>
 						{totalCategories}
 					</div>
 					<div style={{ fontSize: 10, color: 'var(--admin-text-4)', marginTop: 2 }}>
-						覆盖各个技术领域
+						专属颜色与图标定义
 					</div>
 				</div>
 
 				<div className="admin-card" style={{ padding: '12px 14px' }}>
 					<div style={{ fontSize: 11, color: 'var(--admin-text-3)', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 						<span>标签索引</span>
-						<Icon icon="tabler:tags" style={{ fontSize: 14 }} />
+						<Icon icon="tabler:tags" style={{ fontSize: 14, color: '#ff7733' }} />
 					</div>
 					<div style={{ fontSize: 20, fontWeight: 700, marginTop: 4, color: 'var(--admin-text-1)', letterSpacing: '-0.02em' }}>
 						{totalTags}
 					</div>
 					<div style={{ fontSize: 10, color: 'var(--admin-text-4)', marginTop: 2 }}>
-						知识图谱关联点
+						知识图谱关键词
+					</div>
+				</div>
+
+				<div className="admin-card" style={{ padding: '12px 14px' }}>
+					<div style={{ fontSize: 11, color: 'var(--admin-text-3)', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+						<span>本地数据健康</span>
+						<Icon icon="tabler:shield-check" style={{ fontSize: 14, color: 'var(--admin-success)' }} />
+					</div>
+					<div style={{ fontSize: 16, fontWeight: 700, marginTop: 4, color: 'var(--admin-success)', letterSpacing: '-0.02em' }}>
+						正常就绪
+					</div>
+					<div style={{ fontSize: 10, color: 'var(--admin-text-4)', marginTop: 2 }}>
+						已接入实时同源渲染
 					</div>
 				</div>
 			</div>
@@ -204,7 +291,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 				<div className="admin-card" style={{ padding: '14px 16px' }}>
 					<div style={{ fontSize: 12, fontWeight: 600, marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 						<span>分类权重占比</span>
-						<span style={{ fontSize: 11, color: 'var(--admin-text-3)' }}>共 {categoryEntries.length} 类</span>
+						<button
+							type="button"
+							className="admin-btn btn-ghost btn-sm"
+							onClick={() => onNavigate('categories')}
+							style={{ height: 20, fontSize: 11 }}
+						>
+							<span>管理分类</span>
+							<Icon icon="tabler:chevron-right" />
+						</button>
 					</div>
 					<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
 						{categoryEntries.slice(0, 6).map(([cat, count]) => {
@@ -273,6 +368,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 										<span>{p.date || '无日期'}</span>
 										<span>{p.categories?.[0] || '未分类'}</span>
 										<span>{p.wordCount} 字</span>
+										{p.draft && <span className="admin-badge badge-warning" style={{ fontSize: 9 }}>草稿</span>}
 									</div>
 								</div>
 								<Icon icon="tabler:edit" style={{ fontSize: 13, color: 'var(--admin-text-3)' }} />
@@ -281,55 +377,115 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 					</div>
 				</div>
 
-				{/* Git 状态 */}
+				{/* Git 工作区状态 */}
 				{gitStatus && (
-					<div className="admin-card" style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-						<div>
-							<div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-								<div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-									<Icon icon="tabler:git-branch" style={{ fontSize: 14 }} />
-									<span>Git 工作区状态</span>
-								</div>
-								<span className={`admin-badge ${gitStatus.hasChanges ? 'badge-warning' : 'badge-success'}`}>
-									{gitStatus.hasChanges ? `${gitStatus.changes.length} 处变更` : '工作区洁净'}
+					<div className="admin-card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+						<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+							<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+								<Icon icon="tabler:git-branch" style={{ fontSize: 16, color: 'var(--admin-accent)' }} />
+								<span style={{ fontSize: 13, fontWeight: 700, color: 'var(--admin-text-1)' }}>Git 工作区状态</span>
+								<span style={{ fontSize: 11, color: 'var(--admin-text-3)', fontFamily: 'var(--admin-font-mono)' }}>
+									{gitStatus.branch || 'main'}
 								</span>
 							</div>
+							<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+								<span className={`admin-badge ${gitStatus.hasChanges ? 'badge-warning' : 'badge-success'}`}>
+									{gitStatus.hasChanges ? `${gitStatus.changes.length} 项变更待提交` : '工作区整洁'}
+								</span>
+								<button
+									type="button"
+									className="admin-btn btn-ghost btn-sm"
+									style={{ padding: '2px 6px', height: 22, fontSize: 11 }}
+									onClick={() => onNavigate('console')}
+									title="前往运维控制台查看详情"
+								>
+									<span>前往提交</span>
+									<Icon icon="tabler:arrow-right" style={{ fontSize: 12 }} />
+								</button>
+							</div>
+						</div>
 
-							{gitStatus.hasChanges ? (
-								<div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, maxHeight: 110, overflowY: 'auto' }}>
-									{gitStatus.changes.map((c, i) => (
+						{gitStatus.hasChanges ? (
+							<div
+								style={{
+									display: 'flex',
+									flexDirection: 'column',
+									gap: 4,
+									maxHeight: 140,
+									overflowY: 'auto',
+									background: 'var(--admin-bg-subtle)',
+									padding: '6px 8px',
+									borderRadius: 6,
+									border: '1px solid var(--admin-border)',
+								}}
+							>
+								{gitStatus.changes.map((c, i) => {
+									const isMod = c.status.includes('M')
+									const isAdd = c.status.includes('A') || c.status.includes('?')
+									const isDel = c.status.includes('D')
+									const badgeBg = isMod ? 'rgba(245, 158, 11, 0.12)' : isAdd ? 'rgba(34, 197, 94, 0.12)' : 'rgba(239, 68, 68, 0.12)'
+									const badgeColor = isMod ? '#f59e0b' : isAdd ? '#22c55e' : '#ef4444'
+
+									return (
 										<div
 											key={i}
 											style={{
-												fontSize: 10,
-												fontFamily: 'var(--admin-font-mono)',
-												padding: '2px 6px',
-												background: 'var(--admin-bg-subtle)',
-												borderRadius: 3,
-												color: 'var(--admin-text-2)',
-												border: '1px solid var(--admin-border)',
+												display: 'flex',
+												alignItems: 'center',
+												gap: 8,
+												padding: '3px 6px',
+												borderRadius: 4,
+												fontSize: 11,
+												background: 'var(--admin-surface)',
+												border: '1px solid rgba(0,0,0,0.03)',
 											}}
 										>
-											<strong style={{ color: c.status.includes('M') ? 'var(--admin-warning)' : 'var(--admin-success)', marginRight: 3 }}>
-												{c.status}
-											</strong>
-											<span>{c.file}</span>
+											<span
+												style={{
+													fontSize: 10,
+													fontWeight: 700,
+													fontFamily: 'var(--admin-font-mono)',
+													padding: '1px 5px',
+													borderRadius: 3,
+													background: badgeBg,
+													color: badgeColor,
+													flexShrink: 0,
+													minWidth: 20,
+													textAlign: 'center',
+												}}
+											>
+												{c.status.trim()}
+											</span>
+											<span
+												style={{
+													fontFamily: 'var(--admin-font-mono)',
+													color: 'var(--admin-text-1)',
+													overflow: 'hidden',
+													textOverflow: 'ellipsis',
+													whiteSpace: 'nowrap',
+													flex: 1,
+												}}
+												title={c.file}
+											>
+												{c.file}
+											</span>
 										</div>
-									))}
-								</div>
-							) : (
-								<div style={{ fontSize: 12, color: 'var(--admin-text-3)', padding: '12px 0' }}>
-									本地所有改动已提交，暂无未保存变更。
-								</div>
-							)}
-						</div>
+									)
+								})}
+							</div>
+						) : (
+							<div style={{ fontSize: 12, color: 'var(--admin-text-3)', padding: '8px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+								<Icon icon="tabler:circle-check" style={{ color: 'var(--admin-success)' }} />
+								<span>本地所有改动已提交，暂无未保存变更。</span>
+							</div>
+						)}
 
 						{gitStatus.recentCommits && gitStatus.recentCommits.length > 0 && (
-							<div style={{ borderTop: '1px solid var(--admin-border)', paddingTop: 8, marginTop: 8 }}>
-								<div style={{ fontSize: 10, color: 'var(--admin-text-3)', marginBottom: 4 }}>最近提交：</div>
-								<div style={{ fontSize: 11, fontFamily: 'var(--admin-font-mono)', color: 'var(--admin-text-2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+							<div style={{ borderTop: '1px solid var(--admin-border)', paddingTop: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
+								<span style={{ color: 'var(--admin-text-3)' }}>最近提交:</span>
+								<span style={{ fontFamily: 'var(--admin-font-mono)', color: 'var(--admin-text-2)', maxWidth: '80%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
 									{gitStatus.recentCommits[0]}
-								</div>
+								</span>
 							</div>
 						)}
 					</div>

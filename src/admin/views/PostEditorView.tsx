@@ -1,13 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Icon } from '@iconify/react'
 import { adminApi } from '../api'
-import type { PostDetail } from '../types'
+import type { PostDetail, PostSnapshot } from '../types'
 import { MdcSnippetsPicker } from '../components/MdcSnippetsPicker'
 import { MarkdownPreview } from '../components/MarkdownPreview'
+import { DevicePreviewFrame } from '../components/DevicePreviewFrame'
 import { DiffViewerModal } from '../components/DiffViewerModal'
 import { AssetPickerModal } from '../components/AssetPickerModal'
+import { IconPickerModal } from '../components/IconPickerModal'
+import { HistoryVersionModal } from '../components/HistoryVersionModal'
 import { useToast } from '../components/Toast'
 import { parseArrayField, calculatePostStats } from '../../utils/post-meta'
+import { Temporal } from 'temporal-polyfill'
 
 interface PostEditorViewProps {
 	postPath?: string
@@ -21,12 +25,15 @@ interface TocItem {
 	lineIndex: number
 }
 
+export type EditorLayoutMode = 'split' | 'vertical' | 'editor-only' | 'preview-only'
+
 export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack, onSaved }) => {
 	const { showToast } = useToast()
 	const isNew = !postPath
 	const [loading, setLoading] = useState(!isNew)
 	const [saving, setSaving] = useState(false)
 	const [validating, setValidating] = useState(false)
+	const [layoutMode, setLayoutMode] = useState<EditorLayoutMode>('split')
 
 	const [originalRawContent, setOriginalRawContent] = useState('')
 
@@ -35,6 +42,7 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 	const [slug, setSlug] = useState('')
 	const [description, setDescription] = useState('')
 	const [category, setCategory] = useState('前端开发')
+	const [categoriesList, setCategoriesList] = useState<string[]>([])
 	const [tags, setTags] = useState<string[]>([])
 	const [tagInput, setTagInput] = useState('')
 	const [type, setType] = useState('tech')
@@ -45,15 +53,29 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 	const [content, setContent] = useState('')
 	const [showMeta, setShowMeta] = useState(true)
 	const [showToc, setShowToc] = useState(false)
+	const [isDirty, setIsDirty] = useState(false)
 
 	// 弹窗状态
 	const [showDiffModal, setShowDiffModal] = useState(false)
 	const [showAssetPicker, setShowAssetPicker] = useState(false)
+	const [showIconPicker, setShowIconPicker] = useState(false)
+	const [showHistoryModal, setShowHistoryModal] = useState(false)
 	const [hasDraftNotice, setHasDraftNotice] = useState(false)
 
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null)
-	const draftStorageKey = `blog_draft_${postPath || 'new'}`
+	const currentSlug = postPath ? postPath.replace(/^.*[\\/]/, '').replace(/\.(md|mdx)$/i, '') : slug || 'new-post'
+	const draftStorageKey = `blog_draft_${currentSlug}`
 
+	// 加载系统分类列表
+	useEffect(() => {
+		adminApi.getCategories()
+			.then((cats) => {
+				setCategoriesList(cats.map(c => c.name))
+			})
+			.catch(() => {})
+	}, [])
+
+	// 加载文章数据
 	useEffect(() => {
 		if (postPath) {
 			setLoading(true)
@@ -93,14 +115,17 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 		}
 	}, [postPath, draftStorageKey, showToast])
 
+	// 自动防抖暂存草稿
 	useEffect(() => {
 		if (!content) return
+		setIsDirty(content !== originalRawContent)
 		const timer = setTimeout(() => {
 			localStorage.setItem(draftStorageKey, content)
-		}, 3000)
+		}, 1500)
 		return () => clearTimeout(timer)
-	}, [content, draftStorageKey])
+	}, [content, originalRawContent, draftStorageKey])
 
+	// 恢复暂存草稿
 	const handleRestoreDraft = () => {
 		const savedDraft = localStorage.getItem(draftStorageKey)
 		if (savedDraft) {
@@ -110,13 +135,15 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 		}
 	}
 
+	// 放弃暂存草稿
 	const handleDiscardDraft = () => {
 		localStorage.removeItem(draftStorageKey)
 		setHasDraftNotice(false)
-		showToast('已清理本地草稿', 'info')
+		showToast('已清理本地暂存草稿', 'info')
 	}
 
-	const handleSave = useCallback(async () => {
+	// 保存文章
+	const handleSave = useCallback(async (isPublish = false) => {
 		if (!title.trim()) {
 			showToast('文章标题不能为空', 'warning')
 			return
@@ -137,6 +164,7 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 					content,
 				})
 				localStorage.removeItem(draftStorageKey)
+				setIsDirty(false)
 				showToast('新建文章成功', 'success')
 				setTimeout(() => {
 					if (onSaved) onSaved()
@@ -153,12 +181,16 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 					type: type === 'tech' ? undefined : type,
 					image: image.trim() || undefined,
 					permalink: permalink.trim() || undefined,
-					draft: draft ? true : undefined,
+					draft: isPublish ? undefined : (draft ? true : undefined),
+				}
+				if (isPublish) {
+					setDraft(false)
 				}
 				await adminApi.savePost(postPath!, frontmatter, content)
 				localStorage.removeItem(draftStorageKey)
 				setOriginalRawContent(content)
-				showToast('文章已保存', 'success')
+				setIsDirty(false)
+				showToast(isPublish ? '文章已正式发布上线' : '文章已保存', 'success')
 				if (onSaved) onSaved()
 			}
 		}
@@ -170,23 +202,33 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 		}
 	}, [title, isNew, postPath, slug, category, tags, type, permalink, description, content, date, image, draft, draftStorageKey, showToast, onSaved, onBack])
 
+	// 快捷键监听
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if ((e.ctrlKey || e.metaKey) && e.key === 's') {
 				e.preventDefault()
-				handleSave()
+				handleSave(false)
+			}
+			else if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+				e.preventDefault()
+				handleSave(true)
+			}
+			else if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+				e.preventDefault()
+				setLayoutMode(prev => prev === 'split' ? 'preview-only' : 'split')
 			}
 		}
 		window.addEventListener('keydown', handleKeyDown)
 		return () => window.removeEventListener('keydown', handleKeyDown)
 	}, [handleSave])
 
+	// 语法静态校验
 	const handleValidateMdx = async () => {
 		setValidating(true)
 		try {
 			const res = await adminApi.validatePostMdx(content)
 			if (res.valid) {
-				showToast('MDX 语法校验通过，格式无误', 'success')
+				showToast('MDX 语法校验通过，无语法错误', 'success')
 			}
 			else {
 				showToast(`语法错误 (第 ${res.line || '?'} 行): ${res.error}`, 'error')
@@ -251,24 +293,43 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 		}
 	}
 
+	// 恢复历史快照
+	const handleRestoreSnapshot = (snapshot: PostSnapshot) => {
+		if (snapshot.frontmatter) {
+			if (snapshot.frontmatter.title) setTitle(snapshot.frontmatter.title)
+			if (snapshot.frontmatter.description) setDescription(snapshot.frontmatter.description)
+		}
+		setContent(snapshot.content)
+		setShowHistoryModal(false)
+		showToast(`已成功恢复至历史快照 (${snapshot.timestamp})`, 'success')
+	}
+
+	// 提取 TOC 目录
 	const tocList: TocItem[] = []
 	const lines = content.split('\n')
 	lines.forEach((line, idx) => {
 		const match = line.match(/^(#{1,6})\s+(.*)$/)
 		if (match) {
 			tocList.push({
-				level: match[1].length,
-				text: match[2].trim(),
+				level: match[1]!.length,
+				text: match[2]!.trim(),
 				lineIndex: idx,
 			})
 		}
 	})
 
 	const stats = calculatePostStats(content)
-	const chineseCount = stats.chineseCount
-	const englishWords = stats.englishWords
-	const imageCount = stats.imageCount
-	const readTimeMinutes = stats.readingMinutes
+
+	const frontmatterPreviewData = {
+		title: title.trim() || '无标题文章',
+		description: description.trim(),
+		date: date || Temporal.Now.plainDateTimeISO().toLocaleString('sv'),
+		updated: Temporal.Now.plainDateTimeISO().toLocaleString('sv'),
+		categories: [category],
+		tags,
+		image,
+		type,
+	}
 
 	if (loading) {
 		return (
@@ -278,8 +339,26 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 		)
 	}
 
+	const [isZenMode, setIsZenMode] = useState(false)
+
 	return (
-		<div style={{ display: 'flex', flexDirection: 'column', gap: 10, height: 'calc(100vh - 102px)' }}>
+		<div
+			style={isZenMode ? {
+				position: 'fixed',
+				inset: 0,
+				background: 'var(--admin-bg)',
+				zIndex: 99999,
+				padding: 12,
+				display: 'flex',
+				flexDirection: 'column',
+				gap: 8,
+			} : {
+				display: 'flex',
+				flexDirection: 'column',
+				gap: 10,
+				height: 'calc(100vh - 100px)',
+			}}
+		>
 			{/* 草稿恢复提示 */}
 			{hasDraftNotice && (
 				<div
@@ -316,6 +395,8 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 					alignItems: 'center',
 					justifyContent: 'space-between',
 					flexShrink: 0,
+					flexWrap: 'wrap',
+					gap: 8,
 				}}
 			>
 				<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -324,18 +405,74 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 						<span>返回</span>
 					</button>
 
-					<div style={{ fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+					<div style={{ fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+						<span
+							className={`pulse-indicator ${isDirty ? 'dirty' : 'online'}`}
+							title={isDirty ? '存在未保存修改' : '所有修改已实时保存'}
+						/>
 						<span>{isNew ? '新建文章' : `${title || '无标题'}`}</span>
 						{draft && <span className="admin-badge badge-warning">草稿</span>}
+						{isDirty && <span className="admin-badge badge-secondary" style={{ fontSize: 10 }}>未保存</span>}
 					</div>
 				</div>
 
-				<div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+				<div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+					{/* 沉浸全屏模式切换 */}
+					<button
+						type="button"
+						className={`admin-btn ${isZenMode ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+						onClick={() => setIsZenMode(!isZenMode)}
+						title={isZenMode ? '退出沉浸全屏' : '进入沉浸全屏写作模式'}
+					>
+						<Icon icon={isZenMode ? 'tabler:minimize' : 'tabler:maximize'} />
+						<span>{isZenMode ? '退出全屏' : '全屏'}</span>
+					</button>
+
+					{/* 布局切换器 */}
+					<div style={{ display: 'flex', background: 'var(--admin-bg-subtle)', padding: 2, borderRadius: 6, border: '1px solid var(--admin-border)', gap: 2 }}>
+						<button
+							type="button"
+							className={`admin-btn ${layoutMode === 'split' ? 'btn-primary' : 'btn-ghost'} btn-sm`}
+							onClick={() => setLayoutMode('split')}
+							title="左右双栏实时预览"
+							style={{ padding: '0 6px', height: 24 }}
+						>
+							<Icon icon="tabler:layout-columns" />
+						</button>
+						<button
+							type="button"
+							className={`admin-btn ${layoutMode === 'vertical' ? 'btn-primary' : 'btn-ghost'} btn-sm`}
+							onClick={() => setLayoutMode('vertical')}
+							title="上下双栏实时预览"
+							style={{ padding: '0 6px', height: 24 }}
+						>
+							<Icon icon="tabler:layout-rows" />
+						</button>
+						<button
+							type="button"
+							className={`admin-btn ${layoutMode === 'editor-only' ? 'btn-primary' : 'btn-ghost'} btn-sm`}
+							onClick={() => setLayoutMode('editor-only')}
+							title="纯编辑模式"
+							style={{ padding: '0 6px', height: 24 }}
+						>
+							<Icon icon="tabler:edit" />
+						</button>
+						<button
+							type="button"
+							className={`admin-btn ${layoutMode === 'preview-only' ? 'btn-primary' : 'btn-ghost'} btn-sm`}
+							onClick={() => setLayoutMode('preview-only')}
+							title="纯预览模式"
+							style={{ padding: '0 6px', height: 24 }}
+						>
+							<Icon icon="tabler:eye" />
+						</button>
+					</div>
+
 					<button
 						type="button"
 						className={`admin-btn ${showToc ? 'btn-primary' : 'btn-secondary'} btn-sm`}
 						onClick={() => setShowToc(!showToc)}
-						title="文章目录"
+						title="文章目录大纲"
 					>
 						<Icon icon="tabler:list-tree" />
 						<span>大纲 ({tocList.length})</span>
@@ -346,11 +483,23 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 						className="admin-btn btn-secondary btn-sm"
 						onClick={handleValidateMdx}
 						disabled={validating}
-						title="MDX 静态校验"
+						title="MDX 静态语法校验"
 					>
 						<Icon icon="tabler:code-check" />
 						<span>校验</span>
 					</button>
+
+					{!isNew && (
+						<button
+							type="button"
+							className="admin-btn btn-secondary btn-sm"
+							onClick={() => setShowHistoryModal(true)}
+							title="查看历史版本与恢复"
+						>
+							<Icon icon="tabler:history" />
+							<span>历史版本</span>
+						</button>
+					)}
 
 					{!isNew && (
 						<button
@@ -370,7 +519,7 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 						onClick={() => setShowMeta(!showMeta)}
 					>
 						<Icon icon={showMeta ? 'tabler:layout-sidebar-right-collapse' : 'tabler:layout-sidebar-right'} />
-						<span>{showMeta ? '折叠属性' : '元数据'}</span>
+						<span>{showMeta ? '收起属性' : '元数据'}</span>
 					</button>
 
 					{!isNew && (
@@ -387,7 +536,7 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 					<button
 						type="button"
 						className="admin-btn btn-primary btn-sm"
-						onClick={handleSave}
+						onClick={() => handleSave(false)}
 						disabled={saving}
 					>
 						<Icon icon={saving ? 'tabler:loader-2' : 'tabler:device-floppy'} />
@@ -445,15 +594,9 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 							value={category}
 							onChange={e => setCategory(e.target.value)}
 						>
-							<option value="前端开发">前端开发</option>
-							<option value="后端开发">后端开发</option>
-							<option value="数据库系统">数据库系统</option>
-							<option value="云原生与运维">云原生与运维</option>
-							<option value="网络安全">网络安全</option>
-							<option value="人工智能">人工智能</option>
-							<option value="技术">技术</option>
-							<option value="杂谈">杂谈</option>
-							<option value="生活">生活</option>
+							{(categoriesList.length > 0 ? categoriesList : ['前端开发', '后端开发', '数据库系统', '云原生与运维', '网络安全', '人工智能', '技术', '杂谈', '生活']).map(c => (
+								<option key={c} value={c}>{c}</option>
+							))}
 						</select>
 					</div>
 
@@ -479,7 +622,7 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 							<input
 								type="text"
 								className="admin-input"
-								placeholder="/image.png"
+								placeholder="/og-image.jpg"
 								value={image}
 								onChange={e => setImage(e.target.value)}
 							/>
@@ -541,7 +684,7 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 				</div>
 			)}
 
-			{/* 双栏实时编辑器工作区 */}
+			{/* 编辑器与实时预览工作区 */}
 			<div
 				className="admin-card"
 				style={{
@@ -567,11 +710,20 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 					}}
 				>
 					<div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
-						<button type="button" className="admin-btn btn-ghost btn-sm" onClick={() => handleInsertFormat('**', '**')} title="粗体">
+						<button type="button" className="admin-btn btn-ghost btn-sm" onClick={() => handleInsertFormat('**', '**')} title="粗体 (Ctrl+B)">
 							<Icon icon="tabler:bold" />
 						</button>
-						<button type="button" className="admin-btn btn-ghost btn-sm" onClick={() => handleInsertFormat('*', '*')} title="斜体">
+						<button type="button" className="admin-btn btn-ghost btn-sm" onClick={() => handleInsertFormat('*', '*')} title="斜体 (Ctrl+I)">
 							<Icon icon="tabler:italic" />
+						</button>
+						<button type="button" className="admin-btn btn-ghost btn-sm" onClick={() => handleInsertFormat('~~', '~~')} title="删除线">
+							<Icon icon="tabler:strikethrough" />
+						</button>
+						<button type="button" className="admin-btn btn-ghost btn-sm" onClick={() => handleInsertFormat('`', '`')} title="行内代码">
+							<Icon icon="tabler:code-circle" />
+						</button>
+						<button type="button" className="admin-btn btn-ghost btn-sm" onClick={() => handleInsertFormat('> ')} title="引用区块">
+							<Icon icon="tabler:quote" />
 						</button>
 						<button type="button" className="admin-btn btn-ghost btn-sm" onClick={() => handleInsertFormat('## ')} title="二级标题">
 							<Icon icon="tabler:h-2" />
@@ -582,55 +734,88 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 						<button type="button" className="admin-btn btn-ghost btn-sm" onClick={() => handleInsertFormat('- ')} title="无序列表">
 							<Icon icon="tabler:list" />
 						</button>
+						<button type="button" className="admin-btn btn-ghost btn-sm" onClick={() => handleInsertFormat('- [ ] ')} title="任务清单">
+							<Icon icon="tabler:checkbox" />
+						</button>
 						<button type="button" className="admin-btn btn-ghost btn-sm" onClick={() => handleInsertFormat('```ts\n', '\n```')} title="代码块">
 							<Icon icon="tabler:code" />
+						</button>
+						<button type="button" className="admin-btn btn-ghost btn-sm" onClick={() => handleInsertFormat('\n| 列1 | 列2 |\n| --- | --- |\n| 内容1 | 内容2 |\n')} title="插入表格">
+							<Icon icon="tabler:table" />
+						</button>
+						<button type="button" className="admin-btn btn-ghost btn-sm" onClick={() => handleInsertFormat('\n---\n')} title="分割线">
+							<Icon icon="tabler:minus" />
 						</button>
 						<button type="button" className="admin-btn btn-ghost btn-sm" onClick={() => handleInsertFormat('[链接文本](', ')')} title="超链接">
 							<Icon icon="tabler:link" />
 						</button>
+
+						<div style={{ width: 1, height: 16, background: 'var(--admin-border)', margin: '0 2px' }} />
+
 						<button
 							type="button"
 							className="admin-btn btn-secondary btn-sm"
 							onClick={() => setShowAssetPicker(true)}
-							title="挑选图片"
+							title="挑选媒体图片"
 						>
 							<Icon icon="tabler:photo" />
 							<span>媒体库</span>
 						</button>
+						<button
+							type="button"
+							className="admin-btn btn-secondary btn-sm"
+							onClick={() => setShowIconPicker(true)}
+							title="插入图标"
+						>
+							<Icon icon="tabler:mood-smile" />
+							<span>图标库</span>
+						</button>
 
-						<div style={{ width: 1, height: 16, background: 'var(--admin-border)', margin: '0 4px' }} />
+						<div style={{ width: 1, height: 16, background: 'var(--admin-border)', margin: '0 2px' }} />
 
 						<MdcSnippetsPicker onInsert={handleInsertSnippet} />
 					</div>
 
 					<div style={{ fontSize: 11, color: 'var(--admin-text-3)', display: 'flex', gap: 10, alignItems: 'center' }}>
-						<span>{chineseCount} 汉字</span>
-						<span>{englishWords} 词</span>
-						<span>{imageCount} 图</span>
-						<span>约 {readTimeMinutes} 分钟</span>
+						<span>{stats.chineseCount} 汉字</span>
+						<span>{stats.englishWords} 词</span>
+						<span>{lines.length} 行</span>
+						<span>{stats.imageCount} 图</span>
+						<span>约 {stats.readingMinutes} 分钟</span>
 					</div>
 				</div>
 
-				{/* 双栏区域 + 大纲侧边树 */}
-				<div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
+				{/* 动态视口排版 */}
+				<div
+					style={{
+						flex: 1,
+						display: 'flex',
+						flexDirection: layoutMode === 'vertical' ? 'column' : 'row',
+						minHeight: 0,
+					}}
+				>
+					{/* 大纲侧边树 */}
 					{showToc && (
 						<div
 							style={{
-								width: 200,
-								borderRight: '1px solid var(--admin-border)',
+								width: layoutMode === 'vertical' ? '100%' : 200,
+								maxHeight: layoutMode === 'vertical' ? 120 : undefined,
+								borderRight: layoutMode === 'vertical' ? 'none' : '1px solid var(--admin-border)',
+								borderBottom: layoutMode === 'vertical' ? '1px solid var(--admin-border)' : 'none',
 								background: 'var(--admin-surface)',
 								padding: '10px 8px',
 								overflowY: 'auto',
 								display: 'flex',
 								flexDirection: 'column',
 								gap: 2,
+								flexShrink: 0,
 							}}
 						>
 							<div style={{ fontSize: 11, fontWeight: 600, color: 'var(--admin-text-3)', padding: '4px 6px', textTransform: 'uppercase' }}>
-								目录大纲
+								目录大纲 ({tocList.length})
 							</div>
 							{tocList.length === 0 ? (
-								<div style={{ fontSize: 11, color: 'var(--admin-text-3)', textAlign: 'center', marginTop: 16 }}>
+								<div style={{ fontSize: 11, color: 'var(--admin-text-3)', textAlign: 'center', marginTop: 12 }}>
 									正文未包含 H1-H6 标题
 								</div>
 							) : (
@@ -660,33 +845,53 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 						</div>
 					)}
 
-					{/* 左栏 Markdown 编辑 */}
-					<div style={{ flex: 1, borderRight: '1px solid var(--admin-border)', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-						<textarea
-							ref={textareaRef}
-							value={content}
-							onChange={e => setContent(e.target.value)}
-							placeholder="在此书写 Markdown / MDX 正文..."
+					{/* Markdown 编辑区 */}
+					{layoutMode !== 'preview-only' && (
+						<div
 							style={{
 								flex: 1,
-								width: '100%',
-								border: 'none',
-								outline: 'none',
-								padding: '16px',
-								background: 'transparent',
-								color: 'var(--admin-text-1)',
-								fontFamily: 'var(--admin-font-mono)',
-								fontSize: 13,
-								lineHeight: 1.7,
-								resize: 'none',
+								borderRight: layoutMode === 'split' ? '1px solid var(--admin-border)' : 'none',
+								borderBottom: layoutMode === 'vertical' ? '1px solid var(--admin-border)' : 'none',
+								display: 'flex',
+								flexDirection: 'column',
+								minWidth: 0,
+								minHeight: 0,
 							}}
-						/>
-					</div>
+						>
+							<textarea
+								ref={textareaRef}
+								value={content}
+								onChange={e => setContent(e.target.value)}
+								placeholder="在此书写 Markdown / MDX 正文（右侧将进行像素级同源实时渲染）..."
+								style={{
+									flex: 1,
+									width: '100%',
+									border: 'none',
+									outline: 'none',
+									padding: '16px',
+									background: 'transparent',
+									color: 'var(--admin-text-1)',
+									fontFamily: 'var(--admin-font-mono)',
+									fontSize: 13,
+									lineHeight: 1.7,
+									resize: 'none',
+								}}
+							/>
+						</div>
+					)}
 
-					{/* 右栏 实时渲染预览 */}
-					<div style={{ flex: 1, background: 'var(--admin-bg)', overflowY: 'auto', minWidth: 0 }}>
-						<MarkdownPreview content={content} />
-					</div>
+					{/* 同源多设备实时渲染预览区 */}
+					{layoutMode !== 'editor-only' && (
+						<div style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
+							<DevicePreviewFrame title="前台同源实时渲染">
+								<MarkdownPreview
+									content={content}
+									frontmatter={frontmatterPreviewData}
+									showChrome
+								/>
+							</DevicePreviewFrame>
+						</div>
+					)}
 				</div>
 			</div>
 
@@ -696,7 +901,17 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 					oldText={originalRawContent}
 					newText={content}
 					onClose={() => setShowDiffModal(false)}
-					onConfirmSave={handleSave}
+					onConfirmSave={() => handleSave(false)}
+				/>
+			)}
+
+			{/* 历史版本快照弹窗 */}
+			{showHistoryModal && (
+				<HistoryVersionModal
+					slug={currentSlug}
+					currentContent={content}
+					onClose={() => setShowHistoryModal(false)}
+					onRestore={handleRestoreSnapshot}
 				/>
 			)}
 
@@ -710,6 +925,16 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 						handleInsertSnippet(`\n${markdownImg}\n`)
 					}}
 					onClose={() => setShowAssetPicker(false)}
+				/>
+			)}
+
+			{/* 图标选择弹窗 */}
+			{showIconPicker && (
+				<IconPickerModal
+					onSelect={(iconName) => {
+						handleInsertSnippet(`:icon{name="${iconName}"}`)
+					}}
+					onClose={() => setShowIconPicker(false)}
 				/>
 			)}
 		</div>
