@@ -1,4 +1,3 @@
-import Image from '@/lib/compat-image'
 import { Icon } from '@iconify/react'
 import { Temporal } from 'temporal-polyfill'
 import type { FeedEntry } from '../../types/feed'
@@ -15,10 +14,21 @@ export default function FeedCard(props: FeedEntry) {
 	const domainIcon = getDomainIcon(link)
 	const domainTip = getDomainType(getMainDomain(link, true))
 
+	let formattedDate = ''
+	try {
+		if (date) {
+			formattedDate = Temporal.PlainDate.from(date).toLocaleString()
+		}
+	} catch {
+		formattedDate = date || ''
+	}
+
 	const tooltipContent = (
-		<>
+		<div className={styles.feedCardPopover}>
 			<div className={styles.siteContent}>
-				<Image className={styles.siteIcon} src={icon} alt={title} width={24} height={24} unoptimized />
+				{icon ? (
+					<img className={styles.siteIcon} src={icon} alt={title || ''} loading="lazy" />
+				) : null}
 				<div className={styles.siteInfo}>
 					<h3 className="text-creative">{title}</h3>
 					<code className={styles.domain} title={domainTip}>
@@ -26,14 +36,17 @@ export default function FeedCard(props: FeedEntry) {
 						{domainIcon && <Icon className={styles.domainMark} icon={domainIcon} />}
 					</code>
 				</div>
-				{archs?.map(arch => (
-					<span key={arch} className={styles.arch} title={arch}>
-						<Icon icon={getArchIcon(arch)} />
-					</span>
-				))}
+				{archs?.map(arch => {
+					const archIcon = getArchIcon(arch as any)
+					return archIcon ? (
+						<span key={arch} className={styles.arch} title={arch}>
+							<Icon icon={archIcon} />
+						</span>
+					) : null
+				})}
 			</div>
 			<div className={styles.descContent}>
-				<div className={styles.date}>{Temporal.PlainDate.from(date).toLocaleString()}</div>
+				{formattedDate && <div className={styles.date}>{formattedDate}</div>}
 				<p>{error ?? desc}</p>
 				{comment && (
 					<p>
@@ -41,26 +54,28 @@ export default function FeedCard(props: FeedEntry) {
 					</p>
 				)}
 			</div>
-		</>
+		</div>
 	)
 
 	return (
-		<ZTooltip content={tooltipContent} placement="top" interactive delay={200}>
+		<ZTooltip
+			content={tooltipContent}
+			placement="top"
+			interactive
+			delay={100}
+			className={styles.feedTooltip}
+		>
 			<UtilLink
 				to={error ? undefined : link}
-				rel="noopener"
 				className={`${styles.feedCard} feed-card gradient-card`}
 				data-error={error || undefined}
 			>
 				<div className={`${styles.avatar} avatar`} title={feed ? undefined : '无订阅源'}>
-					<Image
+					<img
 						className="round-cobblestone"
 						src={avatar}
 						alt={author}
-						width={40}
-						height={40}
 						loading="lazy"
-						unoptimized
 					/>
 					{appConfig.link.remindNoFeed && !feed && (
 						<Icon className={styles.noFeed} icon="tabler:bell-off" />
