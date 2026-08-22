@@ -5,6 +5,7 @@ import { Icon } from '@iconify/react'
 import { useEffect, useState } from 'react'
 import appConfig from '../../app.config'
 import styles from './ThemeToggle.module.scss'
+import ZTooltip from '../partial/ZTooltip'
 
 export default function ThemeToggle() {
 	const { theme, setTheme } = useTheme()
@@ -23,18 +24,22 @@ export default function ThemeToggle() {
 	}
 
 	return (
-		<div className={styles.themeToggle}>
-			{Object.entries(appConfig.themes).map(([themeName, themeData]) => (
-				<button
-					key={themeName}
-					data-tip={themeData.tip}
-					aria-label={themeData.tip}
-					className={theme === themeName ? styles.active : ''}
-					onClick={() => setTheme(themeName)}
-				>
-					<Icon icon={themeData.icon} />
-				</button>
-			))}
+		<div className={`${styles.themeToggle} theme-toggle`}>
+			{Object.entries(appConfig.themes).map(([themeName, themeData]) => {
+				const isActive = (theme || 'system') === themeName
+				return (
+					<ZTooltip key={themeName} content={themeData.tip}>
+						<button
+							type="button"
+							aria-label={themeData.tip}
+							className={`${isActive ? `${styles.active} active` : ''}`.trim()}
+							onClick={() => setTheme(themeName)}
+						>
+							<Icon icon={themeData.icon} />
+						</button>
+					</ZTooltip>
+				)
+			})}
 		</div>
 	)
 }
