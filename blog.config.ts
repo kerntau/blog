@@ -2,19 +2,19 @@ import type { FeedEntry } from './src/types/feed'
 
 const basicConfig = {
 	title: 'kerntau',
-	subtitle: '全栈探索者 · AI 极客',
+	subtitle: '心中有景,花香满径',
 	// 长 description 利好于 SEO
 	description: '在有序的世界里，寻一处生活的归栈。用理性梳理日常，用技术温柔时光，不慌不忙，自在生长。',
 	author: {
 		name: 'kerntau',
-		avatar: '/avatar.png',
+		avatar: '/avatar.webp',
 		email: '1722288011@qq.com',
 		homepage: 'https://blog.cot.wiki/',
 	},
 	copyright: {
 		abbr: 'CC BY-NC-SA 4.0',
 		name: '署名-非商业性使用-相同方式共享 4.0 国际',
-		url: 'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans',
+		url: 'https://keru.in/',
 	},
 	favicon: '/favicon.ico',
 	language: 'zh-CN',

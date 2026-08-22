@@ -45,14 +45,14 @@ const appConfig = {
 			/** 归档页面每年标题对应的年龄 */
 			birthYear: 2006,
 			/** blog-stats widget 的预置文本 */
-			wordCount: '约10万',
+			wordCount: '约12万',
 		},
 	},
 
 	// @keep-sorted
 	footer: {
 		/** 页脚版权信息，支持 <br> 换行等 HTML 标签 */
-		copyright: `© ${Temporal.Now.plainDateISO().year.toString()} ${blogConfig.author.name}`,
+		copyright: `© 2026 kerntau`,
 		/** 侧边栏底部图标导航 */
 		iconNav: [
 			{ icon: 'tabler:home', text: '个人主页', url: blogConfig.author.homepage },
@@ -87,13 +87,13 @@ const appConfig = {
 		] satisfies Nav,
 	},
 
-	/** 左侧栏顶部 Logo */
+	/** 左侧栏顶部 Logo (与博主头像保持同一权威数据源) */
 	header: {
-		logo: '/og-image.jpg',
+		logo: blogConfig.author.avatar,
 		/** 展示标题文本，否则展示纯 Logo */
 		showTitle: true,
 		subtitle: blogConfig.subtitle,
-		emojiTail: ['💻', '⚡', '☕', '🚀'],
+		emojiTail: ['🚀', '🚀', '🚀', '🚀'],
 	},
 
 	/** 友链页面 */
@@ -124,6 +124,46 @@ const appConfig = {
 		allowAscending: false,
 	},
 
+	widgets: {
+		tech: {
+			title: '技术信息',
+			services: [
+				{ label: '部署平台', value: 'vercel', icon: 'logos:vercel-icon', iconColor: '#0052D9' },
+				{ label: '图片存储', value: 'Cloudflare R2', icon: 'devicon:cloudflare', iconColor: '' },
+				{ label: '开源协议', value: 'MIT', icon: 'tabler:license', iconColor: '#F59E0B' },
+				{ label: '文章许可', value: blogConfig.copyright.abbr, icon: '', iconColor: '' },
+				{ label: '规范域名', value: 'keru.in', icon: '', iconColor: '' },
+			],
+			techstack: [
+				{ name: 'React', version: '^19.0.0', icon: 'logos:react', iconColor: '' },
+				{ name: 'Rsbuild', version: '^2.1.13', icon: 'tabler:bolt', iconColor: '#F85D00' },
+			],
+		},
+		commGroup: {
+			title: '博客/技术社区',
+			groupName: '纸网接入点',
+			account: '169994096',
+			icon: 'ri:qq-fill',
+			bgImg: '',
+		},
+		log: {
+			title: '更新日志',
+			items: [
+				{ date: '2025-07-26', content: '重构至 React 19 + Rsbuild，迁移架构' },
+				{ date: '2024-08-11', content: '重构至 Next.js / Content 架构' },
+				{ date: '2023-05-24', content: '迁移为 Hexo，使用 Butterfly 主题' },
+				{ date: '2020-08-24', content: '使用 blog 独立域名' },
+				{ date: blogConfig.timeEstablished, content: '发布第一篇文章' },
+			],
+		},
+		pageAsideMappings: {
+			link: ['blog-stats', 'comm-group'],
+			archive: ['blog-stats', 'blog-log'],
+			home: ['blog-stats', 'blog-tech', 'comm-group'],
+			post: ['toc'],
+		},
+	},
+
 	themes: {
 		light: {
 			icon: 'tabler:sun',
@@ -138,7 +178,7 @@ const appConfig = {
 			tip: '深色模式',
 		},
 	},
-} as const
+}
 
 export type AppConfig = typeof appConfig
 
