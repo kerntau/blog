@@ -1,0 +1,94 @@
+.overlay {
+	position: fixed;
+	inset: 0;
+	background-color: var(--c-bg-a50);
+	backdrop-filter: blur(0.5rem);
+	z-index: 2000;
+}
+
+.searchModal {
+	--float-distance: 20vh;
+
+	contain: paint;
+	position: fixed;
+	inset: 0;
+	width: 90%;
+	height: fit-content;
+	max-height: 85vh;
+	max-width: 768px; /* $breakpoint-mobile */
+	margin: auto;
+	border: 1px solid var(--c-primary);
+	border-radius: 1.5rem;
+	box-shadow: var(--box-shadow-2), var(--box-shadow-3);
+	outline: 0.2rem solid var(--c-primary-soft);
+	background-color: var(--ld-bg-card);
+	display: flex;
+	flex-direction: column;
+}
+
+.inputForm {
+	display: flex;
+	align-items: center;
+	gap: 1em;
+	position: relative;
+	padding: 0 1.5rem;
+	border-bottom: 1px solid var(--c-primary-soft-2);
+}
+
+.searchIcon {
+	font-size: 1.4rem;
+	color: var(--c-primary);
+}
+
+.searchInput {
+	flex: 1;
+	background: none;
+	border: none;
+	outline: none;
+	padding: 1.25rem 0;
+	font-size: 1.1rem;
+	color: var(--c-text);
+}
+
+.resultsContainer {
+	flex: 1;
+	overflow-y: auto;
+	padding: 0.5rem 0;
+}
+
+.resultsList {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.noResult {
+	padding: 2rem;
+	text-align: center;
+	color: var(--c-text-3);
+}
+
+.footer {
+	padding: 0.75rem 1.5rem;
+	display: flex;
+	justify-content: flex-end;
+	gap: 1.5rem;
+	background-color: var(--c-bg-soft);
+	border-top: 1px solid var(--c-primary-soft-2);
+	border-bottom-left-radius: 1.5rem;
+	border-bottom-right-radius: 1.5rem;
+}
+
+.tip {
+	font-size: 0.75rem;
+	color: var(--c-text-3);
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+
+	kbd {
+		background-color: var(--c-bg);
+		border: 1px solid var(--c-text-4);
+		box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+	}
+}

@@ -1,0 +1,26 @@
+.mdExcerpt {
+	opacity: 0.6;
+	margin: 1rem 0.5rem;
+	padding: 0.5rem;
+	font-size: 0.9em;
+	transition: opacity 0.2s;
+
+	&:hover {
+		opacity: 1;
+	}
+}
+
+.static {
+	opacity: 0;
+	pointer-events: none;
+	user-select: none;
+}
+
+.dynamic {
+	position: absolute;
+	width: calc(100% - 1rem);
+}
+
+.mdExcerpt :global(.iconify) {
+	margin-inline-end: 0.3em;
+}

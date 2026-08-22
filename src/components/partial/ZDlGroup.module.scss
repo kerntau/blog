@@ -1,0 +1,38 @@
+.dlGroup {
+	.item {
+		padding: 0.2em 0;
+
+		.dt {
+			font-size: 0.9em;
+			color: var(--c-text-2);
+		}
+	}
+}
+
+.small {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5em 1em;
+	text-align: center;
+
+	.item {
+		flex: 1;
+		white-space: nowrap;
+	}
+}
+
+.medium {
+	display: grid;
+	grid-template-columns: auto auto;
+	gap: 0.4em 8%;
+	padding: 0.2em 0;
+
+	.item {
+		display: contents;
+
+		.dt {
+			font-size: inherit;
+			text-align: end;
+		}
+	}
+}

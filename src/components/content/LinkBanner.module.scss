@@ -1,0 +1,16 @@
+.linkBanner {
+	display: block;
+	margin: 2rem 0;
+	border-radius: 1rem;
+	overflow: hidden;
+	transition: opacity 0.2s;
+
+	&:hover {
+		opacity: 0.9;
+	}
+}
+
+.image {
+	width: 100%;
+	aspect-ratio: 3 / 1;
+}

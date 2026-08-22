@@ -1,0 +1,24 @@
+.commGroup {
+	:global(.bg-img.bg-img.bg-img) {
+		opacity: 0.5;
+	}
+}
+
+.title {
+	background-clip: text;
+	background-image: linear-gradient(60deg, var(--c-accent) -30%, var(--c-primary), var(--c-text-1));
+	background-position: 100% 0;
+	background-size: 200%;
+	font-size: 1.8em;
+	color: transparent;
+	transition: background-position 0.2s;
+
+	:global(.blog-widget):hover & {
+		background-position: 0 0;
+	}
+}
+
+.tip {
+	font-size: 0.9em;
+	line-height: 2;
+}

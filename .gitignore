@@ -1,0 +1,24 @@
+# Next dev/build outputs
+.next
+tsconfig.tsbuildinfo
+
+# Node dependencies
+node_modules
+
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.fleet
+.idea
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# Custom
+.vercel
+content/posts/test.mdx

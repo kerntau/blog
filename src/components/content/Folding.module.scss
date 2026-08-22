@@ -1,0 +1,48 @@
+.folding {
+	margin: 1rem 0;
+	border: 1px solid var(--c-border);
+	border-radius: 0.5rem;
+	background-color: var(--c-bg-2);
+	overflow: hidden;
+
+	&[open] {
+		.icon {
+			transform: rotate(90deg);
+		}
+	}
+}
+
+.foldingTitle {
+	padding: 0.8rem 1rem;
+	cursor: pointer;
+	list-style: none;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-weight: bold;
+	user-select: none;
+
+	&::-webkit-details-marker {
+		display: none;
+	}
+
+	&:hover {
+		background-color: var(--c-bg-soft);
+	}
+}
+
+.icon {
+	transition: transform 0.2s;
+	opacity: 0.5;
+}
+
+.foldingContent {
+	padding: 1rem;
+	border-top: 1px solid var(--c-border);
+	animation: float-in 0.3s ease;
+}
+
+@keyframes float-in {
+	from { opacity: 0; transform: translateY(-5px); }
+	to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,68 @@
+.articleItem {
+	display: flex;
+	align-items: center;
+	column-gap: 0.5em;
+	min-width: 0;
+	margin: var(--archive-item-gap, 0.2em) 0;
+	transition: all 0.2s;
+	animation: float-in 0.2s var(--delay) backwards;
+
+	@media (max-width: 768px) {
+		font-size: 0.9em;
+	}
+
+	:global(time) {
+		font-variant-numeric: tabular-nums;
+	}
+
+	:global(.gradient-card) {
+		flex-grow: 1;
+		min-width: 0;
+	}
+
+	&:hover,
+	&:focus-within {
+		.articleTitle {
+			color: var(--c-text);
+		}
+
+		.dimHover {
+			opacity: 1;
+		}
+	}
+}
+
+.dimHover {
+	opacity: 0.4;
+	transition: opacity 0.2s;
+}
+
+.info {
+	font-size: 0.8em;
+}
+
+.articleLink {
+	--scrollbar-height: 0px;
+
+	display: flex;
+	align-items: baseline;
+	gap: 1em;
+	padding: 0.3em 0.6em;
+	white-space: nowrap;
+}
+
+.articleTitle {
+	display: inline;
+}
+
+.tagList {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 0.5em;
+	margin-left: auto;
+
+	&::before {
+		content: "#";
+		opacity: 0.5;
+	}
+}

@@ -1,0 +1,112 @@
+:global(#blog-sidebar).sidebar {
+	display: flex;
+	flex-direction: column;
+	color: var(--c-text-2);
+
+	&:hover {
+		color: currentcolor;
+	}
+
+	@media (max-width: 768px) {
+		position: fixed;
+		inset-inline-start: 0;
+		width: 320px;
+		max-width: 100%;
+		background-color: var(--ld-bg-blur);
+		backdrop-filter: blur(0.5rem);
+		color: currentcolor;
+		transform: var(--transform-start-far);
+		transition: transform 0.2s;
+		z-index: var(--z-index-popover);
+
+		&.show {
+			box-shadow: var(--box-shadow-1), var(--box-shadow-3);
+			transform: none;
+		}
+	}
+}
+
+.sidebarNav {
+	flex-grow: 1;
+	padding: 0 5%;
+	font-size: 0.9em;
+
+	h3 {
+		margin: 2em 0 1em 1em;
+		font: inherit;
+		color: var(--c-text-2);
+	}
+
+	li {
+		margin: 0.5em 0;
+	}
+}
+
+.navItem {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+	padding: 0.5em 1em;
+	border-radius: 0.5em;
+	transition: all 0.2s;
+
+	&:hover,
+	&.routerLinkActive {
+		background-color: var(--c-bg-soft);
+		color: var(--c-text);
+	}
+
+	&.routerLinkActive::after {
+		content: "⦁";
+		width: 1em;
+		text-align: center;
+		color: var(--c-text-3);
+	}
+
+	:global(.iconify) {
+		font-size: 1.5em;
+	}
+}
+
+.navText {
+	flex-grow: 1;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.searchBtn {
+	margin: 1rem 0;
+	opacity: 0.5;
+	outline: 2px solid var(--c-border);
+	outline-offset: -2px;
+	cursor: text;
+	user-select: none;
+
+	&:hover {
+		opacity: 1;
+		outline-color: transparent;
+		background-color: transparent;
+	}
+}
+
+.externalTip {
+	opacity: 0.5;
+	font-size: 1em;
+}
+
+.keycut {
+	opacity: 0.5;
+	font-size: 0.8em;
+}
+
+.sidebarFooter {
+	--gap: clamp(0.5rem, 3vh, 1rem);
+
+	display: grid;
+	gap: var(--gap);
+	padding: var(--gap);
+	font-size: 0.8em;
+	text-align: center;
+	color: var(--c-text-2);
+}

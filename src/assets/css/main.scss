@@ -1,0 +1,228 @@
+:root {
+	--start: left;
+	--end: right;
+	--transform-start-far: translateX(-100%);
+	--transform-end-far: translateX(100%);
+	--delay: 0.2s;
+	--z-index-popover: 100;
+	--text-shadow-black: 0 0.1em 0.1em #0003, 0 0.1em 0.2em #0003;
+	--box-shadow-1: 0 0.1em 0.2em var(--ld-shadow);
+	--box-shadow-2: 0 0.2em 0.5em var(--ld-shadow);
+	--box-shadow-3: 0 0.5em 1em var(--ld-shadow);
+
+	overflow-wrap: break-word;
+	background-color: var(--c-bg-1);
+	font-family: sans-serif;
+	font-family: var(--font-basic);
+	font-synthesis: style;
+	line-height: 1.4;
+	text-autospace: normal;
+	text-size-adjust: none;
+	color: var(--c-text-1);
+	transition: color 0.1s, background-color 0.2s;
+	scroll-behavior: smooth;
+	scroll-padding: 2rem;
+	scrollbar-color: var(--c-text-3) transparent;
+	font-variant-alternates: styleset(open-digits, disambiguation, round-quotes-and-commas);
+	-webkit-tap-highlight-color: var(--c-primary-soft);
+
+	&:dir(rtl) {
+		--start: right;
+		--end: left;
+		--transform-start-far: translateX(100%);
+		--transform-end-far: translateX(-100%);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		transition: none;
+		scroll-behavior: auto;
+	}
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+
+*, ::before, ::after {
+	box-sizing: border-box;
+}
+
+::selection {
+	background-color: var(--c-primary-soft);
+}
+
+a {
+	text-decoration: none;
+	color: currentcolor;
+}
+
+code, pre {
+	font-family: var(--font-monospace);
+	text-autospace: no-autospace;
+}
+
+menu, ol, ul {
+	list-style: none;
+}
+
+mark {
+	background-color: var(--c-primary-soft);
+	color: var(--c-primary);
+}
+
+button {
+	cursor: pointer;
+
+	> .iconify:only-child {
+		display: block;
+	}
+
+	&:disabled {
+		cursor: auto;
+	}
+}
+
+button, input, textarea {
+	background: none;
+	font: inherit;
+	color: currentcolor;
+}
+
+// Iconify 图标复用了此类
+:where(.iconify) {
+	display: inline-block;
+	flex-shrink: 0;
+	font-size: 1.2em;
+	vertical-align: sub;
+}
+
+.rtl-flip:dir(rtl) {
+	transform: scaleX(-1);
+}
+
+.light .iconify[class*="i-catppuccin:"] {
+	filter: invert(0.7) hue-rotate(180deg) saturate(4);
+}
+
+/* stylelint-disable-next-line selector-class-pattern */
+.i-simple-icons\:mdnwebdocs {
+	transform: scale(0.8);
+}
+
+// 图片加载失败 fallback
+img {
+	contain: paint;
+	display: inline-block;
+
+	&::before {
+		all: initial;
+		content: attr(alt); // Firefox 的 ::before content 仅在 alt 不为空时展示且值为 attr(alt) 无法修改
+		display: grid;
+		place-content: center;
+		position: absolute;
+		inset: 0;
+		padding: 0.5em;
+		background-color: var(--c-border);
+		font: bold 1.5rem/1.2 var(--font-serif);
+		text-align: center;
+		color: var(--c-bg-soft);
+		cursor: inherit;
+	}
+}
+
+.katex-display {
+	overflow: auto hidden;
+	padding: 1px 0;
+	scrollbar-width: thin;
+}
+
+.bikariya-overlay {
+	position: fixed;
+	inset: 0;
+	background-color: #0003;
+	backdrop-filter: blur(4px);
+
+	&.v-enter-from,
+	&.v-leave-to {
+		opacity: 0;
+	}
+
+	&.v-enter-active,
+	&.v-leave-active {
+		transition: all var(--delay);
+	}
+}
+
+.tippy-box {
+	padding: 0.3em 0.6em;
+	border-radius: 0.5em;
+	box-shadow: var(--box-shadow-3);
+	background-color: var(--ld-bg-card);
+	font-size: 0.8rem;
+	line-height: 1.4;
+	color: var(--c-text-2);
+	animation: float-in 0.2s;
+
+	&[data-state="hidden"] {
+		opacity: 0;
+	}
+
+	> .tippy-svg-arrow {
+		fill: var(--ld-bg-card);
+		pointer-events: none;
+	}
+}
+
+.shiki > .line {
+	> span {
+		font-style: var(--shiki-light-font-style);
+
+		.dark & {
+			background-color: var(--shiki-dark-bg) !important; /* stylelint-disable-line declaration-no-important */
+			font-style: var(--shiki-dark-font-style);
+			color: var(--shiki-dark) !important; /* stylelint-disable-line declaration-no-important */
+		}
+	}
+
+	.indent {
+		display: inline-block;
+		position: relative;
+		left: var(--indent-offset);
+	}
+
+	.indent:empty {
+		height: 1.4em;
+		height: 1lh;
+		vertical-align: bottom;
+	}
+
+	.indent::before {
+		content: "";
+		position: absolute;
+		opacity: 0.15;
+		height: 100%;
+		border-inline-start: 1px solid currentcolor;
+		background-color: currentcolor;
+		pointer-events: none;
+	}
+
+	> .space::before,
+	>.tab::before {
+		display: inline-block;
+		opacity: 0.3;
+		width: 0;
+		pointer-events: none;
+	}
+
+	> .space:is(:first-child, :last-child)::before,
+	> :not(.space) + .space:has(+ .space)::before,
+	> .space + .space::before {
+		content: "·";
+	}
+
+	>.tab::before {
+		content: "⇥";
+	}
+}

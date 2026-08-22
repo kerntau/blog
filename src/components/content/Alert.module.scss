@@ -1,0 +1,32 @@
+.alert {
+	margin: 1em 0;
+	padding: 0.2em 0.8em;
+	border-radius: 0.5em;
+	background-color: var(--c-bg-2);
+	font-size: 0.9em;
+
+	@supports (color: color-mix(in srgb, transparent, transparent)) {
+		--c-primary-soft: color-mix(in srgb, var(--c-primary) 15%, transparent);
+		--c-bg-2: color-mix(in srgb, var(--c-primary) 8%, var(--ld-bg-card));
+	}
+
+	&.card {
+		background-color: var(--ld-bg-card);
+		background-image:
+			radial-gradient(circle at 4em -25em, var(--c-primary), transparent 30em),
+			linear-gradient(var(--c-primary) -2000%, transparent);
+	}
+
+	.alertTitle {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		margin: 0.5em 0;
+		font-weight: bold;
+		color: var(--c-primary);
+
+		:global(p) {
+			margin: 0;
+		}
+	}
+}

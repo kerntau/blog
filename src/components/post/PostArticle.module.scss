@@ -1,0 +1,109 @@
+.articleCard {
+	container-type: inline-size;
+	position: relative;
+	margin: 1em 0;
+	border-radius: 0.8em;
+	color: var(--c-text);
+	text-decoration: none;
+	display: block;
+	overflow: hidden;
+	animation: float-in 0.2s var(--delay) backwards;
+
+	.articleBody {
+		display: grid;
+		gap: 0.5em;
+		padding: 1em;
+		position: relative;
+		z-index: 1;
+	}
+}
+
+.articleInfo {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5em clamp(1em, 5%, 1.5em);
+	font-size: 0.8em;
+	color: var(--c-text-2);
+
+	&:empty {
+		display: none;
+	}
+
+	.useUpdated {
+		order: -1;
+	}
+
+	span {
+		display: flex;
+		align-items: center;
+		gap: 0.2em;
+	}
+}
+
+.articleTitle {
+	font-size: 1.2em;
+	color: var(--c-text);
+	margin: 0;
+}
+
+.articleDescription {
+	font-size: 0.9em;
+	color: var(--c-text-2);
+	margin: 0;
+}
+
+.articleCover {
+	position: absolute !important;
+	opacity: 0.8;
+	left: auto !important;
+	right: 0 !important;
+	inset-inline-end: 0 !important;
+	inset-inline-start: auto !important;
+	top: 0 !important;
+	bottom: 0 !important;
+	width: calc(40% + 2em) !important;
+	height: 100% !important;
+	margin: 0;
+	mask-image: linear-gradient(to var(--end), transparent, #FFF 50%);
+	transition: opacity 0.2s;
+	object-fit: cover;
+	z-index: 0;
+
+	.articleCard:hover > & {
+		opacity: 1;
+	}
+
+	& + .articleBody {
+		width: 60%;
+	}
+
+	@mixin cover-narrow {
+		position: relative !important;
+		inset: auto !important;
+		left: auto !important;
+		right: auto !important;
+		width: 100% !important;
+		height: auto !important;
+		max-width: none;
+		max-height: 256px;
+		aspect-ratio: 2.4;
+		margin-bottom: -10%;
+		mask-image: linear-gradient(#FFF 50%, transparent);
+
+		& + .articleBody {
+			width: auto;
+
+			> .articleTitle {
+				text-shadow: 0 0 0.2em var(--ld-bg-card), 0 0 0.5em var(--ld-bg-card), 0 0 1em var(--ld-bg-card);
+			}
+		}
+	}
+
+	@media (max-width: 528px) { /* $breakpoint-phone */
+		@include cover-narrow;
+	}
+
+	@container (max-width: 528px) {
+		@include cover-narrow;
+	}
+}

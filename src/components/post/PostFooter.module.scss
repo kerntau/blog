@@ -1,0 +1,28 @@
+.postFooter {
+	margin: 2rem 0.5rem;
+	border: 1px solid var(--c-border);
+	border-radius: 1rem;
+	background-color: var(--c-bg-2);
+
+	:global(section) {
+		padding: 1rem;
+
+		& + :global(section) {
+			border-top: 1px solid var(--c-border);
+		}
+	}
+}
+
+.title {
+	font-weight: bold;
+	color: var(--c-text);
+}
+
+.content {
+	margin-top: 0.5em;
+	font-size: 0.9rem;
+
+	:global(li) {
+		margin: 0.5em 0;
+	}
+}

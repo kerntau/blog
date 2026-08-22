@@ -1,0 +1,13 @@
+.skipLink {
+	position: fixed;
+	top: -100%;
+	width: 80%;
+	margin: 1rem;
+	padding: 0.5rem;
+	text-align: center;
+	z-index: 9999;
+}
+
+.skipLink:focus {
+	top: auto;
+}

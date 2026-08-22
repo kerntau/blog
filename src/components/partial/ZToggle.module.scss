@@ -1,0 +1,41 @@
+.zToggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	cursor: pointer;
+	user-select: none;
+}
+
+.track {
+	width: 2.4em;
+	height: 1.2em;
+	background-color: var(--c-bg-3);
+	border-radius: 1em;
+	position: relative;
+	transition: background-color 0.2s;
+
+	&.active {
+		background-color: var(--c-primary);
+		
+		.thumb {
+			transform: translateX(1.2em);
+		}
+	}
+}
+
+.thumb {
+	width: 1em;
+	height: 1em;
+	background-color: white;
+	border-radius: 50%;
+	position: absolute;
+	top: 0.1em;
+	left: 0.1em;
+	transition: transform 0.2s;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.label {
+	font-size: 0.9em;
+	color: var(--c-text-2);
+}

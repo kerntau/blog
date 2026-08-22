@@ -1,0 +1,8 @@
+.techWidget :global(.z-expand) {
+	margin-top: 0.2em;
+}
+
+.techWidget :global(dl) :global(img) {
+	height: 1.2em;
+	vertical-align: sub;
+}

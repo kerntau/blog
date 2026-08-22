@@ -1,0 +1,36 @@
+.chat {
+	margin-inline: 2vw;
+	font-size: 0.9em;
+}
+
+.chatCaption {
+	opacity: 0.8;
+	font-size: 0.9em;
+}
+
+.chatBody {
+	overflow: hidden;
+	width: fit-content;
+	max-width: 90%;
+	margin-bottom: 1em;
+	padding: 0 1em;
+	border-radius: 1rem;
+	border-start-start-radius: 0.2rem;
+	background-color: var(--c-bg-2);
+}
+
+.chatSystem {
+	margin-bottom: 1em;
+	text-align: center;
+}
+
+.chatMyself {
+	text-align: end;
+
+	& + .chatBody {
+		margin-inline-start: auto;
+		border-radius: 1rem;
+		border-start-end-radius: 0.2rem;
+		background-color: var(--c-primary-soft);
+	}
+}

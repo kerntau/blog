@@ -1,0 +1,32 @@
+#blog-root {
+	display: flex;
+	justify-content: center;
+	gap: 1rem;
+	min-width: 0;
+}
+
+#blog-sidebar, #blog-aside {
+	flex: 0 0 280px; /* 防止搜索框 grow */
+	position: sticky;
+	top: 0;
+	height: 100vh;
+	height: 100dvh;
+	min-width: 0; /* 防止搜索框撑开页面 */
+	scrollbar-width: thin;
+
+	@media (max-width: 1080px) { /* $breakpoint-widescreen placeholder */
+		flex-shrink: 0.2;
+	}
+}
+
+#content {
+	display: flex;
+	gap: 1rem;
+	width: 1080px;
+	min-width: 0;
+
+	> #main-content {
+		flex-grow: 1;
+		min-width: 0;
+	}
+}

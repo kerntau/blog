@@ -1,0 +1,40 @@
+.blogPanel {
+	contain: paint;
+	position: fixed;
+	inset-inline-end: min(1rem, 5%);
+	bottom: min(2rem, 5%);
+	border-radius: 0.5rem;
+	background-color: var(--c-bg-a50);
+	backdrop-filter: blur(0.5rem);
+	font-size: 1.4rem;
+	transition: transform 0.1s;
+	z-index: var(--z-index-popover);
+
+	@media (max-height: 480px) { /* breakpoint-phone */
+		display: flex;
+	}
+
+	&.hasActive {
+		box-shadow: var(--box-shadow-1), var(--box-shadow-3);
+	}
+
+	button {
+		display: block;
+		padding: 0.5rem;
+		transition: all 0.2s;
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: inherit;
+
+		&:hover {
+			background-color: var(--c-bg-a80);
+			color: var(--c-primary);
+		}
+
+		&.active {
+			background-color: var(--ld-bg-active);
+			color: var(--c-primary);
+		}
+	}
+}

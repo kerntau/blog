@@ -1,0 +1,24 @@
+.cardList {
+	:global(:where(ol, ul):not([class])) {
+		margin: 0;
+		padding-inline-start: 0;
+		list-style: none;
+
+		> :global(li) {
+			margin: 0;
+		}
+	}
+
+	> :global(ol), > :global(ul) {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+		gap: 0.5em;
+
+		> :global(li) {
+			padding: 0.5em 0.8em;
+			border-radius: 0.5em;
+			box-shadow: var(--box-shadow-2);
+			background-color: var(--ld-bg-card);
+		}
+	}
+}

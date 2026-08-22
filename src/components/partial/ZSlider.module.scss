@@ -1,0 +1,37 @@
+.zSlider {
+	display: flex;
+	align-items: center;
+	gap: 1em;
+	padding: 0.5em 0;
+}
+
+.label {
+	font-size: 0.9em;
+	color: var(--c-text-2);
+	min-width: 3em;
+}
+
+.range {
+	flex: 1;
+	height: 4px;
+	border-radius: 2px;
+	background: var(--c-bg-3);
+	appearance: none;
+	outline: none;
+
+	&::-webkit-slider-thumb {
+		appearance: none;
+		width: 12px;
+		height: 12px;
+		border-radius: 50%;
+		background: var(--c-primary);
+		cursor: pointer;
+	}
+}
+
+.value {
+	font-size: 0.8em;
+	color: var(--c-text-3);
+	min-width: 1.5em;
+	text-align: end;
+}

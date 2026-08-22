@@ -1,0 +1,29 @@
+{
+  "headers": [
+    {
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "source": "/api/*"
+    },
+    {
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml"
+        }
+      ],
+      "source": "/cotovo.opml"
+    }
+  ],
+  "redirects": [
+    {
+      "destination": "/og-image.jpg",
+      "source": "/favicon.ico",
+      "statusCode": 308
+    }
+  ]
+}

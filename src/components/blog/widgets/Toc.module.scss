@@ -1,0 +1,66 @@
+.toc {
+	position: relative;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	padding-inline-start: 0.8rem;
+
+	&::before {
+		content: "";
+		position: absolute;
+		inset: 0.3rem;
+		width: 3px;
+		border-radius: 1rem;
+		background-color: var(--c-bg-soft);
+	}
+}
+
+.tocItem {
+	opacity: 0.6;
+	font-size: 0.94em;
+	color: var(--c-text);
+	transition: opacity 0.2s, font-size 0.2s;
+
+	&:hover {
+		opacity: 0.94;
+	}
+
+	&.hasActive, &.active {
+		opacity: 1;
+		font-size: 1em;
+	}
+
+	&.active::before {
+		content: "";
+		position: absolute;
+		inset-inline-start: 0.3rem;
+		margin: 0.2rem 0;
+		padding: 0.6rem 1.5px;
+		border-radius: 1rem;
+		background-color: var(--c-primary);
+	}
+
+	> a {
+		display: block;
+		overflow: hidden;
+		padding: 0.2em 0.5em;
+		border-radius: 0.5em;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		transition: all 0.2s;
+		color: inherit;
+		text-decoration: none;
+
+		&:hover {
+			background-color: var(--c-bg-soft);
+		}
+	}
+}
+
+.noToc {
+	padding: 1em;
+	text-align: center;
+	color: var(--c-text-3);
+}
+
+

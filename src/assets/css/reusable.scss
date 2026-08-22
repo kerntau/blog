@@ -1,0 +1,186 @@
+// 一部分具有卡片样式的组件复用了此类
+.card {
+	contain: paint;
+	display: block;
+	border-radius: 0.5em;
+	box-shadow: var(--box-shadow-1);
+	background-color: var(--ld-bg-card);
+	transition: all 0.2s;
+
+	&.upraise:hover {
+		box-shadow: var(--box-shadow-3);
+		transform: translateY(-2px);
+	}
+}
+
+.gradient-card {
+	position: relative;
+	border-radius: 0.5rem;
+	z-index: 0;
+
+	&::before {
+		content: "";
+		position: absolute;
+		opacity: 0;
+		inset: 0;
+		border: 2px solid transparent;
+		border-radius: inherit;
+		background: linear-gradient(var(--c-bg-a80), var(--c-bg-a80)) padding-box, linear-gradient(45deg, var(--c-accent), var(--c-primary-soft)) border-box;
+		transition: opacity 0.2s;
+		z-index: -1;
+	}
+
+	&:hover, &:focus, &.active {
+		color: var(--c-text-1);
+
+		&::before {
+			opacity: 1;
+		}
+	}
+}
+
+.scrollbar-hidden.scrollbar-hidden {
+	--scrollbar-height: 0px;
+	--guessed-scrollbar-width: 0px;
+
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+// 横向滚动遮罩
+// PURE CSS MAGIC!
+.scrollcheck-x, .scrollcheck-y {
+	scrollbar-width: thin;
+
+	&::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+		background-color: var(--c-bg-2);
+		cursor: default;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		border-radius: 4px;
+		background-color: var(--c-bg-soft);
+		cursor: pointer;
+	}
+}
+
+.scrollcheck-x {
+	--start-offset: 0px; // 如果填写 0 会在 calc() 时出错
+	--scrollbar-height: 8px;
+	--fadeout-width: 2em;
+
+	overflow-x: auto;
+	animation: scrollcheck-x;
+	animation-timeline: scroll(x self);
+}
+
+@keyframes scrollcheck-x {
+	0% {
+		mask-image:
+			linear-gradient(to var(--end), #FFF calc(100% - var(--fadeout-width)), transparent),
+			linear-gradient(to top, #FFF var(--scrollbar-height), transparent var(--scrollbar-height));
+	}
+
+	0.01%, 99.99% {
+		mask-image:
+			linear-gradient(to var(--end), #FFF var(--start-offset), transparent var(--start-offset), #FFF calc(var(--start-offset) + var(--fadeout-width)), #FFF calc(100% - var(--fadeout-width)), transparent),
+			linear-gradient(to top, #FFF var(--scrollbar-height), transparent var(--scrollbar-height));
+	}
+
+	100% {
+		mask-image:
+			linear-gradient(to var(--end), #FFF var(--start-offset), transparent var(--start-offset), #FFF calc(var(--start-offset) + var(--fadeout-width))),
+			linear-gradient(to top, #FFF var(--scrollbar-height), transparent var(--scrollbar-height));
+	}
+}
+
+.scrollcheck-y {
+	// 如果填写 0 会在 calc() 时出错
+	--top-offset: 0px;
+	--guessed-scrollbar-width: 8px;
+	--fadeout-height: 2em;
+
+	overflow-y: auto;
+	animation: scrollcheck-y;
+	animation-timeline: scroll(y self);
+}
+
+@keyframes scrollcheck-y {
+	0% {
+		mask-image:
+			linear-gradient(to bottom, #FFF calc(100% - var(--fadeout-height)), transparent),
+			linear-gradient(to var(--start), #FFF var(--guessed-scrollbar-width), transparent var(--guessed-scrollbar-width));
+	}
+
+	0.01%, 99.99% {
+		mask-image:
+			linear-gradient(to bottom, #FFF var(--top-offset), transparent var(--top-offset), #FFF calc(var(--top-offset) + var(--fadeout-height)), #FFF calc(100% - var(--fadeout-height)), transparent),
+			linear-gradient(to var(--start), #FFF var(--guessed-scrollbar-width), transparent var(--guessed-scrollbar-width));
+	}
+
+	100% {
+		mask-image:
+			linear-gradient(to bottom, #FFF var(--top-offset), transparent var(--top-offset), #FFF calc(var(--top-offset) + var(--fadeout-height))),
+			linear-gradient(to var(--start), #FFF var(--guessed-scrollbar-width), transparent var(--guessed-scrollbar-width));
+	}
+}
+
+@each $name, $size in $breakpoints {
+	@media not (max-width: $size) {
+		.#{$name}-only {
+			display: none !important; /* stylelint-disable-line declaration-no-important */
+		}
+	}
+
+	@media (max-width: $size) {
+		.#{$name}-hidden {
+			display: none !important; /* stylelint-disable-line declaration-no-important */
+		}
+	}
+}
+
+.proper-height {
+	min-height: 70vh;
+}
+
+.round-cobblestone {
+	corner-shape: superellipse(1.2);
+}
+
+.text-center {
+	text-align: center;
+}
+
+.text-creative, .text-tech {
+	font-family: var(--font-creative);
+	font-weight: 550;
+	-webkit-font-smoothing: antialiased; // macOS下"DOUYINSANSBOLD-GB"过粗
+}
+
+.text-story {
+	font-family: var(--font-serif);
+}
+
+.text-repeat {
+	text-shadow: 0.1em 0 var(--c-bg-soft), 0.2em 0 var(--c-bg-soft), 0.3em 0 var(--c-bg-soft), 0.4em 0 var(--c-bg-soft), 0.5em 0 var(--c-bg-soft);
+}
+
+.text-zoom {
+	display: inline-block;
+	transform-origin: left bottom;
+
+	@supports (animation-timeline: view()) {
+		animation: zoom 1s both;
+		animation-timeline: view();
+	}
+
+	@keyframes zoom {
+		from { transform: scale(0.8); }
+		to { transform: scale(1.25); }
+	}
+}

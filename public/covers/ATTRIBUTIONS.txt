@@ -1,0 +1,309 @@
+# Covers Attribution
+
+本轮封面通过 Openverse 检索、下载并统一裁切为站内使用的 `webp` 横图。
+
+## 2026AI大模型格局 (ai001)
+- Search Query: artificial intelligence technology
+- Source Title: Artificial Intelligence
+- Creator: theglobalpanorama
+- License: by-sa 2.0
+- License URL: https://creativecommons.org/licenses/by-sa/2.0/
+- Landing URL: https://www.flickr.com/photos/121483302@N02/14696937320
+- Original URL: https://live.staticflickr.com/5567/14696937320_c76e4b8646_b.jpg
+
+## 十大排序算法详解 (algo001)
+- Search Query: sorting algorithm data visualization
+- Source Title: 20110907-NodeXL-Twitter-IKnow2011 top between
+- Creator: Marc_Smith
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/49503165485@N01/6124807244
+- Original URL: https://live.staticflickr.com/6080/6124807244_7434a8a1d8_b.jpg
+
+## 动态规划核心思路 (algo002)
+- Search Query: dynamic programming code abstract
+- Source Title: HIP 54515 b orbit (Currie 2026)
+- Creator: Thayne Currie et al 2026 AJ 171 5
+- License: by 4.0
+- License URL: https://creativecommons.org/licenses/by/4.0/
+- Landing URL: https://commons.wikimedia.org/w/index.php?curid=184436834
+- Original URL: https://upload.wikimedia.org/wikipedia/commons/6/6b/HIP_54515_b_orbit_%28Currie_2026%29.jpg
+
+## 图算法遍历与最短路 (algo003)
+- Search Query: graph network nodes visualization
+- Source Title: 20110503-NodeXL-Twitter-wiredbiz graph
+- Creator: Marc_Smith
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/49503165485@N01/5685714162
+- Original URL: https://live.staticflickr.com/5254/5685714162_49f7771796_b.jpg
+
+## 网络安全威胁与防护 (sec001)
+- Search Query: network security abstract
+- Source Title: Virus
+- Creator: Yu. Samoilov
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/110751683@N02/15462325023
+- Original URL: https://live.staticflickr.com/7474/15462325023_85083999b2_b.jpg
+
+## TCPIP协议安全分析 (sec002)
+- Search Query: network protocol data packets
+- Source Title: Tinyg v3 bare board
+- Creator: rileyporter
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/31697990@N00/4833593161
+- Original URL: https://live.staticflickr.com/4085/4833593161_54abbb8bdc_b.jpg
+
+## 常见网络攻击手法详解 (sec003)
+- Search Query: computer network attack
+- Source Title: Computer Data Hacker
+- Creator: Visual Content
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/143601516@N03/29402709463
+- Original URL: https://live.staticflickr.com/8549/29402709463_4d693aee71_b.jpg
+
+## 密码学基础与应用 (sec004)
+- Search Query: cryptography encryption lock
+- Source Title: A Bitcoin You Can Flip
+- Creator: jurvetson
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/44124348109@N01/8410385932
+- Original URL: https://live.staticflickr.com/8509/8410385932_5b75ae9652_b.jpg
+
+## 网络安全合规要求解读 (sec005)
+- Search Query: information security compliance
+- Source Title: Unlawful Yellow Boxes - Tottenham Bus Garage #1
+- Creator: Alan Stanton
+- License: by-sa 2.0
+- License URL: https://creativecommons.org/licenses/by-sa/2.0/
+- Landing URL: https://www.flickr.com/photos/53921762@N00/2333534320
+- Original URL: https://live.staticflickr.com/3201/2333534320_2d8cebec3a_b.jpg
+
+## IDS IPS部署实战 (sec007)
+- Search Query: intrusion detection security operations center
+- Source Title: 160413-D-FW736-008
+- Creator: DoD News Photos
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/127934495@N07/25811556054
+- Original URL: https://live.staticflickr.com/1598/25811556054_15381f33dc_b.jpg
+
+## VPN技术与搭建实战 (sec008)
+- Search Query: vpn network security
+- Source Title: 20180927-RD-LSC-0147
+- Creator: USDAgov
+- License: pdm 1.0
+- License URL: https://creativecommons.org/publicdomain/mark/1.0/
+- Landing URL: https://www.flickr.com/photos/41284017@N08/30232261977
+- Original URL: https://live.staticflickr.com/1956/30232261977_6467f80c79_b.jpg
+
+## WAF配置与防护实战 (sec009)
+- Search Query: web security server
+- Source Title: Ableton Live Set
+- Creator: p_kirn
+- License: by-sa 2.0
+- License URL: https://creativecommons.org/licenses/by-sa/2.0/
+- Landing URL: https://www.flickr.com/photos/26491951@N00/2674209091
+- Original URL: https://live.staticflickr.com/3134/2674209091_a52088bccc_b.jpg
+
+## 网络流量分析抓包实战 (sec010)
+- Search Query: network traffic dashboard
+- Source Title: Mercedes SE Coupe
+- Creator: sjeacle
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/22695108@N06/2192906358
+- Original URL: https://live.staticflickr.com/2309/2192906358_980ebf277e_b.jpg
+
+## 堡垒机与零信任实践 (sec011)
+- Search Query: identity access security
+- Source Title: Data Security Breach
+- Creator: Visual Content
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/143601516@N03/29723649810
+- Original URL: https://live.staticflickr.com/8116/29723649810_8cb4a06489_b.jpg
+
+## 威胁情报与ATT&CK (sec012)
+- Search Query: security intelligence
+- Source Title: New Zealand Security Intelligence Service
+- Creator: Giantflightlessbirds
+- License: by-sa 3.0
+- License URL: https://creativecommons.org/licenses/by-sa/3.0/
+- Landing URL: https://commons.wikimedia.org/w/index.php?curid=75923354
+- Original URL: https://upload.wikimedia.org/wikipedia/commons/8/81/New_Zealand_Security_Intelligence_Service.jpg
+
+## SIEM平台搭建实战 (sec013)
+- Search Query: security operations center monitors
+- Source Title: PRT Farah visits Voice of Women facility in Farah City [Image 3 of 22]
+- Creator: DVIDSHUB
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/28650594@N03/8509494327
+- Original URL: https://live.staticflickr.com/8248/8509494327_d68f83a244_b.jpg
+
+## 恶意软件分析入门 (sec014)
+- Search Query: malware analysis
+- Source Title: Alexis Sarghel y Juan Pablo Braña
+- Creator: notaspampeanas
+- License: pdm 1.0
+- License URL: https://creativecommons.org/publicdomain/mark/1.0/
+- Landing URL: https://www.flickr.com/photos/32011625@N03/23105504053
+- Original URL: https://live.staticflickr.com/5661/23105504053_ed24616ede_b.jpg
+
+## 异常流量检测与感知 (sec015)
+- Search Query: security analytics monitoring
+- Source Title: Cloud Solutions - Creative Commons
+- Creator: NEC Corporation of America
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/42956186@N04/16251014260
+- Original URL: https://live.staticflickr.com/7424/16251014260_25fd58d459_b.jpg
+
+## 应急响应流程与方法 (sec017)
+- Search Query: incident response war room
+- Source Title: 20140819-A-BD830-001
+- Creator: U.S. Army Europe
+- License: pdm 1.0
+- License URL: https://creativecommons.org/publicdomain/mark/1.0/
+- Landing URL: https://www.flickr.com/photos/37585279@N03/14966612296
+- Original URL: https://live.staticflickr.com/3852/14966612296_4a948f2464_b.jpg
+
+## Windows应急响应实战 (sec018)
+- Search Query: windows digital forensics
+- Source Title: GK16JXO Kent Police Peugeot. Forensic Investigation.
+- Creator: JOHN K THORNE
+- License: cc0 1.0
+- License URL: https://creativecommons.org/publicdomain/zero/1.0/
+- Landing URL: https://www.flickr.com/photos/89918055@N05/54119436726
+- Original URL: https://live.staticflickr.com/65535/54119436726_ba0a3ab5c4_b.jpg
+
+## Linux应急响应实战 (sec019)
+- Search Query: digital forensics computer
+- Source Title: Book Selections - November, 2011
+- Creator: brewbooks
+- License: by-sa 2.0
+- License URL: https://creativecommons.org/licenses/by-sa/2.0/
+- Landing URL: https://www.flickr.com/photos/93452909@N00/6673022987
+- Original URL: https://live.staticflickr.com/7154/6673022987_d72702bfa8_b.jpg
+
+## 漏洞扫描与风险评估 (sec020)
+- Search Query: security scanning
+- Source Title: Data Security Breach
+- Creator: Visual Content
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/143601516@N03/29723649810
+- Original URL: https://live.staticflickr.com/8116/29723649810_8cb4a06489_b.jpg
+
+## 安全加固与基线核查 (sec021)
+- Search Query: system security audit
+- Source Title: Vision 2025: USACE, Sembach develop net-zero energy master plan
+- Creator: USACE Europe District
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/34728058@N08/6504903851
+- Original URL: https://live.staticflickr.com/7153/6504903851_226a47189c_b.jpg
+
+## Kali环境搭建指南 (sec022)
+- Search Query: penetration testing linux
+- Source Title: Seguridad y redes, Conferencia: DotDotPwn Fuzzer: La pesadilla de los directorios
+- Creator: campuspartymexico
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/42560333@N07/5962789588
+- Original URL: https://live.staticflickr.com/6135/5962789588_1229e74616_b.jpg
+
+## 信息收集与目标侦察 (sec023)
+- Search Query: digital investigation map
+- Source Title: Subject to Change Godpixel Ai Weiwei 2018
+- Creator: Redeytraveler
+- License: by 4.0
+- License URL: https://creativecommons.org/licenses/by/4.0/
+- Landing URL: https://commons.wikimedia.org/w/index.php?curid=171653995
+- Original URL: https://upload.wikimedia.org/wikipedia/commons/d/d2/Subject_to_Change_Godpixel_Ai_Weiwei_2018.jpg
+
+## Linux服务漏洞利用 (sec024)
+- Search Query: linux server terminal
+- Source Title: Wooden Touchscreen Terminal - front
+- Creator: barnoid
+- License: by-sa 2.0
+- License URL: https://creativecommons.org/licenses/by-sa/2.0/
+- Landing URL: https://www.flickr.com/photos/50359335@N00/151529520
+- Original URL: https://live.staticflickr.com/46/151529520_046c027cda_b.jpg
+
+## 提权技术与利用详解 (sec025)
+- Search Query: cybersecurity terminal
+- Source Title: Dark-moon-cybersecurity-terminal
+- Creator: mehdi boutayeb
+- License: by-sa 4.0
+- License URL: https://creativecommons.org/licenses/by-sa/4.0/
+- Landing URL: https://commons.wikimedia.org/w/index.php?curid=141337738
+- Original URL: https://upload.wikimedia.org/wikipedia/commons/1/10/Dark-moon-cybersecurity-terminal.jpg
+
+## Linux后渗透与持久化 (sec026)
+- Search Query: cybersecurity technology
+- Source Title: Cybersecurity
+- Creator: Idaho National Laboratory
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/30369883@N03/3639507323
+- Original URL: https://live.staticflickr.com/3634/3639507323_33ba4b8bf5_b.jpg
+
+## Metasploit渗透实战 (sec027)
+- Search Query: penetration testing laptop
+- Source Title: DSC05476
+- Creator: dfarrell07
+- License: by-sa 2.0
+- License URL: https://creativecommons.org/licenses/by-sa/2.0/
+- Landing URL: https://www.flickr.com/photos/46001741@N07/5013882149
+- Original URL: https://live.staticflickr.com/4083/5013882149_d180838925_b.jpg
+
+## Windows渗透环境搭建 (sec028)
+- Search Query: windows server terminal
+- Source Title: Windows XP in Ubuntu Hardy 2
+- Creator: okubax
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/9933931@N05/2593359248
+- Original URL: https://live.staticflickr.com/3221/2593359248_9b28ed75b4_b.jpg
+
+## Windows端口攻击面分析 (sec029)
+- Search Query: windows server security
+- Source Title: IMG_3670
+- Creator: Jemimus
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/12967790@N00/2647290208
+- Original URL: https://live.staticflickr.com/3009/2647290208_559f3e91b2_b.jpg
+
+## Windows提权技术实战 (sec030)
+- Search Query: windows administrator security
+- Source Title: Cloud Solutions - Creative Commons
+- Creator: NEC Corporation of America
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/42956186@N04/16437481572
+- Original URL: https://live.staticflickr.com/8599/16437481572_cca75586e8_b.jpg
+
+## 域渗透与横向移动基础 (sec031)
+- Search Query: enterprise network security
+- Source Title: Server Room - New Dells
+- Creator: david.dolphin
+- License: by 2.0
+- License URL: https://creativecommons.org/licenses/by/2.0/
+- Landing URL: https://www.flickr.com/photos/33539684@N00/404082588
+- Original URL: https://live.staticflickr.com/160/404082588_49436333df_b.jpg
+
+## Windows后渗透实战 (sec032)
+- Search Query: windows post exploitation
+- Source Title: Pharmacy served the Tottenham Community over 25 Years
+- Creator: Alan Stanton
+- License: by-sa 2.0
+- License URL: https://creativecommons.org/licenses/by-sa/2.0/
+- Landing URL: https://www.flickr.com/photos/53921762@N00/8227815954
+- Original URL: https://live.staticflickr.com/8344/8227815954_89a36edcbd_b.jpg

@@ -1,0 +1,156 @@
+.zComment {
+	margin: 3rem 1rem;
+
+	> h3 {
+		margin-top: 3rem;
+		font-size: 1.25rem;
+	}
+}
+
+.popoverFloating {
+	z-index: var(--z-index-popover);
+	border-radius: 0.5em;
+	box-shadow: var(--box-shadow-2);
+	background-color: var(--ld-bg-card);
+	color: var(--c-text);
+	overflow: hidden;
+}
+
+.popoverConfirm {
+	display: flex;
+	align-items: center;
+	overflow-wrap: anywhere;
+
+	> .input {
+		min-width: 0;
+		padding: 0.3em 0.6em;
+		outline: none;
+	}
+
+	> button {
+		flex-shrink: 0;
+		align-self: stretch;
+		padding: 0.3em;
+		border: 0;
+		border-radius: 0 0.5em 0.5em 0;
+		background: transparent;
+		color: inherit;
+		cursor: pointer;
+	}
+}
+
+.twikoo {
+	margin: 2em 0;
+
+	:global(.tk-admin-container) {
+		position: fixed;
+		z-index: calc(var(--z-index-popover) + 1);
+	}
+
+	:global(.tk-input) {
+		font-family: var(--font-monospace);
+	}
+
+	:global(.tk-avatar) {
+		border-radius: 50%;
+
+		@supports (corner-shape: squircle) {
+			corner-shape: superellipse(1.2);
+		}
+
+		&:global(.tk-clickable) {
+			cursor: auto;
+		}
+	}
+
+	:global(.tk-time) {
+		color: var(--c-text-3);
+	}
+
+	:global(.tk-content) {
+		margin-top: 0;
+	}
+
+	:global(.tk-comments-title), :global(.tk-nick) {
+		font-family: var(--font-creative);
+	}
+
+	:global(.tk-owo-emotion) {
+		width: auto;
+		height: 1.4em;
+		vertical-align: text-bottom;
+	}
+
+	:global(.tk-extras), :global(.tk-footer) {
+		font-size: 0.7em;
+		color: var(--c-text-3);
+	}
+
+	:global(.tk-replies:not(.tk-replies-expand)) {
+		mask-image: linear-gradient(to top, transparent, #FFF 4em);
+	}
+
+	:global(.tk-expand) {
+		border-radius: 0.5em;
+		transition: background-color 0.1s;
+	}
+
+	:global(.tippy-svg-arrow > svg) {
+		fill: inherit;
+		width: auto;
+		height: auto;
+	}
+}
+
+.twikoo :global(:where(.tk-preview-container,.tk-content)) {
+	pre {
+		overflow: auto;
+		border-radius: 0.5em;
+		font-size: 0.85em;
+	}
+
+	a {
+		margin: -0.1em -0.2em;
+		padding: 0.1em 0.2em;
+		background: linear-gradient(var(--c-primary-soft), var(--c-primary-soft)) no-repeat center bottom / 100% 0.1em;
+		color: var(--c-primary);
+		transition: all 0.2s;
+
+		&:hover {
+			border-radius: 0.3em;
+			background-size: 100% 100%;
+		}
+	}
+
+	p {
+		margin: 0.2em 0;
+	}
+
+	img {
+		border-radius: 0.5em;
+	}
+
+	menu, ol, ul {
+		margin: 0.5em 0;
+		padding-inline-start: 1.5em;
+		font-size: 0.9rem;
+		list-style: revert;
+
+		> li {
+			margin: 0.2em 0;
+
+			&::marker {
+				color: var(--c-primary);
+			}
+		}
+	}
+
+	blockquote {
+		margin: 0.5em 0;
+		padding: 0.2em 0.5em;
+		border-inline-start: 4px solid var(--c-border);
+		border-radius: 4px;
+		background-color: var(--c-bg-2);
+		font-size: 0.9em;
+	}
+}

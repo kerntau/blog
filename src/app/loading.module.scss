@@ -1,0 +1,64 @@
+.loading {
+	margin: 1rem;
+}
+
+.bar {
+	position: fixed;
+	inset-block-start: 0;
+	inset-inline-start: 0;
+	width: 35%;
+	height: 3px;
+	border-radius: 0 999px 999px 0;
+	background: linear-gradient(to var(--end), var(--c-primary), transparent);
+	animation: loading-bar 1s ease-in-out infinite;
+	z-index: 3000;
+}
+
+.card {
+	display: grid;
+	gap: 0.8rem;
+	padding: 1rem;
+	border-radius: 0.8rem;
+	background-color: var(--c-bg-2);
+	box-shadow: var(--box-shadow-1);
+
+	> span {
+		height: 1rem;
+		border-radius: 999px;
+		background: linear-gradient(90deg, var(--c-bg-3), var(--c-border), var(--c-bg-3));
+		background-size: 200% 100%;
+		animation: loading-shimmer 1.2s ease-in-out infinite;
+
+		&:nth-child(1) {
+			width: min(18rem, 70%);
+		}
+
+		&:nth-child(2) {
+			width: min(30rem, 100%);
+		}
+
+		&:nth-child(3) {
+			width: min(24rem, 85%);
+		}
+	}
+}
+
+@keyframes loading-bar {
+	0% {
+		transform: translateX(-100%);
+	}
+
+	100% {
+		transform: translateX(300%);
+	}
+}
+
+@keyframes loading-shimmer {
+	0% {
+		background-position: 100% 0;
+	}
+
+	100% {
+		background-position: -100% 0;
+	}
+}

@@ -1,0 +1,23 @@
+.pic {
+	margin: 1rem auto;
+	max-width: 100%;
+
+	&.clickable {
+		cursor: zoom-in;
+	}
+}
+
+.image {
+	object-fit: contain;
+}
+
+.caption {
+	margin-top: -0.5em;
+	font-size: 0.8em;
+	text-align: center;
+	color: var(--c-text-2);
+}
+
+.fallbackImage {
+	cursor: zoom-in;
+}

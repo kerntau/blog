@@ -1,0 +1,52 @@
+.button {
+	display: inline-block;
+	padding: 0.4em 0.6em;
+	border: 1px solid var(--c-bg-soft);
+	border-radius: 0.5em;
+	box-shadow: var(--box-shadow-1);
+	background-color: var(--ld-bg-card);
+	line-height: 1.2;
+	vertical-align: middle;
+	transition: color 0.1s, background-color 0.2s;
+	cursor: pointer;
+	text-decoration: none;
+	color: inherit;
+
+	&.primary {
+		background-color: var(--c-primary);
+		color: var(--c-bg);
+	}
+
+	&:hover {
+		box-shadow: var(--box-shadow-2);
+		background-color: var(--c-bg-2);
+		color: var(--c-text);
+	}
+
+	&:active {
+		background-color: var(--ld-shadow);
+	}
+
+	&:disabled {
+		background-color: var(--c-bg-1);
+		color: var(--c-text-3);
+		cursor: not-allowed;
+	}
+
+	& + .button {
+		margin-inline-start: 0.8em;
+	}
+}
+
+.buttonMain {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.2em;
+}
+
+.buttonDesc {
+	font-size: 0.75em;
+	text-align: center;
+	color: var(--c-text-2);
+}

@@ -1,0 +1,80 @@
+.zCodeblock {
+	--line-height: 1.4;
+
+	contain: paint;
+	margin: 0.5em 0;
+	border-radius: 0.5em;
+	background-color: var(--c-bg-2);
+	font-size: 0.85em;
+	line-height: 1.4;
+	tab-size: var(--tab-size, 4);
+
+	pre {
+		margin: 0;
+		padding: 1rem;
+		overflow: auto;
+
+		&.wrap {
+			white-space: pre-wrap;
+			word-break: break-all;
+		}
+	}
+}
+
+.figcaption {
+	display: flex;
+	justify-content: space-between;
+	gap: 1em;
+	position: sticky;
+	top: 0;
+	padding: 0 1em;
+	z-index: 2;
+
+	.filename {
+		padding: 0.2em 0.8em;
+		border-radius: 0 0 0.5em 0.5em;
+		background-color: var(--c-border);
+		word-break: break-all;
+		display: flex;
+		align-items: center;
+		gap: 0.3em;
+		min-height: 1.5em;
+	}
+
+	.language {
+		opacity: 0.4;
+		height: 0;
+		transform: translateY(0.2em);
+		text-transform: uppercase;
+		font-size: 0.8em;
+	}
+
+	.operations {
+		position: absolute;
+		opacity: 0;
+		inset-inline-end: 0;
+		padding: 0 0.6em;
+		border-end-start-radius: 0.5em;
+		background-color: var(--c-bg-2);
+		transition: opacity 0.2s;
+
+		:global(.z-codeblock:hover) &,
+		:global(.z-codeblock:focus-within) & {
+			opacity: 1;
+		}
+
+		button {
+			opacity: 0.4;
+			padding: 0.2em 0.4em;
+			transition: opacity 0.2s;
+			background: none;
+			border: none;
+			color: inherit;
+			cursor: pointer;
+
+			&:hover {
+				opacity: 1;
+			}
+		}
+	}
+}

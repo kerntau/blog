@@ -1,0 +1,64 @@
+.menu {
+	display: flex;
+	justify-content: center;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+
+	a {
+		position: relative;
+		padding: 0.5em;
+		border-radius: 2em;
+		transition: background-color 0.2s;
+
+		&:hover {
+			background-color: var(--c-bg-soft);
+		}
+
+		svg {
+			display: block;
+			font-size: 1.5em;
+		}
+
+		&::before,
+		&::after {
+			position: absolute;
+			inset-inline-start: 50%;
+			pointer-events: none;
+			opacity: 0;
+			transform: translate(-50%, 0.4rem);
+			transition: opacity 0.15s, transform 0.15s;
+			z-index: calc(var(--z-index-popover) + 1);
+		}
+
+		&::before {
+			content: attr(data-tip);
+			bottom: calc(100% + 0.55rem);
+			width: max-content;
+			max-width: 16rem;
+			padding: 0.35em 0.55em;
+			border-radius: 0.5em;
+			box-shadow: var(--box-shadow-2), var(--box-shadow-3);
+			background-color: var(--ld-bg-card);
+			color: var(--c-text);
+			font-size: 1rem;
+			white-space: nowrap;
+		}
+
+		&::after {
+			content: "";
+			bottom: calc(100% + 0.25rem);
+			border: 0.35rem solid transparent;
+			border-top-color: var(--ld-bg-card);
+			transform: translate(-50%, 0.2rem);
+		}
+
+		&:hover::before,
+		&:focus-visible::before,
+		&:hover::after,
+		&:focus-visible::after {
+			opacity: 1;
+			transform: translate(-50%, 0);
+		}
+	}
+}

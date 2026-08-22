@@ -1,0 +1,18 @@
+.preview {
+	margin: 1rem;
+}
+
+.previewHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	h1 {
+		mask-image: linear-gradient(#FFF, transparent);
+	}
+}
+
+.previewList {
+	list-style: none;
+	padding: 0;
+}

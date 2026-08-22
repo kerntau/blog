@@ -1,0 +1,7 @@
+.postList {
+	margin: 1rem;
+
+	:global(.float-in-leave-to) {
+		position: absolute;
+	}
+}

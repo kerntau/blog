@@ -1,0 +1,63 @@
+.copy {
+	contain: paint;
+	display: flex;
+	overflow: auto;
+	margin: 0.5rem 0;
+	border: 1px solid var(--c-border);
+	border-radius: 4px;
+	background-color: var(--ld-bg-card);
+	font-size: 0.8rem;
+	line-height: 2.5;
+	transition: border-color 0.2s;
+
+	&:focus-within {
+		border-color: var(--c-primary);
+		outline: 0.2em solid var(--c-primary-soft);
+
+		.prompt {
+			border-inline-end-color: var(--c-primary);
+			background-color: var(--c-primary-soft);
+			color: var(--c-primary);
+		}
+	}
+}
+
+.prompt {
+	flex-shrink: 0;
+	padding: 0 1em;
+	border-inline-end: 1px solid var(--c-border);
+	background-color: var(--c-bg-2);
+	color: var(--c-text-2);
+	transition: all 0.2s;
+}
+
+.code {
+	--fadeout-width: 3ch;
+	--scrollbar-height: 4px;
+
+	flex-grow: 1;
+	overflow: auto;
+	padding: 0 1em;
+	outline: none;
+	white-space: nowrap;
+	scrollbar-color: auto;
+	scrollbar-width: auto;
+
+	&::-webkit-scrollbar {
+		height: 4px;
+		background-color: transparent;
+	}
+}
+
+.operation {
+	flex-shrink: 0;
+	height: 2.5em;
+	margin-inline-start: -0.5em;
+	padding: 0.5em;
+	color: var(--c-text-2);
+	transition: color, 0.2s;
+
+	&:hover {
+		color: var(--c-primary);
+	}
+}

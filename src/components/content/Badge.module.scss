@@ -1,0 +1,15 @@
+.badge {
+	display: inline-block;
+	padding: 0.1em 0.4em;
+	border-radius: 0.3em;
+	font-size: 0.8em;
+	vertical-align: middle;
+	background-color: var(--c-bg-2);
+	color: var(--c-text-2);
+
+	&.primary { background-color: var(--c-primary-soft); color: var(--c-primary); }
+	&.tip { background-color: #3A72; color: #3A7; }
+	&.info { background-color: var(--c-bg-soft); color: var(--c-text-1); }
+	&.warning { background-color: #F802; color: #F80; }
+	&.error { background-color: #F332; color: #F33; }
+}

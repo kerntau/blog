@@ -1,0 +1,88 @@
+.archive {
+	padding: 1rem;
+	mask-image: linear-gradient(#FFF 50%, #FFF7);
+}
+
+.archiveGroup {
+	margin: 1rem 0 3rem;
+
+	.archiveList {
+		display: grid;
+		grid-template-columns: repeat(var(--archive-item-column, 1), 1fr);
+		column-gap: calc((5 - var(--archive-item-column, 1)) * 0.2em);
+		list-style: none;
+		padding: 0;
+	}
+
+	&.hideInfo :global(.dim-hover) {
+		display: none;
+	}
+}
+
+.archiveTuning {
+	position: sticky;
+	bottom: min(2em, 5%);
+	padding: 1rem;
+	z-index: 10;
+}
+
+.archiveTitle {
+	display: flex;
+	justify-content: space-between;
+	gap: 1em;
+	position: sticky;
+	opacity: 0.5;
+	top: 0;
+	font-size: min(1.5em, 5vw);
+	color: transparent;
+	transition: color 0.2s;
+
+	&::selection {
+		color: var(--c-text-3);
+	}
+
+	&:hover {
+		.archiveAge {
+			opacity: 0;
+		}
+	}
+
+	.archiveYear, .archiveAge {
+		margin: 0;
+		margin-bottom: -0.3em;
+		mask-image: linear-gradient(#FFF 50%, transparent);
+		font-family: var(--font-stroke-free, sans-serif);
+		font-size: 3em;
+		font-variant-numeric: tabular-nums;
+		font-weight: 800;
+		line-height: 1;
+		z-index: -1;
+		-webkit-text-stroke: 1px var(--c-text-3);
+	}
+
+	.archiveAge {
+		position: absolute;
+		inset-inline-end: 0;
+		transition: opacity 0.2s;
+
+		.ageLabel {
+			font-size: 0.5em;
+			vertical-align: super;
+		}
+	}
+
+	.archiveInfo {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		column-gap: 0.5em;
+	}
+}
+
+.archiveGroup:hover .archiveTitle {
+	color: var(--c-text-3);
+
+	.archiveAge {
+		opacity: 0;
+	}
+}

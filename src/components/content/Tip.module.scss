@@ -1,0 +1,12 @@
+.tip {
+	position: relative;
+	text-decoration: underline dashed var(--c-text-3);
+	cursor: pointer;
+	text-underline-offset: 4px;
+}
+
+.tipIcon {
+	display: inline-block;
+	font-size: 1em;
+	vertical-align: top;
+}

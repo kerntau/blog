@@ -1,0 +1,32 @@
+.zExpand {
+	display: flex;
+	flex-direction: column;
+}
+
+.toggleBtn {
+	display: block;
+	width: fit-content;
+	margin: 0 auto;
+	padding: 0.3em;
+	font-size: 0.9em;
+	color: var(--c-text-2);
+	background: none;
+	border: none;
+	cursor: pointer;
+
+	&.inPlace {
+		order: -1;
+	}
+}
+
+.toggleIcon {
+	transition: transform 0.2s;
+
+	&.expand {
+		transform: scaleY(-1);
+	}
+}
+
+.content {
+	// 无额外动画，由 collapse CSS transition 驱动
+}
