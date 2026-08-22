@@ -24,9 +24,11 @@ export enum QgroupAvatarSize {
 	Size640 = 640,
 }
 
-export function getOciqGroupAvatar(group = '', size: QgroupAvatarSize | number = QgroupAvatarSize.Size100) {
+export function getOicqGroupAvatar(group = '', size: QgroupAvatarSize | number = QgroupAvatarSize.Size100) {
 	return `https://p.qlogo.cn/gh/${group}/${group}/${size}/`
 }
+
+export const getOciqGroupAvatar = getOicqGroupAvatar
 
 interface FaviconOptions {
 	provider?: 'google' | 'duckduckgo' | 'microlink'

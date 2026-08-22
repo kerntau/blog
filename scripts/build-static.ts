@@ -20,7 +20,6 @@ import { visit } from 'unist-util-visit'
 import blogConfig, { myFeed } from '../blog.config'
 import feeds from '../src/feeds'
 import packageJson from '../package.json'
-import readingTimeOverrides from '../src/data/reading-time-overrides.json'
 import { toZonedTemporal } from '../src/utils/time'
 import remarkMusic from '../remark-plugins/remark-music'
 import rehypeMetaSlots from '../remark-plugins/rehype-meta-slots'
@@ -90,6 +89,16 @@ function parseYamlProps(yamlStr: string) {
 	return props
 }
 
+function convertMdcPropsToJsx(propsStr: string) {
+	if (!propsStr) return ''
+	// 处理 :prop='[...]' 或 :prop="{...}" 或 :prop="true" -> prop={[...]}
+	const converted = propsStr.replace(/:([\w-]+)=(['"])(.*?)\2/g, (_m, key, _q, val) => {
+		return `${key}={${val}}`
+	})
+	// 处理纯布尔值简写或普通 key=val
+	return converted
+}
+
 function preprocessMdc(source: string) {
 	// 预先清理 HTML 注释，防止 MDX 语法解析器将其误作为非法 JSX 抛出异常
 	source = source.replace(/<!--[\s\S]*?-->/g, '')
@@ -97,7 +106,7 @@ function preprocessMdc(source: string) {
 	let inCodeBlock = false
 	const lines = source.split('\n')
 	const result: string[] = []
-	const blockStack: { colons: string, component: string }[] = []
+	const blockStack: { colons: string, component: string, currentSlot?: string }[] = []
 
 	for (let i = 0; i < lines.length; i++) {
 		let line = lines[i]!
@@ -119,7 +128,7 @@ function preprocessMdc(source: string) {
 			const colons = blockMatch[1]!
 			const name = blockMatch[2]!
 			const component = mdcLeafComponents[name] || name.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('')
-			const inlineProps = blockMatch[3] ? blockMatch[3].slice(1, -1).trim() : ''
+			const inlineProps = blockMatch[3] ? convertMdcPropsToJsx(blockMatch[3].slice(1, -1).trim()) : ''
 
 			let nextIdx = i + 1
 			while (nextIdx < lines.length && lines[nextIdx]!.trim() === '') nextIdx++
@@ -165,25 +174,50 @@ function preprocessMdc(source: string) {
 		if (endMatch && blockStack.length > 0) {
 			const top = blockStack[blockStack.length - 1]!
 			if (top.colons.length <= endMatch[1]!.length) {
+				if (top.currentSlot) {
+					result.push(`</div>`)
+				}
 				blockStack.pop()
 				result.push(`</${top.component}>`)
 				continue
 			}
 		}
 
+		// 处理 MDC 命名插槽 #slotname (如 #title, #default, #tab1, #tab2)
+		const slotMatch = line.match(/^\s*#([\w-]+)\s*$/)
+		if (slotMatch && blockStack.length > 0) {
+			const top = blockStack[blockStack.length - 1]!
+			const slotName = slotMatch[1]!
+			if (top.currentSlot) {
+				result.push(`</div>`)
+			}
+			top.currentSlot = slotName
+			result.push(`<div className="slot-${slotName}" data-slot="${slotName}">`)
+			continue
+		}
+
+		// 处理代码块首行标题语法 e.g. ```sh [可疑命令] -> ```sh title="可疑命令"
+		line = line.replace(/^(\s*```[\w-]+)\s+\[(.*?)\]/, '$1 title="$2"')
+
+		// 处理行内代码块 MDC 属性语法 e.g. `code`{lang="sh"} -> `code`
+		line = line.replace(/(`[^`\n]+`)\{[^}\n]*\}/g, '$1')
+
 		// 处理行内带文本组件 :tip[文本]{tip="..."} 或 :quote[文本]
-		line = line.replace(/(^|[^\w/]):([a-z][\w-]*)\[(.*?)\](\{[^}\n]*\})?/g, (_m, prefix, name, text, attrs) => {
+		line = line.replace(/(^|[^\w/]):([a-z][\w-]*)\[(.*?)\](?:\{((?:[^{}]|"[^"]*"|'[^']*')*)\})?/g, (_m, prefix, name, text, attrs) => {
 			const comp = mdcLeafComponents[name] || name.split('-').map((s: string) => s.charAt(0).toUpperCase() + s.slice(1)).join('')
-			const props = attrs ? attrs.slice(1, -1).trim() : ''
+			const props = attrs ? convertMdcPropsToJsx(attrs.trim()) : ''
 			return `${prefix}<${comp}${props ? ` ${props}` : ''}>${text}</${comp}>`
 		})
 
-		// 处理行内无文本组件 :key{code="..."}
-		line = line.replace(/(^|[^\w/]):([a-z][\w-]*)(\{[^}\n]*\})?/g, (_m, prefix, name, attrs) => {
+		// 处理行内无文本组件 :key{code="..."} 或 :copy{code="..."}
+		line = line.replace(/(^|[^\w/]):([a-z][\w-]*)\{((?:[^{}]|"[^"]*"|'[^']*')*)\}/g, (_m, prefix, name, attrs) => {
 			const comp = mdcLeafComponents[name] || name.split('-').map((s: string) => s.charAt(0).toUpperCase() + s.slice(1)).join('')
-			const props = attrs ? attrs.slice(1, -1).trim() : ''
+			const props = attrs ? convertMdcPropsToJsx(attrs.trim()) : ''
 			return `${prefix}<${comp}${props ? ` ${props}` : ''} />`
 		})
+
+		// 处理 Markdown 原生自动链接 <http://...> 或 <https://...>
+		line = line.replace(/<(https?:\/\/[^>]+)>/g, (_m, url) => `[${url}](${url})`)
 
 		// 处理单标签 HTML 格式兼容
 		line = line.replace(/<br\s*>/gi, '<br />').replace(/<hr\s*>/gi, '<hr />')
@@ -197,7 +231,7 @@ function preprocessMdc(source: string) {
 					return part
 						.replace(/\{/g, '&#123;')
 						.replace(/\}/g, '&#125;')
-						.replace(/<(?![a-zA-Z/])/g, '&lt;')
+						.replace(/<(?!\/?(?:Alert|Badge|BlogHeader|Copy|EmojiClock|Tip|Pic|Tab|Folding|Timeline|MusicScore|VideoEmbed|Poetry|LinkCard|LinkBanner|Chat|Key|Quote|CardList|MdTitle|a|p|div|span|strong|em|code|pre|blockquote|ul|ol|li|table|thead|tbody|tr|th|td|hr|br|img|h1|h2|h3|h4|h5|h6)\b)/gi, '&lt;')
 				})
 				.join('')
 		}
@@ -207,6 +241,9 @@ function preprocessMdc(source: string) {
 
 	while (blockStack.length > 0) {
 		const top = blockStack.pop()!
+		if (top.currentSlot) {
+			result.push(`</div>`)
+		}
 		result.push(`</${top.component}>`)
 	}
 
@@ -277,22 +314,19 @@ function getSharedHighlighter() {
 	return sharedHighlighterPromise
 }
 
-async function compileMdxSource(rawBody: string, frontmatterTitle?: string) {
-	const cacheKey = createHash('md5').update(`${CACHE_VERSION}::${rawBody}::${frontmatterTitle || ''}`).digest('hex')
+async function compileMdxSource(rawSource: string, frontmatterTitle?: string, filePath = '') {
+	const source = preprocessMdc(rawSource)
+	const cacheKey = createHash('md5').update(`${CACHE_VERSION}:${source}`).digest('hex')
 	const cacheFile = join(cacheDir, `${cacheKey}.json`)
 
 	if (existsSync(cacheFile)) {
 		try {
-			const cached = JSON.parse(readFileSync(cacheFile, 'utf-8'))
-			if (cached && typeof cached.compiledCode === 'string' && Array.isArray(cached.toc)) {
-				return cached
-			}
+			return JSON.parse(readFileSync(cacheFile, 'utf-8'))
 		} catch {
-			// 缓存损坏时自动回退重新编译
+			// 忽略缓存解析失败
 		}
 	}
 
-	const source = preprocessMdc(rawBody)
 	const slugger = new GithubSlugger()
 	const toc: any[] = []
 	let isFirstHeading = true
@@ -374,7 +408,7 @@ async function compileMdxSource(rawBody: string, frontmatterTitle?: string) {
 
 		return result
 	} catch (err) {
-		console.warn('MDX 编译异常，使用源码回退:', err)
+		console.warn(`MDX 编译异常 [${filePath}]:`, err)
 		return {
 			compiledCode: '',
 			toc: [],
@@ -399,6 +433,10 @@ function getPostFiles(dir: string): string[] {
 async function getAllPostsData() {
 	const files = getPostFiles(contentDir)
 	const limit = pLimit(Math.max(os.cpus().length, 4))
+	const overridesPath = join(rootDir, 'src/data/reading-time-overrides.json')
+	const readingTimeOverrides: Record<string, number> = existsSync(overridesPath)
+		? JSON.parse(readFileSync(overridesPath, 'utf-8'))
+		: {}
 
 	const posts = await Promise.all(
 		files.map(fullPath => limit(async () => {
@@ -431,29 +469,12 @@ async function getAllPostsData() {
 				data.image = data.images[0]
 			}
 
-			const categoryZhMap: Record<string, string> = {
-				'frontend': '前端开发',
-				'backend': '后端开发',
-				'database': '数据库系统',
-				'devops': '云原生与运维',
-				'security': '网络安全',
-				'artificial-intelligence': '人工智能',
-				'ai': '人工智能',
-			}
-
 			if (!data.categories) {
 				if (data.category) {
 					data.categories = [data.category]
 				} else {
 					data.categories = [blogConfig.defaultCategory]
 				}
-			}
-
-			if (Array.isArray(data.categories)) {
-				data.categories = data.categories.map((cat: string) => categoryZhMap[cat] || cat)
-			}
-			if (data.category) {
-				data.category = categoryZhMap[data.category] || data.category
 			}
 
 			if (!data.tags) {
@@ -471,7 +492,7 @@ async function getAllPostsData() {
 				}
 			}
 
-			const { compiledCode, toc } = await compileMdxSource(body, data.title)
+			const { compiledCode, toc } = await compileMdxSource(body, data.title, fullPath)
 
 			return {
 				categories: [blogConfig.defaultCategory],

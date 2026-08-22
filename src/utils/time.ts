@@ -41,7 +41,6 @@ export function isSameUnit(
 	}
 }
 
-
 const timeIntervals = [
 	{ label: '世纪', threshold: 60 * 60 * 24 * 365.2422 * 100 },
 	{ label: '年', threshold: 60 * 60 * 24 * 365.2422 },

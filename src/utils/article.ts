@@ -2,7 +2,9 @@ import appConfig from '../app.config'
 
 export function getCategoryIcon(category?: string) {
 	if (!category) return 'tabler:folder'
-	return appConfig.article.categories[category as keyof typeof appConfig.article.categories]?.icon ?? 'tabler:folder'
+	return appConfig.article.categories[category as keyof typeof appConfig.article.categories]?.icon
+		?? appConfig.article.categories[appConfig.defaultCategory as keyof typeof appConfig.article.categories]?.icon
+		?? 'tabler:folder'
 }
 
 export function getCategoryColor(category?: string) {

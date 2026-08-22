@@ -24,9 +24,6 @@ export default defineConfig({
 			'~': path.resolve(__dirname, 'src'),
 			'~~': path.resolve(__dirname),
 			'/fonts': path.resolve(__dirname, 'public/fonts'),
-			'next/link': path.resolve(__dirname, 'src/lib/compat-link.tsx'),
-			'next/image': path.resolve(__dirname, 'src/lib/compat-image.tsx'),
-			'next/navigation': path.resolve(__dirname, 'src/lib/compat-navigation.tsx'),
 		},
 		define: {
 			'process.env.NEXT_PUBLIC_BUILD_TIME': JSON.stringify(new Date().toISOString()),

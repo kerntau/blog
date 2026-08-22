@@ -7,7 +7,7 @@ import Tab from '@/components/content/Tab'
 import Copy from '@/components/content/Copy'
 import BlogHeader from '@/components/blog/BlogHeader'
 import feeds from '@/feeds'
-import { myFeed } from '~~/blog.config'
+import { myFeed } from '../../blog.config'
 import appConfig from '@/app.config'
 import PostComment from '@/components/post/PostComment'
 import styles from './LinkPage.module.scss'
@@ -21,17 +21,17 @@ export default function LinkPage() {
 	}, [setAside])
 
 	const copyFields = {
-		博主: myFeed.author,
+		作者: myFeed.author,
 		标题: myFeed.title,
-		介绍: myFeed.desc,
-		网址: myFeed.link,
+		描述: myFeed.desc,
+		地址: myFeed.link,
 		头像: myFeed.avatar,
 	}
 
 	return (
 		<div className="link-page proper-height">
 			<div className="mobile-only">
-				<BlogHeader as="h1" />
+				<BlogHeader as="h1" suffix="友链" />
 			</div>
 
 			{feeds.map((group) => (
@@ -42,7 +42,7 @@ export default function LinkPage() {
 				/>
 			))}
 
-			<Tab tabs={['我的博客信息', '申请友链']} center>
+			<Tab tabs={['我的博客信息', '申请说明']} center>
 				<div slot="tab1" className={styles.linkTab}>
 					<FeedCard {...myFeed} />
 					{Object.entries(copyFields).map(([prompt, code]) => (
@@ -55,7 +55,7 @@ export default function LinkPage() {
 							{mdx.content}
 						</article>
 					) : (
-						<p className="text-center">可于 link.md 配置友链补充说明。</p>
+						<p className="text-center">请新建 link.md 说明</p>
 					)}
 				</div>
 			</Tab>

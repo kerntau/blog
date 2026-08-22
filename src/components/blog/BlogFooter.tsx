@@ -1,4 +1,4 @@
-import Link from '@/lib/compat-link'
+import UtilLink from '../util/UtilLink'
 import appConfig from '../../app.config'
 import styles from './BlogFooter.module.scss'
 import { Icon } from '@iconify/react'
@@ -14,14 +14,10 @@ export default function BlogFooter() {
 							<menu>
 								{group.items.map((item, itemIndex) => (
 									<li key={itemIndex}>
-										<Link
-											href={item.url}
-											target={item.url.startsWith('http') ? '_blank' : undefined}
-											rel={item.url.startsWith('http') ? 'noopener noreferrer' : undefined}
-										>
+										<UtilLink to={item.url}>
 											<Icon icon={item.icon} />
 											<span className={styles.navText}>{item.text}</span>
-										</Link>
+										</UtilLink>
 									</li>
 								))}
 							</menu>

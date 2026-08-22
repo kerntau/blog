@@ -1,17 +1,28 @@
 import Image from '@/lib/compat-image'
-import Link from '@/lib/compat-link'
+import UtilLink from '../util/UtilLink'
 import appConfig from '../../app.config'
 import styles from './BlogHeader.module.scss'
 import { getFixedDelay } from '../../utils/anim'
 
 interface BlogHeaderProps {
 	as?: React.ElementType
+	tag?: React.ElementType
+	to?: string
+	suffix?: string
 	className?: string
 }
 
-export default function BlogHeader({ as: Tag = 'div', className = '' }: BlogHeaderProps) {
+export default function BlogHeader({
+	as,
+	tag,
+	to = '/',
+	suffix,
+	className = '',
+}: BlogHeaderProps) {
+	const Tag = as || tag || 'div'
+	const titleText = suffix ? `${appConfig.title} · ${suffix}` : appConfig.title
 	return (
-		<Link href="/" className={`${styles.blogHeader} ${className}`.trim()}>
+		<UtilLink to={to} className={`${styles.blogHeader} ${className}`.trim()}>
 			{appConfig.header.emojiTail && (
 				<div className={styles.emojiTail}>
 					{appConfig.header.emojiTail.map((emoji, idx) => (
@@ -34,7 +45,7 @@ export default function BlogHeader({ as: Tag = 'div', className = '' }: BlogHead
 			{appConfig.header.showTitle && (
 				<div className={styles.blogText}>
 					<Tag className={styles.headerTitle}>
-						{appConfig.title.split('').map((char, idx) => (
+						{titleText.split('').map((char, idx) => (
 							<span key={idx} className={styles.splitChar} style={getFixedDelay((idx + 1) * 0.1)}>
 								{char}
 							</span>
@@ -45,6 +56,6 @@ export default function BlogHeader({ as: Tag = 'div', className = '' }: BlogHead
 					</div>
 				</div>
 			)}
-		</Link>
+		</UtilLink>
 	)
 }

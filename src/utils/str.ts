@@ -5,14 +5,6 @@ function toArray<T>(val: T | T[] | undefined): T[] {
 	return Array.isArray(val) ? val : [val]
 }
 
-// @keep-sorted
-const promptLanguageMap: Record<string, string> = {
-	'#': 'sh',
-	'$': 'sh',
-	'CMD': 'bat',
-	'PS': 'powershell',
-}
-
 export function formatNumber(num?: number) {
 	if (typeof num !== 'number')
 		return ''
@@ -55,16 +47,6 @@ export function formatBytes(bytes: number, options: FormatBytesOptions = {}) {
 	return `${value}${unitSeparator}${units[i]}`
 }
 
-export function getPromptLanguage(prompt: string | boolean) {
-	if (typeof prompt === 'boolean')
-		return 'text'
-	for (const promptPrefix in promptLanguageMap) {
-		if (prompt.startsWith(promptPrefix))
-			return promptLanguageMap[promptPrefix] ?? 'text'
-	}
-	return 'text'
-}
-
 export function highlightHtml(text: string, words: string | string[] | undefined, className?: string) {
 	const validTerms = toArray(words)
 		.filter((t): t is string => !!t?.trim())
@@ -95,4 +77,3 @@ export function extractNodeText(node: any): string {
 export function joinWith(list: (string | undefined | null)[], separator = ' - ') {
 	return list.filter(Boolean).join(separator)
 }
-

@@ -18,12 +18,5 @@
       ],
       "source": "/cotovo.opml"
     }
-  ],
-  "redirects": [
-    {
-      "destination": "/og-image.jpg",
-      "source": "/favicon.ico",
-      "statusCode": 308
-    }
   ]
 }

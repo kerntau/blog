@@ -69,7 +69,7 @@ export default function HomePage() {
 						{previewCount > 0 && (
 							<UtilLink to="/preview" className="preview-entrance">
 								<Icon icon="tabler:shield-lock" />
-								查看预览文章
+								查看预览
 							</UtilLink>
 						)}
 					</ZSecret>

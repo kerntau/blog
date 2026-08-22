@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react'
-import Link from '@/lib/compat-link'
+import { Link } from 'react-router-dom'
 import { isExtLink } from '../../utils/link'
 
 interface UtilLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
@@ -18,17 +18,31 @@ const UtilLink = forwardRef<HTMLAnchorElement, UtilLinkProps>(({ to, href, child
 		return <span ref={ref as any} {...(props as any)}>{children}</span>
 	}
 
+	if (isExtLink(destination)) {
+		return (
+			<a
+				ref={ref}
+				href={destination}
+				target="_blank"
+				rel="noopener noreferrer"
+				{...props}
+			>
+				{children}
+			</a>
+		)
+	}
+
 	return (
 		<Link
 			ref={ref}
-			href={destination}
-			target={isExtLink(destination) ? '_blank' : undefined}
-			rel={isExtLink(destination) ? 'noopener noreferrer' : undefined}
-			{...props}
+			to={destination}
+			{...(props as any)}
 		>
 			{children}
 		</Link>
 	)
 })
+
+UtilLink.displayName = 'UtilLink'
 
 export default UtilLink

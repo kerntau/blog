@@ -24,7 +24,7 @@ export default function PreviewPage() {
 		<div className={styles.preview}>
 			<div className={styles.previewHeader}>
 				<h1>
-					<UtilLink className="mobile-only" to="/" title="返回首页">
+					<UtilLink className="mobile-only" to="/" title="主页">
 						<Icon icon="tabler:chevron-left" />
 					</UtilLink>
 					预览
@@ -39,7 +39,7 @@ export default function PreviewPage() {
 					categories={categories}
 				/>
 			</div>
-			<p>勇敢的人探索世界。这里是一些还未发布的文章。</p>
+			<p>勇敢的探索者。这里是一些尚未发布的文章。</p>
 
 			<motion.menu layout className={`${styles.previewList} proper-height`}>
 				<AnimatePresence mode="popLayout">
