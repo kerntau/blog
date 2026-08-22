@@ -1,9 +1,17 @@
+@use "@/assets/css/variable" as *;
+
 .surroundPost {
 	contain: layout;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1rem;
 	margin: 3rem 1rem;
+
+	@media (max-width: $breakpoint-mobile) {
+		flex-direction: column;
+		gap: 0.75rem;
+		margin: 2rem 0.5rem;
+	}
 }
 
 .surroundLink {
@@ -11,6 +19,8 @@
 	align-items: center;
 	gap: 0.5em;
 	transition: color 0.2s;
+	flex: 1 1 200px;
+	min-width: 0;
 
 	&:not([href]) {
 		opacity: 0.4;
@@ -24,13 +34,30 @@
 		text-align: end;
 	}
 
+	@media (max-width: $breakpoint-mobile) {
+		width: 100%;
+		padding: 8px 12px;
+		background: var(--ld-bg-card, rgba(0,0,0,0.02));
+		border-radius: 8px;
+		border: 1px solid var(--c-border, #e2e8f0);
+
+		&.alignEnd,
+		&[align-end] {
+			margin-inline-start: 0;
+		}
+	}
+
 	.surroundText {
 		text-wrap: balance;
 		transition: transform 0.2s;
+		overflow: hidden;
 
 		.title {
 			display: block;
 			font-weight: bold;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
 		}
 
 		.date {
