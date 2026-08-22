@@ -44,11 +44,7 @@ export default function HomePage() {
 
 	const listRecommended = useMemo(() => {
 		const withRecommend = allPosts.filter(item => item.recommend !== undefined && item.recommend !== null)
-		if (withRecommend.length > 0) {
-			return orderBy(withRecommend, ['recommend', 'date'], ['desc'])
-		}
-		// 默认取带封面图的前 6 篇作为精选推荐
-		return allPosts.filter(item => item.image).slice(0, 6)
+		return orderBy(withRecommend, ['recommend', 'date'], ['desc'])
 	}, [allPosts])
 
 	return (

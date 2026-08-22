@@ -1,7 +1,6 @@
 import Link from '@/lib/compat-link'
 import appConfig from '../../app.config'
 import styles from './BlogFooter.module.scss'
-import { getFixedDelay } from '../../utils/anim'
 import { Icon } from '@iconify/react'
 
 export default function BlogFooter() {
@@ -11,10 +10,10 @@ export default function BlogFooter() {
 				<nav className={styles.footerNav}>
 					{appConfig.footer.nav.map((group, groupIndex) => (
 						<div key={groupIndex} className={styles.navGroup}>
-							<hgroup className="text-creative" style={getFixedDelay(groupIndex * 0.1)}>{group.title}</hgroup>
+							<hgroup className="text-creative">{group.title}</hgroup>
 							<menu>
 								{group.items.map((item, itemIndex) => (
-									<li key={itemIndex} style={getFixedDelay((groupIndex + 1) * 0.1 + itemIndex * 0.05)}>
+									<li key={itemIndex}>
 										<Link
 											href={item.url}
 											target={item.url.startsWith('http') ? '_blank' : undefined}

@@ -1,5 +1,5 @@
 .archive {
-	padding: 1rem 0;
+	padding: 1rem; // 防止内部 outline 被 mask
 	mask-image: linear-gradient(#FFF 50%, #FFF7);
 }
 

@@ -44,10 +44,10 @@ export default function ArchivePage() {
 				const d = (sortOrder === 'updated' ? article.updated : article.date) || ''
 				return toZonedTemporal(d).year.toString()
 			} catch {
-				return 'Unknown'
+				return ''
 			}
 		})
-		const entries = Object.entries(groups)
+		const entries = Object.entries(groups).filter(([year]) => !!year)
 		return isAscending ? entries : entries.reverse()
 	}, [listCategorized, sortOrder, isAscending])
 

@@ -23,6 +23,25 @@ export function isTimeDiffSignificant(
 	}
 }
 
+export function isSameUnit(
+	date1?: string | Temporal.ZonedDateTime,
+	date2?: string | Temporal.ZonedDateTime,
+	unit: 'year' | 'month' | 'day' = 'year'
+) {
+	if (!date1 || !date2) return false
+	try {
+		const zdt1 = typeof date1 === 'string' ? toZonedTemporal(date1) : date1
+		const zdt2 = typeof date2 === 'string' ? toZonedTemporal(date2) : date2
+		if (unit === 'year') return zdt1.year === zdt2.year
+		if (unit === 'month') return zdt1.year === zdt2.year && zdt1.month === zdt2.month
+		if (unit === 'day') return zdt1.year === zdt2.year && zdt1.month === zdt2.month && zdt1.day === zdt2.day
+		return false
+	} catch {
+		return false
+	}
+}
+
+
 const timeIntervals = [
 	{ label: '世纪', threshold: 60 * 60 * 24 * 365.2422 * 100 },
 	{ label: '年', threshold: 60 * 60 * 24 * 365.2422 },

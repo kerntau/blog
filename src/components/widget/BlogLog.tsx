@@ -4,9 +4,11 @@ import appConfig from '../../app.config'
 
 export default function BlogLog() {
 	const blogLog = [
-		{ label: '2026-05-11', value: '从旧项目迁移并重构至 Next.js 15' },
-		{ label: '2026-04-10', value: '初始化 Cotovo 个人空间' },
-		{ label: appConfig.timeEstablished, value: '开启博客之旅' },
+		{ label: '2025-07-26', value: '重构至 Nuxt 4 + Nuxt Content v3，迁移 zhilu.site 域名' },
+		{ label: '2024-08-11', value: '重构至 Nuxt 3 + Nuxt Content v2' },
+		{ label: '2023-05-24', value: '迁移为 Hexo，使用 Butterfly 主题' },
+		{ label: '2020-08-24', value: '使用 zhilu.cyou 域名' },
+		{ label: appConfig.timeEstablished, value: '发布第一篇文章' },
 	]
 
 	return (

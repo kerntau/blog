@@ -91,3 +91,8 @@ export function extractNodeText(node: any): string {
 	}
 	return ''
 }
+
+export function joinWith(list: (string | undefined | null)[], separator = ' - ') {
+	return list.filter(Boolean).join(separator)
+}
+
