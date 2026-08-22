@@ -48,7 +48,7 @@ async function main() {
 
 	if (!inUse) {
 		console.log('⚡ 正在伴生启动本地管理 API 引擎 (http://localhost:3001)...')
-		adminProcess = spawn('npx', ['tsx', 'scripts/admin-server.ts'], {
+		adminProcess = spawn('npx', ['tsx', 'watch', 'scripts/admin-server.ts'], {
 			cwd: rootDir,
 			shell: true,
 			stdio: 'inherit',
