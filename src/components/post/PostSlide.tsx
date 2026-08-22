@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect } from 'react'
-import Image from '@/lib/compat-image'
 import useEmblaCarousel from 'embla-carousel-react'
 import Autoplay from 'embla-carousel-autoplay'
 import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
@@ -20,7 +19,7 @@ export default function PostSlide({ list }: { list: ArticleProps[] }) {
 		{ containScroll: false, loop: true, skipSnaps: true },
 		[
 			Autoplay({ stopOnInteraction: false, stopOnMouseEnter: true }),
-			WheelGesturesPlugin() as any, // Plugin types might mismatch, fallback
+			WheelGesturesPlugin() as any,
 		]
 	)
 
@@ -57,13 +56,12 @@ export default function PostSlide({ list }: { list: ArticleProps[] }) {
 							to={article.path}
 						>
 							{article.image && (
-								<Image
+								<img
 									className={styles.cover}
 									src={article.image}
 									alt={compConf.showTitle ? '' : (article.title || '')}
-									fill
-									sizes="(max-width: 768px) 80vw, 28vw"
-									unoptimized
+									loading="lazy"
+									decoding="async"
 								/>
 							)}
 

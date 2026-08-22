@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import UtilLink from '../util/UtilLink'
 import ZTooltip from '../partial/ZTooltip'
-import Image from '@/lib/compat-image'
+import Image from '@/components/util/Image'
 import { getGithubUsername, isExtLink, getDomain, safelyDecodeUriComponent } from '../../utils/link'
 import { getGithubAvatar, getFavicon } from '../../utils/img'
 import styles from './Badge.module.scss'

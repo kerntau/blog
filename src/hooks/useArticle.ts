@@ -1,7 +1,7 @@
 'use client'
 
-import { useSearchParams, useRouter, usePathname } from '@/lib/compat-navigation'
 import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import type { ArticleOrderType, ArticleProps } from '../types/article'
 import { orderBy } from 'es-toolkit/array'
 import appConfig from '../app.config'
@@ -15,9 +15,10 @@ interface UseCategoryOptions {
 
 export function useCategory(list: ArticleProps[], options?: UseCategoryOptions) {
 	const { bindQuery } = options || {}
-	const searchParams = useSearchParams()
-	const router = useRouter()
-	const pathname = usePathname()
+	const [searchParams] = useSearchParams()
+	const navigate = useNavigate()
+	const location = useLocation()
+	const pathname = location.pathname
 
 	const queryCategory = bindQuery ? (searchParams?.get(bindQuery) ?? undefined) : undefined
 	const [localCategory, setLocalCategory] = useState<string | undefined>(queryCategory)
@@ -51,9 +52,9 @@ export function useCategory(list: ArticleProps[], options?: UseCategoryOptions) 
 				params.set(bindQuery, newCategory)
 			}
 			const query = params.toString()
-			router.push(query ? `${pathname}?${query}` : pathname, { scroll: true })
+			navigate(query ? `${pathname}?${query}` : pathname)
 		}
-	}, [bindQuery, pathname, router])
+	}, [bindQuery, pathname, navigate])
 
 	return {
 		category,
@@ -79,9 +80,10 @@ export function useArticleSort(list: ArticleProps[], options?: UseArticleSortOpt
 		initialOrder = appConfig.pagination.sortOrder || 'date',
 	} = options || {}
 
-	const searchParams = useSearchParams()
-	const router = useRouter()
-	const pathname = usePathname()
+	const [searchParams] = useSearchParams()
+	const navigate = useNavigate()
+	const location = useLocation()
+	const pathname = location.pathname
 
 	const querySortOrder = bindOrderQuery
 		? ((searchParams?.get(bindOrderQuery) as ArticleOrderType | null) ?? initialOrder)
@@ -122,18 +124,18 @@ export function useArticleSort(list: ArticleProps[], options?: UseArticleSortOpt
 		if (bindOrderQuery) {
 			const params = new URLSearchParams(window.location.search)
 			params.set(bindOrderQuery, newOrder)
-			router.push(`${pathname}?${params.toString()}`, { scroll: true })
+			navigate(`${pathname}?${params.toString()}`)
 		}
-	}, [bindOrderQuery, pathname, router])
+	}, [bindOrderQuery, pathname, navigate])
 
 	const setIsAscending = useCallback((asc: boolean) => {
 		setLocalIsAscending(asc)
 		if (bindDirectionQuery) {
 			const params = new URLSearchParams(window.location.search)
 			params.set(bindDirectionQuery, asc ? 'true' : 'false')
-			router.push(`${pathname}?${params.toString()}`, { scroll: true })
+			navigate(`${pathname}?${params.toString()}`)
 		}
-	}, [bindDirectionQuery, pathname, router])
+	}, [bindDirectionQuery, pathname, navigate])
 
 	return {
 		sortOrder,

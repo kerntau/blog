@@ -1,4 +1,4 @@
-import Image from '@/lib/compat-image'
+import Image from '@/components/util/Image'
 import styles from './BlogWidget.module.scss'
 
 interface BlogWidgetProps {

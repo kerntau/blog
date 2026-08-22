@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { Icon } from '@iconify/react'
-import Image from '@/lib/compat-image'
+import Image from '@/components/util/Image'
 import styles from './Lightbox.module.scss'
 
 interface LightboxProps {

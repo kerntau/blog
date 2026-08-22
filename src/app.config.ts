@@ -1,5 +1,4 @@
 import type { Nav, NavItem } from '@/types/nav'
-import { Temporal } from 'temporal-polyfill'
 import blogConfig from '../blog.config'
 
 // 图标查询：https://yesicon.app/tabler
@@ -44,8 +43,6 @@ const appConfig = {
 		stats: {
 			/** 归档页面每年标题对应的年龄 */
 			birthYear: 2006,
-			/** blog-stats widget 的预置文本 */
-			wordCount: '约12万',
 		},
 	},
 
@@ -55,7 +52,7 @@ const appConfig = {
 		copyright: `© 2026 kerntau`,
 		/** 侧边栏底部图标导航 */
 		iconNav: [
-			{ icon: 'tabler:home', text: '个人主页', url: blogConfig.author.homepage },
+			{ icon: 'tabler:home', text: '个人主页', url: 'https://keru.in/' },
 			{ icon: 'tabler:brand-github', text: 'GitHub: kerntau', url: 'https://github.com/kerntau' },
 			{ icon: 'ri:bilibili-line', text: 'Bilibili', url: 'https://space.bilibili.com/9655855' },
 			{ icon: 'tabler:rss', text: 'Atom订阅', url: '/atom.xml' },
@@ -74,14 +71,13 @@ const appConfig = {
 				items: [
 					{ icon: 'tabler:brand-github', text: 'GitHub', url: 'https://github.com/kerntau' },
 					{ icon: 'ri:bilibili-fill', text: '哔哩哔哩', url: 'https://space.bilibili.com/9655855' },
-					{ icon: 'simple-icons:tiktok', text: '抖音', url: 'https://v.douyin.com/HWMgjLaTtFk' },
+					{ icon: 'tabler:brand-x', text: 'X (Twitter)', url: 'https://x.com/Kerntao' },
 				],
 			},
 			{
 				title: '信息',
 				items: [
-					{ icon: 'tabler:certificate', text: '鄂ICP备2025157857号', url: 'https://beian.miit.gov.cn/' },
-					{ icon: 'tabler:shield-check', text: '鄂公网安备 42018502008592号', url: 'http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=42018502008592' },
+					{ icon: 'tabler:certificate', text: '萌ICP备20268811号', url: 'https://icp.gov.moe/?keyword=20268811' },
 				],
 			},
 		] satisfies Nav,
@@ -93,7 +89,7 @@ const appConfig = {
 		/** 展示标题文本，否则展示纯 Logo */
 		showTitle: true,
 		subtitle: blogConfig.subtitle,
-		emojiTail: ['🚀', '🚀', '🚀', '🚀'],
+		emojiTail: ['🌈', '☕', '💡', '🦄', '🎯'],
 	},
 
 	/** 友链页面 */
@@ -129,22 +125,28 @@ const appConfig = {
 			title: '技术信息',
 			services: [
 				{ label: '部署平台', value: 'vercel', icon: 'logos:vercel-icon', iconColor: '#0052D9' },
-				{ label: '图片存储', value: 'Cloudflare R2', icon: 'devicon:cloudflare', iconColor: '' },
+				{ label: '图片存储', value: '图仓', icon: 'tabler:photo', iconColor: '#3b6cba' },
 				{ label: '开源协议', value: 'MIT', icon: 'tabler:license', iconColor: '#F59E0B' },
 				{ label: '文章许可', value: blogConfig.copyright.abbr, icon: '', iconColor: '' },
 				{ label: '规范域名', value: 'keru.in', icon: '', iconColor: '' },
 			],
 			techstack: [
-				{ name: 'React', version: '^19.0.0', icon: 'logos:react', iconColor: '' },
+				{ name: 'React', version: '^19.1.0', icon: 'logos:react', iconColor: '' },
 				{ name: 'Rsbuild', version: '^2.1.13', icon: 'tabler:bolt', iconColor: '#F85D00' },
+				{ name: 'TS', version: '^6.0.3', icon: 'devicon:typescript', iconColor: '' },
+				{ name: 'Sass', version: '^1.99.0', icon: 'logos:sass', iconColor: '' },
+				{ name: 'MDX', version: '^3.1.1', icon: 'simple-icons:mdx', iconColor: '#FCB32C' },
+				{ name: 'Motion', version: '^12.38.0', icon: 'simple-icons:framer', iconColor: '#0055FF' },
+				{ name: 'Node', version: '^22.17', icon: 'logos:nodejs-icon', iconColor: '' },
+				{ name: 'pnpm', version: '^11.0.4', icon: 'logos:pnpm', iconColor: '' },
 			],
 		},
 		commGroup: {
 			title: '博客/技术社区',
-			groupName: '纸网接入点',
-			account: '169994096',
+			groupName: '序栈接入点',
+			account: '1722288011',
 			icon: 'ri:qq-fill',
-			bgImg: '',
+			bgImg: 'https://s1.tucang.cc/images/2026/8/22/%E3%80%90%E5%93%B2%E9%A3%8E%E5%A3%81%E7%BA%B8%E3%80%91%E5%BE%AE%E7%AC%91-%E6%88%B7%E5%A4%96-%E6%97%A5%E8%90%BD.jpg',
 		},
 		log: {
 			title: '更新日志',

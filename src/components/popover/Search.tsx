@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import { useRouter } from '@/lib/compat-navigation'
+import { useNavigate } from 'react-router-dom'
 import MiniSearch from 'minisearch'
 import { Icon } from '@iconify/react'
 import { useSearchStore } from '../../stores/search'
@@ -10,7 +10,7 @@ import Key from '../content/Key'
 import styles from './Search.module.scss'
 
 export default function Search() {
-	const router = useRouter()
+	const navigate = useNavigate()
 	const { word, setWord, isOpen, setIsOpen } = useSearchStore()
 	const [debouncedWord, setDebouncedWord] = useState(word)
 	const [status, setStatus] = useState<'pending' | 'success' | 'error'>('pending')
@@ -117,10 +117,10 @@ export default function Search() {
 	const openActiveItem = useCallback(() => {
 		const item = result[activeIndex]
 		if (item) {
-			router.push(item.id as string)
+			navigate(item.id as string)
 			setIsOpen(false)
 		}
-	}, [activeIndex, result, router, setIsOpen])
+	}, [activeIndex, result, navigate, setIsOpen])
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'ArrowDown') {

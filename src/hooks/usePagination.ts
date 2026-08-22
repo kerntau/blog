@@ -1,5 +1,5 @@
-import { usePathname, useRouter, useSearchParams } from '@/lib/compat-navigation'
 import { useCallback, useMemo, useState } from 'react'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import appConfig from '../app.config'
 
 interface UsePaginationOptions {
@@ -15,9 +15,10 @@ export default function usePagination<T>(list: T[], options?: UsePaginationOptio
 		bindQuery,
 	} = options || {}
 
-	const searchParams = useSearchParams()
-	const router = useRouter()
-	const pathname = usePathname()
+	const [searchParams] = useSearchParams()
+	const navigate = useNavigate()
+	const location = useLocation()
+	const pathname = location.pathname
 
 	const totalPages = Math.ceil(list.length / perPage) || initialPage
 
@@ -45,11 +46,11 @@ export default function usePagination<T>(list: T[], options?: UsePaginationOptio
 				params.set(bindQuery, targetPage.toString())
 			}
 			const query = params.toString()
-			router.push(query ? `${pathname}?${query}` : pathname, { scroll: true })
+			navigate(query ? `${pathname}?${query}` : pathname)
 		} else {
 			setInternalPage(targetPage)
 		}
-	}, [bindQuery, pathname, router, initialPage, totalPages])
+	}, [bindQuery, pathname, navigate, initialPage, totalPages])
 
 	const listPaged = useMemo(() => {
 		const start = (safePage - 1) * perPage

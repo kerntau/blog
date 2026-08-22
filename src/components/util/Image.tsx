@@ -7,8 +7,6 @@ export interface ImageProps extends ImgHTMLAttributes<HTMLImageElement> {
 	height?: number | string
 	fill?: boolean
 	priority?: boolean
-	unoptimized?: boolean
-	quality?: number
 }
 
 export const Image = forwardRef<HTMLImageElement, ImageProps>(({
@@ -18,8 +16,6 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(({
 	height,
 	fill,
 	priority,
-	unoptimized: _unoptimized,
-	quality: _quality,
 	style,
 	className,
 	...props

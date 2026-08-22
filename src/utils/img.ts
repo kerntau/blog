@@ -28,8 +28,6 @@ export function getOicqGroupAvatar(group = '', size: QgroupAvatarSize | number =
 	return `https://p.qlogo.cn/gh/${group}/${group}/${size}/`
 }
 
-export const getOciqGroupAvatar = getOicqGroupAvatar
-
 interface FaviconOptions {
 	provider?: 'google' | 'duckduckgo' | 'microlink'
 	size?: number

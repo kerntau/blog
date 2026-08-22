@@ -51,7 +51,7 @@ export default function BlogTech({ customData }: BlogTechProps = {}) {
 	const techstack = techConfig?.techstack || [
 		{ icon: 'logos:react', name: 'React', version: packageJson.dependencies.react },
 		{ icon: 'tabler:bolt', iconColor: '#F85D00', name: 'Rsbuild', version: (packageJson.devDependencies as any)['@rsbuild/core'] || '^2.1.13' },
-		{ icon: 'logos:typescript-icon', name: 'TS', version: packageJson.devDependencies.typescript },
+		{ icon: 'devicon:typescript', name: 'TS', version: packageJson.devDependencies.typescript },
 		{ icon: 'simple-icons:mdx', iconColor: '#FCB32C', name: 'MDX', version: packageJson.dependencies['@mdx-js/mdx'] },
 		{ icon: 'logos:nodejs-icon', name: 'Node', version: packageJson.engines.node },
 		{ icon: 'logos:pnpm', name: 'pnpm', version: packageJson.packageManager?.split('@')[1] || '11.0.4' },
@@ -67,8 +67,10 @@ export default function BlogTech({ customData }: BlogTechProps = {}) {
 					{techstack.map((tech: any, i: number) => (
 						<div key={i} className={styles.techItem}>
 							<div className={styles.techLabel}>
-								<Icon icon={tech.icon} style={tech.iconColor ? { color: tech.iconColor } : undefined} />
-								<span>{tech.name}</span>
+								<span className={styles.techIcon}>
+									<Icon icon={tech.icon} style={tech.iconColor ? { color: tech.iconColor } : undefined} />
+								</span>
+								<span className={styles.techName}>{tech.name}</span>
 							</div>
 							<div className={styles.techVal}>{tech.version}</div>
 						</div>

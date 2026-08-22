@@ -12,13 +12,14 @@ import UtilLink from '../util/UtilLink'
 import Key from '../content/Key'
 import styles from './BlogSidebar.module.scss'
 
-import { usePathname } from '@/lib/compat-navigation'
+import { useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useTextSelection } from '../../hooks/useTextSelection'
 import { useDebounce } from '../../hooks/useDebounce'
 
 export default function BlogSidebar() {
-	const pathname = usePathname()
+	const location = useLocation()
+	const pathname = location.pathname
 	const [hydrated, setHydrated] = useState(false)
 	const { state, close } = useLayoutStore()
 	const { setIsOpen, word } = useSearchStore()

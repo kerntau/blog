@@ -6,9 +6,10 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 0.3em;
+	vertical-align: middle;
 
 	:global(.iconify) {
-		font-size: 1.15em;
+		font-size: 0.92em;
 		flex-shrink: 0;
 	}
 }
@@ -16,7 +17,7 @@
 .techGrid {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: 0.35em;
+	gap: 0.45em 0.15em;
 	text-align: center;
 	margin-top: 0.4em;
 	width: 100%;
@@ -33,34 +34,41 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: 0.2em;
-		padding: 0.4em 0.15em;
-		border-radius: 0.45em;
-		background-color: var(--c-bg-2);
-		transition: transform 0.2s, background-color 0.2s;
-
-		&:hover {
-			background-color: var(--c-bg-soft);
-			transform: translateY(-1px);
-		}
+		gap: 0.15em;
+		padding: 0.2em 0.05em;
 
 		.techLabel {
 			max-width: 100%;
 			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			gap: 0.2em;
-			font-size: 0.78em;
+			font-size: 0.74em;
 			font-weight: 550;
 			color: var(--c-text-1);
 			line-height: 1.2;
+			letter-spacing: -0.02em;
 
-			:global(.iconify) {
-				font-size: 1.1em;
+			.techIcon {
+				width: 1.15em;
+				height: 1.15em;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
 				flex-shrink: 0;
+
+				:global(.iconify) {
+					font-size: 1.05em;
+					max-width: 100%;
+					max-height: 100%;
+				}
+			}
+
+			.techName {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
 			}
 		}
 
@@ -69,13 +77,13 @@
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
-			font-size: 0.72em;
+			font-size: 0.68em;
 			font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 			font-variant-numeric: tabular-nums;
 			color: var(--c-text-3);
 			line-height: 1.2;
 			margin: 0;
-			letter-spacing: -0.03em;
+			letter-spacing: -0.04em;
 		}
 	}
 }

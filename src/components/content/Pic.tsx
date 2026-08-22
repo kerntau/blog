@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { Children, isValidElement, useEffect, useRef, useState } from 'react'
-import Image from '@/lib/compat-image'
+import Image from '@/components/util/Image'
 import Lightbox from '../popover/Lightbox'
 import { extractNodeText } from '../../utils/str'
 import styles from './Pic.module.scss'

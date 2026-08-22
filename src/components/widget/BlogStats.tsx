@@ -18,7 +18,8 @@ interface BlogStatsProps {
 }
 
 export default function BlogStats({ customData: _customData }: BlogStatsProps = {}) {
-	const [stats, setStats] = useState<any>(() => getStats())
+	const initialStats = useMemo(() => getStats(), [])
+	const [stats, setStats] = useState<any>(initialStats)
 
 	useEffect(() => {
 		fetch('/api/stats.json')
@@ -27,17 +28,32 @@ export default function BlogStats({ customData: _customData }: BlogStatsProps = 
 				return res
 			})
 			.then(res => res.json())
-			.then(data => setStats(data))
+			.then(data => {
+				if (data?.total?.words) {
+					setStats(data)
+				} else if (data?.data?.totalWords) {
+					setStats({
+						total: {
+							posts: data.data.publishedCount || data.data.postCount || 0,
+							words: data.data.totalWords || 0,
+						},
+						annual: data.data.years || {},
+					})
+				}
+			})
 			.catch(() => {})
 	}, [])
 
+	const totalWords = stats?.total?.words || initialStats?.total?.words || 0
+
 	const yearlyTip = useMemo(() => {
-		if (!stats?.annual) return '数据获取失败'
-		return Object.entries(stats.annual)
+		const annual = stats?.annual || initialStats?.annual
+		if (!annual || Object.keys(annual).length === 0) return '数据获取失败'
+		return Object.entries(annual)
 			.reverse()
 			.map(([year, item]: any) => `${year}年：${item.posts}篇，${formatNumber(item.words)}字`)
 			.join('\n')
-	}, [stats])
+	}, [stats, initialStats])
 
 	const blogStats = [
 		{
@@ -57,9 +73,9 @@ export default function BlogStats({ customData: _customData }: BlogStatsProps = 
 		},
 		{
 			label: '总字数',
-			value: stats?.total?.words ? formatNumber(stats.total.words) : (appConfig.component?.stats?.wordCount || '约10万'),
+			value: totalWords ? `${formatNumber(totalWords)}字` : '0字',
 			tip: yearlyTip,
-		}
+		},
 	]
 
 	return (
