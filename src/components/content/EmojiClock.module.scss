@@ -1,0 +1,6 @@
+.emojiClock {
+	&.rotate {
+		display: inline-block;
+		transform: rotate(var(--deg, 0deg));
+	}
+}

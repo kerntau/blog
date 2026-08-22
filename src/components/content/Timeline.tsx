@@ -1,4 +1,5 @@
 import React from 'react'
+import { extractNodeText } from '../../utils/str'
 import styles from './Timeline.module.scss'
 
 interface TimelineProps {
@@ -13,20 +14,7 @@ export default function Timeline({ children }: TimelineProps) {
 	return (
 		<dl className={styles.timeline}>
 			{childrenArray.map((child, i) => {
-				// 尝试提取文本内容进行匹配
-				let textContent = ''
-				if (typeof child === 'string') {
-					textContent = child
-				} else if (React.isValidElement(child)) {
-					// 深度遍历寻找第一个文本节点（简化实现）
-					const findText = (node: any): string => {
-						if (typeof node === 'string') return node
-						if (Array.isArray(node)) return node.map(findText).join('')
-						if (node.props?.children) return findText(node.props.children)
-						return ''
-					}
-					textContent = findText(child)
-				}
+				const textContent = extractNodeText(child)
 
 				const match = textContent.trim().match(timelineRegex)
 				if (match) {

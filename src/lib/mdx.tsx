@@ -136,7 +136,7 @@ export function getCompiledMDX(path: string, components?: Record<string, any>) {
 	if (!post) return null
 
 	const { data, body, toc } = post as any
-	const content = renderCompiledMdx(post.data?.compiledCode, body, components)
+	const content = renderCompiledMdx((data as any)?.compiledCode, body, components)
 
 	return {
 		content,

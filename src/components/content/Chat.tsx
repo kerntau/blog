@@ -1,4 +1,5 @@
 import React from 'react'
+import { extractNodeText } from '../../utils/str'
 import styles from './Chat.module.scss'
 
 interface ChatProps {
@@ -18,18 +19,7 @@ export default function Chat({ children }: ChatProps) {
 	return (
 		<dl className={styles.chat}>
 			{childrenArray.map((child, i) => {
-				let textContent = ''
-				if (typeof child === 'string') {
-					textContent = child
-				} else if (React.isValidElement(child)) {
-					const findText = (node: any): string => {
-						if (typeof node === 'string') return node
-						if (Array.isArray(node)) return node.map(findText).join('')
-						if (node.props?.children) return findText(node.props.children)
-						return ''
-					}
-					textContent = findText(child)
-				}
+				const textContent = extractNodeText(child)
 
 				const match = textContent.trim().match(chatRegex)
 				if (match) {

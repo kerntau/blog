@@ -1,37 +1,48 @@
 .zSlider {
 	display: flex;
 	align-items: center;
-	gap: 1em;
-	padding: 0.5em 0;
+	gap: 0.5em;
+	user-select: none;
 }
 
-.label {
-	font-size: 0.9em;
-	color: var(--c-text-2);
-	min-width: 3em;
-}
-
-.range {
-	flex: 1;
-	height: 4px;
-	border-radius: 2px;
-	background: var(--c-bg-3);
+.inputSlider[type="range"] {
+	flex-grow: 1;
+	overflow: hidden;
+	height: 1.2em;
+	border-radius: 1em;
+	background-color: var(--c-bg-soft);
 	appearance: none;
-	outline: none;
+
+	@supports (-moz-appearance: auto) {
+		accent-color: var(--c-primary);
+		appearance: auto;
+	}
+
+	&::-webkit-slider-container {
+		min-block-size: auto;
+	}
+
+	&::-webkit-slider-runnable-track {
+		height: 100%;
+	}
 
 	&::-webkit-slider-thumb {
-		appearance: none;
-		width: 12px;
-		height: 12px;
+		height: 100%;
+		aspect-ratio: 1;
+		border: 0.2em solid var(--c-primary);
 		border-radius: 50%;
-		background: var(--c-primary);
-		cursor: pointer;
+		box-shadow: -100vw 0 0 calc(100vw - 0.6em) var(--c-primary);
+		background-color: var(--c-bg-1);
+		transition: all 0.2s;
+		appearance: none;
+
+		:hover > & {
+			background-color: var(--c-bg-3);
+		}
 	}
 }
 
-.value {
-	font-size: 0.8em;
-	color: var(--c-text-3);
-	min-width: 1.5em;
-	text-align: end;
+.dataValue {
+	min-width: var(--slider-value, 3ch);
+	text-align: right;
 }

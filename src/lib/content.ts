@@ -13,7 +13,10 @@ export function getAllPosts(): ParsedPost[] {
 }
 
 export function getPostsByStemPrefix(prefix = 'posts/'): ParsedPost[] {
-	return getAllPosts().filter(p => p._stem.startsWith(prefix))
+	if (prefix === 'previews/' || prefix.startsWith('previews')) {
+		return getAllPosts().filter(p => !p.draft && p._stem.startsWith('previews/'))
+	}
+	return getAllPosts().filter(p => !p.draft && p._stem !== 'link' && p._stem !== 'theme' && !p._stem.startsWith('previews/'))
 }
 
 export function getPostByPath(path: string) {
@@ -31,7 +34,7 @@ export function getPostByPath(path: string) {
 }
 
 export function getSurroundPosts(path: string) {
-	const posts = getPostsByStemPrefix('posts/').slice().sort((a, b) => {
+	const posts = getPostsByStemPrefix().slice().sort((a, b) => {
 		const dateA = String(a.date || a.published || '')
 		const dateB = String(b.date || b.published || '')
 		return dateA.localeCompare(dateB)

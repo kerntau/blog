@@ -8,11 +8,17 @@ import { timeElapse } from '../../utils/time'
 import { formatNumber } from '../../utils/str'
 import appConfig from '../../app.config'
 
+import generatedPostsData from '../../data/generated-posts.json'
+
 export default function BlogStats() {
-	const [stats, setStats] = useState<any>(null)
+	const [stats, setStats] = useState<any>(() => (generatedPostsData as any)?.stats || null)
 
 	useEffect(() => {
-		fetch('/api/stats')
+		fetch('/api/stats.json')
+			.then(res => {
+				if (!res.ok) return fetch('/api/stats')
+				return res
+			})
 			.then(res => res.json())
 			.then(data => setStats(data))
 			.catch(() => {})

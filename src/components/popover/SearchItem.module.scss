@@ -1,77 +1,38 @@
 .searchItem {
 	display: block;
-	margin: 0.25rem 0.5rem;
-	padding: 0.75rem 1rem;
-	border-radius: 0.75rem;
-	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	margin: 0.5em;
+	padding: 0.5em 0.8em;
+	border-radius: 0.5em;
+	transition: background-color 0.2s;
 	text-decoration: none;
 	color: inherit;
-	border: 1px solid transparent;
 
 	&.active {
-		background-color: var(--c-primary-soft);
-		border-color: var(--c-primary-soft-2);
-		transform: translateX(4px);
+		background-color: var(--c-bg-soft);
 	}
 }
 
-.hgroup {
-	display: flex;
-	align-items: center;
-	flex-wrap: wrap;
-	gap: 0.3rem;
-	margin-bottom: 0.4rem;
-}
+.title:not(:first-child) {
+	opacity: 0.5;
+	transition: opacity 0.2s;
 
-.title {
-	font-size: 0.9rem;
-	font-weight: 500;
-	color: var(--c-text-1);
-
-	&:not(:last-child) {
-		color: var(--c-text-3);
-		font-weight: normal;
-
-		&::after {
-			content: "/";
-			margin-left: 0.3rem;
-			opacity: 0.4;
-		}
+	.searchItem.active & {
+		opacity: 1;
 	}
 
-	&:last-child {
-		font-weight: 600;
-		color: var(--c-primary);
-	}
-
-	:global(mark) {
-		background: none;
-		color: var(--c-primary);
-		text-decoration: underline;
-		text-underline-offset: 2px;
+	&::before {
+		content: " > ";
+		opacity: 0.5;
 	}
 }
 
-.fileIcon {
-	margin-left: auto;
-	font-size: 1.1rem;
-	opacity: 0.3;
+.title + :global(.iconify) {
+	margin-inline-start: 0.2em;
 }
 
 .content {
-	font-size: 0.85rem;
-	line-height: 1.5;
+	margin-top: 0.2em;
+	font-size: 0.8em;
+	white-space: pre-wrap;
 	color: var(--c-text-2);
-	display: -webkit-box;
-	-webkit-box-orient: vertical;
-	-webkit-line-clamp: 2;
-	overflow: hidden;
-
-	:global(mark) {
-		background-color: rgba(var(--c-primary-rgb), 0.15);
-		color: var(--c-primary);
-		padding: 0 0.1rem;
-		border-radius: 0.2rem;
-		font-weight: 500;
-	}
 }

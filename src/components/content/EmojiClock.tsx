@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Temporal } from 'temporal-polyfill'
 import { toZonedTemporal } from '../../utils/time'
+import styles from './EmojiClock.module.scss'
 
 export default function EmojiClock({ datetime: propsDatetime, rotate }: { datetime?: string, rotate?: boolean }) {
 	const [now, setNow] = useState(() => Temporal.Now.zonedDateTimeISO())
@@ -33,17 +34,10 @@ export default function EmojiClock({ datetime: propsDatetime, rotate }: { dateti
 
 	return (
 		<span
-			className={`emoji-clock ${rotate ? 'rotate-clock' : ''}`}
+			className={`emoji-clock ${styles.emojiClock} ${rotate ? styles.rotate : ''}`}
 			style={{ '--deg': rotate ? `${status.rotate}deg` : undefined } as any}
 		>
 			{status.emoji}
-			<style jsx>{`
-				.rotate-clock {
-					display: inline-block;
-					transform: rotate(var(--deg, 0deg));
-				}
-			`}
-   </style>
 		</span>
 	)
 }

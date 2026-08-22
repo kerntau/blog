@@ -38,9 +38,7 @@ export default function ZPagination({
 		return () => observer.disconnect()
 	}, [])
 
-	if (avoid) {
-		useAvoidTarget(paginationRef as React.RefObject<HTMLElement>, avoid)
-	}
+	useAvoidTarget(paginationRef as React.RefObject<HTMLElement>, Boolean(avoid))
 
 	return (
 		<>

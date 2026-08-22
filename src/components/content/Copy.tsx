@@ -2,7 +2,6 @@
 
 import { Icon } from '@iconify/react'
 import useCopy from '../../hooks/useCopy'
-import { getPromptLanguage } from '../../utils/str'
 import styles from './Copy.module.scss'
 
 interface CopyProps {
@@ -14,7 +13,6 @@ interface CopyProps {
 export default function Copy({ code, prompt = '$' }: CopyProps) {
 	const { isCopied, copy } = useCopy(code)
 	const showPrompt = prompt !== 'true'
-	void getPromptLanguage(prompt)
 
 	return (
 		<code className={styles.copy}>

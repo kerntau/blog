@@ -1,41 +1,58 @@
 .zToggle {
+	user-select: none;
 	display: inline-flex;
 	align-items: center;
-	gap: 0.5em;
 	cursor: pointer;
-	user-select: none;
 }
 
-.track {
-	width: 2.4em;
-	height: 1.2em;
-	background-color: var(--c-bg-3);
-	border-radius: 1em;
+.inputToggle {
 	position: relative;
-	transition: background-color 0.2s;
+	appearance: none;
+	cursor: pointer;
+	margin: 0;
 
-	&.active {
-		background-color: var(--c-primary);
-		
-		.thumb {
-			transform: translateX(1.2em);
+	&::before {
+		content: "";
+		display: inline-block;
+		position: relative;
+		width: 2em;
+		height: 1.2em;
+		border-radius: 1em;
+		outline: 1px solid var(--c-text-1);
+		outline-offset: -1px;
+		vertical-align: text-bottom;
+		transition: background-color 0.2s, outline-color 0.2s;
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		inset-inline-start: 0.2em;
+		top: calc(50% - 0.4em);
+		height: 0.8em;
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background-color: var(--c-text-1);
+		transition: all 0.2s;
+
+		:hover > & {
+			filter: contrast(0.6);
 		}
 	}
-}
 
-.thumb {
-	width: 1em;
-	height: 1em;
-	background-color: white;
-	border-radius: 50%;
-	position: absolute;
-	top: 0.1em;
-	left: 0.1em;
-	transition: transform 0.2s;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
+	&:not(:last-child) {
+		margin-inline-end: 0.5em;
+	}
 
-.label {
-	font-size: 0.9em;
-	color: var(--c-text-2);
+	&:checked {
+		&::before {
+			outline-color: transparent;
+			background-color: var(--c-primary);
+		}
+
+		&::after {
+			background-color: var(--c-bg-1);
+			transform: var(--transform-end-far, translateX(0.8em));
+		}
+	}
 }

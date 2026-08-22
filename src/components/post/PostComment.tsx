@@ -11,15 +11,8 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import appConfig from '../../app.config'
 import ZButton from '../partial/ZButton'
+import { safelyDecodeUriComponent } from '../../utils/link'
 import styles from './PostComment.module.scss'
-
-function safelyDecodeUriComponent(uri: string) {
-	try {
-		return decodeURI(uri)
-	} catch {
-		return uri
-	}
-}
 
 export default function PostComment() {
 	const commentRef = useRef<HTMLElement>(null)

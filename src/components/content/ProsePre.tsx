@@ -1,59 +1,109 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import React, { useState, useRef, useMemo } from 'react'
 import { Icon } from '@iconify/react'
+import useCopy from '../../hooks/useCopy'
+import { formatBytes } from '../../utils/str'
+import { getFileIcon, getLangIcon } from '../../utils/icon'
+import appConfig from '../../app.config'
 import styles from './ProsePre.module.scss'
 
-interface ProsePreProps {
+export interface ProsePreProps {
 	children?: React.ReactNode
 	className?: string
 	style?: React.CSSProperties
-	// Shiki / Rehype 注入的 props
+	code?: string
+	language?: string
+	filename?: string
+	meta?: string
 	'data-language'?: string
 	'data-theme'?: string
 	[key: string]: any
 }
 
-export default function ProsePre({
+export function ProsePre({
 	children,
 	className = '',
 	style,
+	code: propsCode,
+	language: propsLanguage,
+	filename,
+	meta: propsMeta = '',
 	...props
 }: ProsePreProps) {
 	const [isWrap, setIsWrap] = useState(false)
-	const [copied, setCopied] = useState(false)
 	const preRef = useRef<HTMLPreElement>(null)
 
-	const language = props['data-language'] || ''
-	const filename = props.filename || '' // 假设元数据被解析到了 props
+	const rawCode = useMemo(() => {
+		if (propsCode !== undefined) return propsCode
+		if (typeof children === 'string') return children
+		return ''
+	}, [propsCode, children])
+
+	const compConf = appConfig.component.codeblock
+
+	// 计算行数
+	const rows = useMemo(() => {
+		if (rawCode) return rawCode.split('\n').length
+		if (preRef.current) return (preRef.current.textContent || '').split('\n').length
+		return 1
+	}, [rawCode])
+
+	const collapsible = !propsMeta.includes('expand') && rows > compConf.triggerRows
+	const [isCollapsed, setIsCollapsed] = useState(collapsible)
+
+	const detectedLang = useMemo(() => {
+		if (propsLanguage) return propsLanguage
+		if (props['data-language']) return props['data-language']
+		const match = className.match(/language-([\w-]+)/i)
+		if (match) return match[1]
+		return ''
+	}, [propsLanguage, props, className])
+
+	const icon = useMemo(() => {
+		if (filename) return getFileIcon(filename) || 'tabler:file-code'
+		if (detectedLang) return getLangIcon(detectedLang) || 'tabler:file-code'
+		return 'tabler:file-code'
+	}, [filename, detectedLang])
+
+	const byteSize = useMemo(() => {
+		const text = rawCode || (preRef.current ? preRef.current.textContent || '' : '')
+		return formatBytes(new TextEncoder().encode(text).length)
+	}, [rawCode])
+
+	const { isCopied, copy } = useCopy(rawCode || preRef)
 
 	const handleCopy = () => {
-		if (!preRef.current) return
-		const code = preRef.current.textContent ?? ''
-		navigator.clipboard.writeText(code).then(() => {
-			setCopied(true)
-			setTimeout(() => setCopied(false), 2000)
-		})
+		copy()
 	}
 
 	return (
 		<figure
-			className={`${styles.zCodeblock} ${className}`}
-			style={style}
+			className={`${styles.zCodeblock} ${collapsible ? styles.collapsible : ''} ${collapsible && isCollapsed ? styles.collapsed : ''} ${className}`}
+			style={{
+				'--collapsed-rows': compConf.collapsedRows,
+				'--tab-size': compConf.tabSize,
+				...style,
+			} as any}
 		>
 			<figcaption className={styles.figcaption}>
-				<span className={styles.filename}>
-					{filename && <><Icon icon="tabler:file-code" /> {filename}</>}
-				</span>
+				{filename ? (
+					<span className={styles.filename}>
+						<Icon icon={icon} />
+						<span>{filename}</span>
+					</span>
+				) : (
+					<span />
+				)}
 
-				<span className={styles.language}>{language}</span>
+				{detectedLang && <span className={styles.language}>{detectedLang}</span>}
 
 				<div className={styles.operations}>
-					<button onClick={() => setIsWrap(!isWrap)}>
+					<button type="button" onClick={() => setIsWrap(!isWrap)}>
 						{isWrap ? '横向滚动' : '自动换行'}
 					</button>
-					<button onClick={handleCopy}>
-						{copied ? '已复制' : '复制'}
+					<button type="button" onClick={handleCopy}>
+						{isCopied ? '已复制' : '复制'}
 					</button>
 				</div>
 			</figcaption>
@@ -65,6 +115,25 @@ export default function ProsePre({
 			>
 				{children}
 			</pre>
+
+			{collapsible && (
+				<button
+					type="button"
+					className={styles.toggleBtn}
+					aria-label={isCollapsed ? '展开代码块' : '折叠代码块'}
+					onClick={() => setIsCollapsed(!isCollapsed)}
+				>
+					<Icon
+						className={`${styles.toggleIcon} ${isCollapsed ? styles.isCollapsed : ''}`}
+						icon="tabler:chevrons-up"
+					/>
+					<span>
+						{rows} lines, {rawCode ? rawCode.length : ''} chars, {byteSize}
+					</span>
+				</button>
+			)}
 		</figure>
 	)
 }
+
+export default ProsePre

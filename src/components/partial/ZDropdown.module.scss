@@ -1,49 +1,100 @@
 .dropdownContainer {
 	position: relative;
 	display: inline-block;
+	outline: none;
+}
+
+.dropdownTrigger {
+	display: inline-flex;
+	align-items: center;
+	cursor: pointer;
 }
 
 .dropdownContent {
 	position: absolute;
 	top: 100%;
-	left: 50%;
-	transform: translateX(-50%);
-	padding: 0.3em;
-	background-color: var(--ld-bg-card);
-	border-radius: 0.5rem;
-	box-shadow: var(--box-shadow-3);
 	z-index: var(--z-index-popover);
-	display: grid;
 	min-width: max-content;
-	animation: float-in 0.1s ease-out forwards;
+	margin-top: 0.3em;
+
+	&.bottom-start {
+		left: 0;
+	}
+
+	&.bottom {
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	&.bottom-end {
+		right: 0;
+		left: auto;
+	}
+}
+
+.tippyBox {
+	padding: 0.3em;
+	border-radius: 0.5em;
+	box-shadow: var(--box-shadow-3);
+	background-color: var(--ld-bg-card);
+	font-size: inherit;
+	line-height: 1.4;
+	animation: float-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.tippyContent {
+	display: grid;
 
 	:global(button) {
+		display: flex;
+		align-items: center;
 		padding: 0.3em 0.5em;
 		border-radius: 0.3em;
 		text-align: start;
 		color: var(--c-text-1);
+		background-color: transparent;
 		transition: color 0.1s, background-color 0.2s;
 		cursor: pointer;
+		white-space: nowrap;
+		font-size: inherit;
+		font-family: inherit;
+		border: none;
+		outline: none;
+
+		:global(.iconify) {
+			flex-shrink: 0;
+		}
+
+		:global(.iconify) + span {
+			margin-inline-start: 0.4em;
+		}
 
 		&:hover {
 			background-color: var(--c-bg-soft);
 			color: var(--c-text-1);
 		}
 
-		&.active {
+		&.active, &:global(.active) {
 			background-color: var(--c-primary-soft);
 			color: var(--c-primary);
+
+			&:hover {
+				background-color: var(--c-primary-soft);
+				color: var(--c-primary);
+			}
 		}
 	}
 }
 
 @keyframes float-in {
-	from {
+	0% {
 		opacity: 0;
-		transform: translate(-50%, -10px);
+		transform: translateY(6%);
 	}
-	to {
+	100% {
 		opacity: 1;
-		transform: translate(-50%, 0);
+		transform: translateY(0);
 	}
 }
+
+

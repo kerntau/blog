@@ -54,10 +54,10 @@ export default function PostOrderToggle({
 			{children}
 
 			<ZDropdown
-				tabIndex={0}
 				content={({ hide }) => (
 					<>
 						<button
+							type="button"
 							className={!category ? 'active' : ''}
 							onClick={() => {
 								hide()
@@ -70,6 +70,7 @@ export default function PostOrderToggle({
 						{categories?.map((item) => (
 							<button
 								key={item}
+								type="button"
 								className={item === category ? 'active' : ''}
 								onClick={() => {
 									hide()
@@ -83,7 +84,7 @@ export default function PostOrderToggle({
 					</>
 				)}
 			>
-				<button disabled={!categories}>
+				<button type="button" disabled={!categories}>
 					<Icon icon={getCategoryIcon(category)} />
 					<span>{category ?? '全部分类'}</span>
 				</button>

@@ -9,14 +9,98 @@
 	line-height: 1.4;
 	tab-size: var(--tab-size, 4);
 
+	&.collapsible > pre {
+		padding-bottom: 0.5rem;
+	}
+
+	&.collapsed > pre {
+		overflow: hidden;
+		max-height: calc(var(--line-height) * var(--collapsed-rows, 16) * 1em + 1rem);
+		mask-image: linear-gradient(to top, transparent -2em, #fff 4em);
+		animation: none;
+	}
+
 	pre {
+		--start-offset: 3.8em;
+
 		margin: 0;
 		padding: 1rem;
+		padding-inline-start: var(--start-offset);
 		overflow: auto;
+		background: transparent !important;
+		border: none !important;
 
 		&.wrap {
 			white-space: pre-wrap;
 			word-break: break-all;
+		}
+
+		:global(code) {
+			display: block;
+			margin: 0 !important;
+			padding: 0 !important;
+			border: none !important;
+			background: transparent !important;
+			font-family: inherit;
+			font-size: inherit;
+			color: inherit;
+			white-space: inherit;
+			box-shadow: none !important;
+		}
+
+		:global(.line) {
+			display: block;
+			position: relative;
+			min-height: 1.4em;
+
+			&::before {
+				content: var(--line-indicator, "") attr(data-line);
+				position: absolute;
+				inset-inline-start: calc(-1 * var(--start-offset));
+				width: calc(var(--start-offset) - 0.8em);
+				padding-inline-end: 0.5em;
+				background-color: var(--c-bg-2);
+				text-align: end;
+				color: var(--line-indicator-color, var(--c-text-3));
+				font-size: 0.9em;
+				opacity: 0.5;
+				user-select: none;
+			}
+
+			&.diff {
+				background-color: var(--ld-bg-active);
+
+				&.add {
+					--line-indicator: "+ ";
+					--line-indicator-color: var(--c-success);
+					--ld-bg-active: var(--c-success-soft);
+				}
+
+				&.remove {
+					--line-indicator: "- ";
+					--line-indicator-color: var(--c-error);
+					--ld-bg-active: var(--c-error-soft);
+				}
+			}
+
+			&.highlighted {
+				--line-indicator-color: var(--c-text-1);
+				background-color: var(--ld-bg-active, var(--c-primary-soft));
+
+				&.error {
+					--line-indicator-color: var(--c-error);
+					--ld-bg-active: var(--c-error-soft);
+				}
+
+				&.warning {
+					--line-indicator-color: var(--c-warning);
+					--ld-bg-active: var(--c-warning-soft);
+				}
+			}
+
+			> :global(span) {
+				background-color: transparent !important;
+			}
 		}
 	}
 }
@@ -49,7 +133,7 @@
 		font-size: 0.8em;
 	}
 
-	.operations {
+.operations {
 		position: absolute;
 		opacity: 0;
 		inset-inline-end: 0;
@@ -58,23 +142,61 @@
 		background-color: var(--c-bg-2);
 		transition: opacity 0.2s;
 
-		:global(.z-codeblock:hover) &,
-		:global(.z-codeblock:focus-within) & {
-			opacity: 1;
-		}
-
 		button {
-			opacity: 0.4;
-			padding: 0.2em 0.4em;
+			opacity: 0.5;
+			padding: 0.3em 0.5em;
 			transition: opacity 0.2s;
 			background: none;
 			border: none;
 			color: inherit;
 			cursor: pointer;
+			touch-action: manipulation;
 
-			&:hover {
+			&:hover, &:active {
 				opacity: 1;
+				color: var(--c-primary);
 			}
+		}
+
+		@media (max-width: 768px) {
+			opacity: 0.8;
 		}
 	}
 }
+
+.zCodeblock:hover .operations,
+.zCodeblock:focus-within .operations {
+	opacity: 1;
+}
+
+.toggleBtn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	opacity: 0.4;
+	width: 100%;
+	min-height: 2.2rem;
+	padding: 0.4em;
+	border: none;
+	background-color: var(--c-bg-3);
+	color: var(--c-text);
+	font-size: 0.85em;
+	cursor: pointer;
+	touch-action: manipulation;
+	transition: opacity 0.2s;
+
+	&:hover, &:active {
+		opacity: 1;
+	}
+}
+
+.toggleIcon {
+	margin-inline-end: 0.4em;
+	transition: transform 0.2s;
+
+	&.isCollapsed {
+		transform: rotate(180deg);
+	}
+}
+

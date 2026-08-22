@@ -1,23 +1,28 @@
-'use client'
-
 import styles from './ZToggle.module.scss'
 
 interface ZToggleProps {
 	label?: string
-	value: boolean
-	onChange: (val: boolean) => void
+	value?: boolean
+	onChange?: (val: boolean) => void
+	children?: React.ReactNode
 }
 
-export default function ZToggle({ label, value, onChange }: ZToggleProps) {
+export default function ZToggle({ label, value, onChange, children }: ZToggleProps) {
 	return (
-		<label className={styles.zToggle}>
-			{label && <span className={styles.label}>{label}</span>}
-			<div 
-				className={`${styles.track} ${value ? styles.active : ''}`}
-				onClick={() => onChange(!value)}
-			>
-				<div className={styles.thumb} />
-			</div>
+		<label className={`${styles.zToggle} z-toggle`}>
+			<input
+				type="checkbox"
+				name="toggle"
+				className={styles.inputToggle}
+				checked={value}
+				onChange={(e) => onChange?.(e.target.checked)}
+				onKeyDown={(e) => {
+					if (e.key === 'Enter') {
+						onChange?.(!value)
+					}
+				}}
+			/>
+			{children || (label && <span>{label}</span>)}
 		</label>
 	)
 }

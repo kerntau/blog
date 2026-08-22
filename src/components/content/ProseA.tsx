@@ -1,20 +1,11 @@
 import { Icon } from '@iconify/react'
 import UtilLink from '../util/UtilLink'
-import { getDomain, isExtLink } from '../../utils/link'
+import { getDomain, isExtLink, safelyDecodeUriComponent } from '../../utils/link'
 import { getDomainIcon } from '../../utils/icon'
 import styles from './ProseA.module.scss'
 
 interface ProseAProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
 	icon?: string | false
-}
-
-function safelyDecodeUriComponent(uri?: string) {
-	if (!uri) return ''
-	try {
-		return decodeURI(uri)
-	} catch {
-		return uri
-	}
 }
 
 export default function ProseA(props: ProseAProps) {

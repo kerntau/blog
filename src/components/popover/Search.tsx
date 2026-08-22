@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useRouter } from '@/lib/compat-navigation'
-import { motion, AnimatePresence } from 'framer-motion'
 import MiniSearch from 'minisearch'
 import { Icon } from '@iconify/react'
 import { useSearchStore } from '../../stores/search'
@@ -18,22 +17,22 @@ export default function Search() {
 	const [activeIndex, setActiveIndex] = useState(0)
 	const [isKeyboardMode, setIsKeyboardMode] = useState(false)
 	const inputRef = useRef<HTMLInputElement>(null)
-	const resultsListRef = useRef<HTMLMenuElement>(null)
+	const listResultRef = useRef<HTMLMenuElement>(null)
 
-	// Chinese segmentation support
-	const segmenter = useMemo(() => 
-		typeof Intl !== 'undefined' && (Intl as any).Segmenter 
-			? new (Intl as any).Segmenter('zh-CN', { granularity: 'word' }) 
+	// 中文分词支持
+	const segmenter = useMemo(() =>
+		typeof Intl !== 'undefined' && (Intl as any).Segmenter
+			? new (Intl as any).Segmenter('zh-CN', { granularity: 'word' })
 			: null, [])
 
 	const miniSearch = useMemo(() => new MiniSearch({
 		fields: ['title', 'content'],
 		storeFields: ['title', 'titles', 'content', 'level'],
-		searchOptions: { 
-			prefix: true, 
-			fuzzy: 0.2, 
+		searchOptions: {
+			prefix: true,
+			fuzzy: 0.2,
 			combineWith: 'AND',
-			boost: { title: 3, titles: 2 }
+			boost: { title: 3, titles: 2 },
 		},
 		processTerm: segmenter
 			? term => Array.from(segmenter.segment(term), (seg: any) => seg.segment.toLowerCase())
@@ -42,7 +41,11 @@ export default function Search() {
 
 	useEffect(() => {
 		const controller = new AbortController()
-		fetch('/api/search', { signal: controller.signal, cache: 'no-store' })
+		fetch('/api/search.json', { signal: controller.signal, cache: 'no-store' })
+			.then(res => {
+				if (!res.ok) return fetch('/api/search', { signal: controller.signal, cache: 'no-store' })
+				return res
+			})
 			.then(res => {
 				if (!res.ok) throw new Error(`Search index request failed: ${res.status}`)
 				return res.json()
@@ -57,7 +60,7 @@ export default function Search() {
 		return () => controller.abort()
 	}, [miniSearch])
 
-	// Debounce word
+	// Debounce 关键词
 	useEffect(() => {
 		const timer = setTimeout(() => setDebouncedWord(word), 150)
 		return () => clearTimeout(timer)
@@ -65,14 +68,25 @@ export default function Search() {
 
 	useEffect(() => {
 		if (isOpen) {
-			setTimeout(() => inputRef.current?.focus(), 100)
+			setTimeout(() => {
+				inputRef.current?.focus()
+				inputRef.current?.select()
+			}, 50)
 		}
 	}, [isOpen])
 
-	const results = useMemo(() => {
+	const result = useMemo(() => {
 		if (!debouncedWord) return []
-		return miniSearch.search(debouncedWord).slice(0, 20)
+		return miniSearch.search(debouncedWord)
 	}, [debouncedWord, miniSearch])
+
+	const queryTerms = useMemo(() => {
+		if (!debouncedWord) return []
+		if (segmenter) {
+			return Array.from(segmenter.segment(debouncedWord), (s: any) => s.segment.trim()).filter(Boolean)
+		}
+		return [debouncedWord]
+	}, [debouncedWord, segmenter])
 
 	useEffect(() => {
 		setActiveIndex(0)
@@ -89,127 +103,96 @@ export default function Search() {
 		}
 	}, [])
 
-	useEffect(() => {
-		const activeItem = resultsListRef.current?.children[activeIndex] as HTMLElement
-		if (activeItem && isKeyboardMode) {
+	const updateActiveIndex = useCallback((index: number, isKeyboard = false) => {
+		inputRef.current?.focus()
+		if (index < 0 || index >= result.length) return
+		setActiveIndex(index)
+		if (isKeyboard) setIsKeyboardMode(true)
+		const activeItem = listResultRef.current?.children[index] as HTMLElement
+		if (activeItem && isKeyboard) {
 			activeItem.scrollIntoView({ block: 'nearest' })
 		}
-	}, [activeIndex, isKeyboardMode])
+	}, [result.length])
+
+	const openActiveItem = useCallback(() => {
+		const item = result[activeIndex]
+		if (item) {
+			router.push(item.id as string)
+			setIsOpen(false)
+		}
+	}, [activeIndex, result, router, setIsOpen])
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
-		if (!isOpen) return
 		if (e.key === 'ArrowDown') {
 			e.preventDefault()
-			setIsKeyboardMode(true)
-			setActiveIndex(i => Math.min(i + 1, results.length - 1))
+			updateActiveIndex(activeIndex + 1, true)
 		} else if (e.key === 'ArrowUp') {
 			e.preventDefault()
-			setIsKeyboardMode(true)
-			setActiveIndex(i => Math.max(i - 1, 0))
+			updateActiveIndex(activeIndex - 1, true)
 		} else if (e.key === 'Enter') {
-			const activeItem = results[activeIndex]
-			if (activeItem) {
-				router.push(activeItem.id as string)
-				setIsOpen(false)
-			}
+			e.preventDefault()
+			openActiveItem()
 		} else if (e.key === 'Escape') {
+			e.preventDefault()
 			setIsOpen(false)
 		}
 	}
 
+	if (!isOpen) return null
+
 	return (
-		<AnimatePresence>
-			{isOpen && (
-				<motion.div
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-					className={styles.overlay}
-					onClick={() => setIsOpen(false)}
-				>
-					<motion.div
-						initial={{ y: '20vh', opacity: 0 }}
-						animate={{ y: 0, opacity: 1 }}
-						exit={{ y: '20vh', opacity: 0 }}
-						transition={{ duration: 0.2, ease: 'easeOut' }}
-						className={styles.searchModal}
-						onClick={e => e.stopPropagation()}
+		<div className={styles.modalBackdrop} onClick={() => setIsOpen(false)}>
+			<div className={`${styles.blogSearch} blog-search`} onClick={e => e.stopPropagation()}>
+				<form className={styles.input} onSubmit={e => e.preventDefault()}>
+					<Icon icon={status === 'pending' ? 'line-md:loading-alt-loop' : 'tabler:search'} />
+					<input
+						ref={inputRef}
+						value={word}
+						onChange={e => setWord(e.target.value)}
+						onKeyDown={handleKeyDown}
+						type="search"
+						className={styles.searchInput}
+						placeholder="键入开始搜索"
+					/>
+				</form>
+
+				{debouncedWord && status === 'success' && !result.length && (
+					<div className={styles.noResult}>
+						无结果
+					</div>
+				)}
+
+				{result.length > 0 && (
+					<menu
+						ref={listResultRef}
+						key={result.length < 5 ? result.length : result[0]?.id}
+						className={`${styles.searchResult} scrollcheck-y`}
 					>
-						<form className={styles.inputForm} onSubmit={e => e.preventDefault()}>
-							<Icon icon={status === 'pending' ? 'line-md:loading-alt-loop' : 'tabler:search'} className={styles.searchIcon} />
-							<input
-								ref={inputRef}
-								className={styles.searchInput}
-								value={word}
-								onChange={e => setWord(e.target.value)}
-								onKeyDown={handleKeyDown}
-								placeholder="键入开始搜索"
-								type="search"
-								autoComplete="off"
+						{result.map((item, itemIndex) => (
+							<SearchItem
+								key={item.id}
+								{...item as any}
+								active={activeIndex === itemIndex}
+								queryTerms={queryTerms}
+								onMouseMove={() => !isKeyboardMode && setActiveIndex(itemIndex)}
+								onClick={() => setIsOpen(false)}
 							/>
-						</form>
+						))}
+					</menu>
+				)}
 
-						<AnimatePresence mode="popLayout">
-							<motion.div 
-								key="results"
-								className={`${styles.resultsContainer} scrollcheck-y`}
-								layout
-								initial={{ opacity: 0, height: 0 }}
-								animate={{ opacity: 1, height: 'auto' }}
-								exit={{ opacity: 0, height: 0 }}
-								transition={{ duration: 0.5 }}
-							>
-								{debouncedWord && results.length === 0 && status === 'success' && (
-									<div className={styles.noResult}>无结果</div>
-								)}
-								
-								{results.length > 0 && (
-									<motion.menu 
-										ref={resultsListRef}
-										className={styles.resultsList}
-										variants={{
-											show: { transition: { staggerChildren: 0.05 } }
-										}}
-										initial="hidden"
-										animate="show"
-									>
-										{results.map((item, i) => (
-											<motion.div
-												key={item.id}
-												variants={{
-													hidden: { opacity: 0, x: -10 },
-													show: { opacity: 1, x: 0 }
-												}}
-											>
-												<SearchItem
-													{...item as any}
-													active={activeIndex === i}
-													queryTerms={[debouncedWord]}
-													onMouseMove={() => !isKeyboardMode && setActiveIndex(i)}
-												/>
-											</motion.div>
-										))}
-									</motion.menu>
-								)}
-							</motion.div>
-						</AnimatePresence>
-
-						{results.length > 0 && (
-							<div className={styles.footer}>
-								<span className={styles.tip}>
-									<Key code="ArrowUp" /> <Key code="ArrowDown" /> 切换
-								</span>
-								<span className={styles.tip}>
-									<Key code="Enter" /> 选择
-								</span>
-								<span className={styles.tip}>
-									<Key code="Escape" /> 关闭
-								</span>
-							</div>
-						)}
-					</motion.div>
-				</motion.div>
-			)}
-		</AnimatePresence>
+				{result.length > 0 && (
+					<div className={styles.tip} onClick={() => inputRef.current?.focus()}>
+						<Key code="ArrowUp" prevent onPress={() => updateActiveIndex(activeIndex - 1, true)} />
+						<Key code="ArrowDown" prevent onPress={() => updateActiveIndex(activeIndex + 1, true)} />
+						<span>切换&emsp;</span>
+						<Key code="Enter" icon onPress={openActiveItem} />
+						<span>选择&emsp;</span>
+						<Key code="Escape" icon={false} onPress={() => setIsOpen(false)} />
+						<span>关闭</span>
+					</div>
+				)}
+			</div>
+		</div>
 	)
 }

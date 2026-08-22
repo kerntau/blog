@@ -1,7 +1,7 @@
 import { forwardRef, type AnchorHTMLAttributes, type MouseEvent, type ReactNode } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 
-export interface LinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+export interface LinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
 	href: string | { pathname?: string, search?: string, hash?: string }
 	replace?: boolean
 	scroll?: boolean

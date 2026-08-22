@@ -1,7 +1,3 @@
-'use client'
-
-import { useState } from 'react'
-import { Icon } from '@iconify/react'
 import styles from './Folding.module.scss'
 
 interface FoldingProps {
@@ -11,17 +7,12 @@ interface FoldingProps {
 }
 
 export default function Folding({ title, open, children }: FoldingProps) {
-	const [isOpen, setIsOpen] = useState(open)
-
 	return (
-		<details className={styles.folding} open={isOpen} onToggle={(e) => setIsOpen(e.currentTarget.open)}>
-			<summary className={styles.foldingTitle}>
+		<details className={`${styles.folding} folding`} open={open}>
+			<summary className={styles.summary}>
 				{title}
-				<Icon icon="tabler:chevron-right" className={styles.icon} />
 			</summary>
-			<div className={styles.foldingContent}>
-				{children}
-			</div>
+			{children}
 		</details>
 	)
 }

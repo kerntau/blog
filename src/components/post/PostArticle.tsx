@@ -32,9 +32,9 @@ export default forwardRef<HTMLAnchorElement, PostArticleProps>(({
 	const showAllDate = isTimeDiffSignificant(date, updated)
 
 	const categoryStr = categories?.[0]
-	const catConfig = categoryStr ? appConfig.article.categories[categoryStr as keyof typeof appConfig.article.categories] : null
+	const catConfig = categoryStr ? appConfig.article.categories?.[categoryStr as keyof typeof appConfig.article.categories] : null
 	const catColor = catConfig?.color
-	const catIcon = catConfig?.icon || appConfig.article.categories[appConfig.defaultCategory as keyof typeof appConfig.article.categories].icon
+	const catIcon = catConfig?.icon || appConfig.article.categories?.[appConfig.defaultCategory as keyof typeof appConfig.article.categories]?.icon || 'tabler:circle-dashed'
 
 	return (
 		<UtilLink ref={ref} to={to} className={`${styles.articleCard} card upraise`} style={style}>

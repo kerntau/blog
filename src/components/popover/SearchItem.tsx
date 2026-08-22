@@ -1,46 +1,43 @@
 import { Icon } from '@iconify/react'
 import UtilLink from '../util/UtilLink'
+import { highlightHtml } from '../../utils/str'
 import styles from './SearchItem.module.scss'
 
 interface SearchItemProps {
 	id: string
 	title: string
-	content: string
+	content?: string
 	titles?: string[]
 	level?: number
 	queryTerms?: string[]
 	active?: boolean
 	onMouseMove?: () => void
-}
-
-function highlightHtml(text: string, terms?: string[]) {
-	if (!terms || !terms.length) return text
-	const regex = new RegExp(`(${terms.join('|')})`, 'gi')
-	return text.replace(regex, '<mark>$1</mark>')
+	onClick?: () => void
 }
 
 export default function SearchItem(props: SearchItemProps) {
-	const { id, title, content, titles = [], level, queryTerms, active, onMouseMove } = props
+	const { id, title = '', content = '', titles = [], level, queryTerms, active, onMouseMove, onClick } = props
 
 	return (
 		<UtilLink
 			to={id}
-			className={`${styles.searchItem} ${active ? styles.active : ''}`}
+			className={`${styles.searchItem} search-item ${active ? `${styles.active} active` : ''}`}
 			onMouseMove={onMouseMove}
+			onClick={onClick}
 		>
-			<hgroup className={`${styles.hgroup} text-creative`}>
+			<hgroup className="text-creative">
 				{[...titles, title].map((heading, i) => (
 					<span
 						key={i}
-						className={styles.title}
+						className={`${styles.title} title`}
 						dangerouslySetInnerHTML={{ __html: highlightHtml(heading, queryTerms) }}
 					/>
 				))}
-				{level === 1 && <Icon icon="tabler:file-text" className={styles.fileIcon} />}
+				{level === 1 && <Icon icon="tabler:file-text" />}
 			</hgroup>
 			{content && (
 				<p
-					className={styles.content}
+					className={`${styles.content} content`}
 					dangerouslySetInnerHTML={{ __html: highlightHtml(content, queryTerms) }}
 				/>
 			)}

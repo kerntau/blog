@@ -1,30 +1,82 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import abcjs from 'abcjs'
+import React, { useEffect, useRef } from 'react'
+import type { AbcVisualParams, SynthObjectController, SynthVisualOptions, TuneObject } from 'abcjs'
+import styles from './MusicScore.module.scss'
 
-export default function MusicScore({ abc }: { abc: string }) {
-	const elRef = useRef<HTMLDivElement>(null)
+export interface MusicScoreProps {
+	abc?: string
+	children?: React.ReactNode
+}
+
+export function MusicScore({ abc, children }: MusicScoreProps) {
+	const containerRef = useRef<HTMLDivElement>(null)
+	const synthRef = useRef<HTMLDivElement>(null)
+	const synthObjRef = useRef<SynthObjectController | null>(null)
+
+	const scoreText = (abc || (typeof children === 'string' ? children : '')).trim()
 
 	useEffect(() => {
-		if (elRef.current && abc) {
+		let isCancelled = false
+
+		async function initScore() {
+			if (!containerRef.current || !scoreText) return
+
 			try {
-				abcjs.renderAbc(elRef.current, abc, {
+				const abcjs = await import('abcjs')
+				if (isCancelled) return
+
+				const abcVisualParams: AbcVisualParams = {
 					responsive: 'resize',
-					paddingbottom: 0,
-					paddingtop: 0,
-					paddingleft: 0,
-					paddingright: 0,
-				})
+				}
+
+				const rendered = abcjs.renderAbc(containerRef.current, scoreText, abcVisualParams)
+				const tuneObj: TuneObject = rendered[0]
+
+				if (!tuneObj) return
+
+				const synthVisualOptions: SynthVisualOptions = {
+					displayLoop: true,
+					displayRestart: true,
+					displayPlay: true,
+					displayProgress: true,
+					displayWarp: true,
+				}
+
+				if (abcjs.synth && abcjs.synth.supportsAudio()) {
+					try {
+						const res = await fetch('https://paulrosen.github.io/midi-js-soundfonts/', { method: 'HEAD' })
+						if (res.ok && synthRef.current && !isCancelled) {
+							const synthObjController = new abcjs.synth.SynthController()
+							synthObjRef.current = synthObjController
+							synthObjController.load(synthRef.current, null, synthVisualOptions)
+							synthObjController.setTune(tuneObj, false)
+						}
+					} catch {
+						// SoundFonts fallback
+					}
+				}
 			} catch (e) {
-				console.error('Failed to render ABC score:', e)
+				console.error('[music-abc] Failed to render score:', e)
 			}
 		}
-	}, [abc])
+
+		initScore()
+
+		return () => {
+			isCancelled = true
+			try {
+				synthObjRef.current?.pause()
+			} catch {}
+		}
+	}, [scoreText])
 
 	return (
-		<div className="music-score-container" style={{ overflow: 'auto', margin: '1rem 0' }}>
-			<div ref={elRef} />
+		<div className={`music-score ${styles.musicScore}`}>
+			<div ref={containerRef} />
+			<div ref={synthRef} />
 		</div>
 	)
 }
+
+export default MusicScore

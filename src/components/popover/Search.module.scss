@@ -1,12 +1,10 @@
-.overlay {
+.modalBackdrop {
 	position: fixed;
 	inset: 0;
-	background-color: var(--c-bg-a50);
-	backdrop-filter: blur(0.5rem);
-	z-index: 2000;
+	z-index: var(--z-index-popover);
 }
 
-.searchModal {
+.blogSearch {
 	--float-distance: 20vh;
 
 	contain: paint;
@@ -14,81 +12,63 @@
 	inset: 0;
 	width: 90%;
 	height: fit-content;
-	max-height: 85vh;
 	max-width: 768px; /* $breakpoint-mobile */
 	margin: auto;
 	border: 1px solid var(--c-primary);
-	border-radius: 1.5rem;
+	border-radius: 1em;
 	box-shadow: var(--box-shadow-2), var(--box-shadow-3);
-	outline: 0.2rem solid var(--c-primary-soft);
+	outline: 0.2em solid var(--c-primary-soft);
 	background-color: var(--ld-bg-card);
-	display: flex;
-	flex-direction: column;
+	animation: float-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+	z-index: 1;
 }
 
-.inputForm {
+.input {
 	display: flex;
 	align-items: center;
 	gap: 1em;
 	position: relative;
-	padding: 0 1.5rem;
-	border-bottom: 1px solid var(--c-primary-soft-2);
-}
+	padding: 0 1em;
 
-.searchIcon {
-	font-size: 1.4rem;
-	color: var(--c-primary);
-}
-
-.searchInput {
-	flex: 1;
-	background: none;
-	border: none;
-	outline: none;
-	padding: 1.25rem 0;
-	font-size: 1.1rem;
-	color: var(--c-text);
-}
-
-.resultsContainer {
-	flex: 1;
-	overflow-y: auto;
-	padding: 0.5rem 0;
-}
-
-.resultsList {
-	list-style: none;
-	padding: 0;
-	margin: 0;
+	> .searchInput {
+		width: 100%;
+		padding: 1em 0;
+		outline: none;
+		border: none;
+		background: transparent;
+		color: var(--c-text);
+		font-size: 1em;
+	}
 }
 
 .noResult {
-	padding: 2rem;
+	max-height: 5em;
+	line-height: 5em;
 	text-align: center;
 	color: var(--c-text-3);
+	transition: all 0.5s;
 }
 
-.footer {
-	padding: 0.75rem 1.5rem;
-	display: flex;
-	justify-content: flex-end;
-	gap: 1.5rem;
-	background-color: var(--c-bg-soft);
-	border-top: 1px solid var(--c-primary-soft-2);
-	border-bottom-left-radius: 1.5rem;
-	border-bottom-right-radius: 1.5rem;
+.searchResult {
+	max-height: 75vh;
+	max-height: 75dvh;
+	transition: all 0.5s;
+	scroll-padding: var(--fadeout-height);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	overflow-y: auto;
 }
 
 .tip {
-	font-size: 0.75rem;
+	max-height: 1rem;
+	margin: 0 1em 0.5rem;
+	font-size: 0.8em;
+	text-align: center;
 	color: var(--c-text-3);
+	transition: all 0.5s;
 	display: flex;
 	align-items: center;
-	gap: 0.4rem;
-
-	kbd {
-		background-color: var(--c-bg);
-		border: 1px solid var(--c-text-4);
-		box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
-	}
+	justify-content: center;
+	gap: 0.2em;
 }

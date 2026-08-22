@@ -1,53 +1,31 @@
 import React, { forwardRef } from 'react'
-import { Icon } from '@iconify/react'
 import type { ArticleProps } from '../../types/article'
 import UtilLink from '../util/UtilLink'
-import UtilDate from '../util/UtilDate'
-import { getCategoryColor, getCategoryIcon } from '../../utils/article'
-import { isSameUnit, isTimeDiffSignificant } from '../../utils/time'
 import styles from './PostArchive.module.scss'
 
 interface PostArchiveProps extends ArticleProps {
 	showCategory?: boolean
 	useUpdated?: boolean
 	style?: React.CSSProperties
+	to?: string
 }
 
 export default forwardRef<HTMLLIElement, PostArchiveProps>((props, ref) => {
-	const { title, path, categories, tags, description, showCategory, useUpdated, style } = props
-	const mainDate = useUpdated ? props.updated : props.date
-	const category = categories?.[0]
+	const { title, path, categories, showCategory = true, useUpdated, style, to } = props
+	const date = (useUpdated ? props.updated : props.date) || ''
+	const targetPath = to || path || ''
 
 	return (
-		<li ref={ref} className={styles.articleItem} style={style}>
-			<UtilDate className={`${styles.dimHover} dim-hover`} date={mainDate} format="monthDay" />
-
-			<div className="gradient-card" style={{ '--c-accent': getCategoryColor(category) } as React.CSSProperties}>
-				<UtilLink className={`${styles.articleLink} scrollbar-hidden scrollcheck-x`} to={path} title={description}>
-					<span className={styles.articleTitle}>
-						{showCategory && (
-							<>
-								<Icon icon={getCategoryIcon(category)} />{' '}
-							</>
-						)}
-						{title}
-					</span>
-
-					{props.date && useUpdated && isTimeDiffSignificant(props.date, props.updated) && (
-						<UtilDate
-							className={`${styles.dimHover} ${styles.info} dim-hover`}
-							date={props.date}
-							format={props.updated && isSameUnit(props.date, props.updated, 'year') ? 'monthDay' : 'date'}
-						/>
-					)}
-
-					{tags && tags.length > 0 && (
-						<ul className={`${styles.dimHover} ${styles.info} ${styles.tagList} dim-hover`}>
-							{tags.map(tag => <li key={tag}>{tag}</li>)}
-						</ul>
-					)}
-				</UtilLink>
-			</div>
+		<li ref={ref} className={styles.postArchive} style={style}>
+			<UtilLink to={targetPath} className={styles.archiveItem}>
+				<time className={styles.archiveTime} dateTime={date}>
+					{date.slice(5, 10)}
+				</time>
+				<h3 className={styles.archiveTitle}>{title}</h3>
+				{showCategory && categories?.[0] && (
+					<span className="dim-hover">{categories[0]}</span>
+				)}
+			</UtilLink>
 		</li>
 	)
 })
