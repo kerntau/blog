@@ -21,13 +21,14 @@ import blogConfig, { myFeed } from '../blog.config'
 import feeds from '../src/feeds'
 import packageJson from '../package.json'
 import { toZonedTemporal } from '../src/utils/time'
+import { parseArrayField } from '../src/utils/post-meta'
 import remarkMusic from '../remark-plugins/remark-music'
 import rehypeMetaSlots from '../remark-plugins/rehype-meta-slots'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const rootDir = resolve(__dirname, '..')
 const contentDir = join(rootDir, 'content')
-const cacheDir = join(rootDir, 'node_modules', '.cache', 'cotovo-mdx')
+const cacheDir = join(rootDir, 'node_modules', '.cache', 'blog-mdx')
 const CACHE_VERSION = 'v1'
 const dateFields = ['date', 'updated', 'published'] as const
 
@@ -469,17 +470,9 @@ async function getAllPostsData() {
 				data.image = data.images[0]
 			}
 
-			if (!data.categories) {
-				if (data.category) {
-					data.categories = [data.category]
-				} else {
-					data.categories = [blogConfig.defaultCategory]
-				}
-			}
-
-			if (!data.tags) {
-				data.tags = []
-			}
+			const parsedCats = parseArrayField(data.categories || data.category)
+			data.categories = parsedCats.length > 0 ? parsedCats : [blogConfig.defaultCategory]
+			data.tags = parseArrayField(data.tags)
 
 			if (!data.readingTime) {
 				data.readingTime = readingTime(body)
@@ -688,7 +681,7 @@ function generateAtomXml(posts: any[]) {
 		generator: {
 			$uri: 'https://blog.cot.wiki',
 			$version: packageJson.version,
-			_: 'Cotovo Blog Engine (Rsbuild)',
+			_: 'Blog Engine (Rsbuild)',
 		},
 		icon: blogConfig.favicon,
 		logo: blogConfig.author.avatar,
@@ -769,11 +762,12 @@ export async function buildStaticData() {
 	mkdirSync(publicApiDir, { recursive: true })
 
 	writeFileSync(join(publicDir, 'atom.xml'), atomXml, 'utf-8')
+	writeFileSync(join(publicDir, 'friends.opml'), opmlXml, 'utf-8')
 	writeFileSync(join(publicDir, 'cotovo.opml'), opmlXml, 'utf-8')
 	writeFileSync(join(publicApiDir, 'stats.json'), JSON.stringify(stats, null, 2), 'utf-8')
 	writeFileSync(join(publicApiDir, 'search.json'), JSON.stringify(searchIndex, null, 2), 'utf-8')
 
-	console.log(`✅ 静态数据生成完毕：共预编译 ${posts.length} 篇文章，已生成 atom.xml, cotovo.opml, stats.json, search.json`)
+	console.log(`静态数据生成完毕：共预编译 ${posts.length} 篇文章，已生成 atom.xml, friends.opml, stats.json, search.json`)
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

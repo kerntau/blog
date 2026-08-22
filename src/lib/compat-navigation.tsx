@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback } from 'react'
 import {
 	useLocation,
 	useNavigate,
@@ -14,14 +14,36 @@ export function usePathname(): string {
 export function useRouter() {
 	const navigate = useNavigate()
 
-	return useMemo(() => ({
-		push: (url: string, _options?: { scroll?: boolean }) => navigate(url),
-		replace: (url: string, _options?: { scroll?: boolean }) => navigate(url, { replace: true }),
-		back: () => navigate(-1),
-		forward: () => navigate(1),
-		refresh: () => window.location.reload(),
-		prefetch: (_url: string) => {},
-	}), [navigate])
+	const push = useCallback((url: string, _options?: { scroll?: boolean }) => {
+		navigate(url)
+	}, [navigate])
+
+	const replace = useCallback((url: string, _options?: { scroll?: boolean }) => {
+		navigate(url, { replace: true })
+	}, [navigate])
+
+	const back = useCallback(() => {
+		navigate(-1)
+	}, [navigate])
+
+	const forward = useCallback(() => {
+		navigate(1)
+	}, [navigate])
+
+	const refresh = useCallback(() => {
+		window.location.reload()
+	}, [])
+
+	const prefetch = useCallback((_url: string) => {}, [])
+
+	return {
+		push,
+		replace,
+		back,
+		forward,
+		refresh,
+		prefetch,
+	}
 }
 
 export function useSearchParams() {
