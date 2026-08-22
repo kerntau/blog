@@ -123,11 +123,10 @@ export const AdminAppContent: React.FC = () => {
 			{/* 左侧固定侧边栏 */}
 			<aside className={`admin-sidebar ${mobileSidebarOpen ? 'open' : ''}`}>
 				<div className="sidebar-brand">
-					<div className="brand-logo" style={{ overflow: 'hidden', borderRadius: '50%', border: '2px solid var(--admin-accent)', width: 34, height: 34, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--admin-surface)' }}>
+					<div className="brand-logo">
 						<img
 							src={siteProfile.authorAvatar}
 							alt={siteProfile.authorName}
-							style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 							onError={e => (e.currentTarget.src = '/favicon.ico')}
 						/>
 					</div>

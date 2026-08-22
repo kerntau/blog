@@ -3,15 +3,15 @@
   <head>
     <title>kerntau的友链订阅</title>
     <dateCreated>2025-11-09T16:00:00Z</dateCreated>
-    <dateModified>2026-08-22T12:48:08.665Z</dateModified>
+    <dateModified>2026-08-22T14:10:11.618Z</dateModified>
     <ownerName>kerntau</ownerName>
     <ownerEmail>1722288011@qq.com</ownerEmail>
-    <ownerId>https://blog.cot.wiki/</ownerId>
+    <ownerId>https://keru.in/</ownerId>
     <docs>https://opml.org/spec2.opml</docs>
   </head>
   <body>
-    <outline text="kerntau" type="rss" xmlUrl="https://blog.cot.wiki/atom.xml" created="2025-11-09T16:00:00Z" description="心中有景,花香满径" htmlUrl="https://blog.cot.wiki/"></outline>
-    <outline text="kerntau" type="rss" xmlUrl="https://blog.cot.wiki/atom.xml" created="2025-11-09T16:00:00Z" description="心中有景,花香满径" htmlUrl="https://blog.cot.wiki/"></outline>
+    <outline text="kerntau" type="rss" xmlUrl="https://keru.in/atom.xml" created="2025-11-09T16:00:00Z" description="心中有景,花香满径" htmlUrl="https://keru.in/"></outline>
+    <outline text="kerntau" type="rss" xmlUrl="https://keru.in/atom.xml" created="2025-11-09T16:00:00Z" description="心中有景,花香满径" htmlUrl="https://keru.in/"></outline>
     <outline text="古怪杂记本" type="rss" xmlUrl="https://blog.guuguai.site/atom.xml" created="2023-12-22T16:00:00Z" description="一个什么都可能会写的博客" htmlUrl="https://blog.guuguai.site/"></outline>
     <outline text="小李同学 Coding" type="rss" xmlUrl="https://blog.junjieli.top/atom.xml" created="2024-01-31T16:00:00Z" description="一支努力变强的小彩笔" htmlUrl="https://blog.junjieli.top/"></outline>
     <outline text="希乐博客" type="rss" xmlUrl="https://blog.xlenco.top/atom.xml" created="2024-07-27T16:00:00Z" description="互联网中的静谧之地" htmlUrl="https://blog.xlenco.top/"></outline>

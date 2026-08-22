@@ -30,7 +30,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const rootDir = resolve(__dirname, '..')
 const contentDir = join(rootDir, 'content')
 const cacheDir = join(rootDir, 'node_modules', '.cache', 'blog-mdx')
-const CACHE_VERSION = 'v1'
+const CACHE_VERSION = 'v2'
 const dateFields = ['date', 'updated', 'published'] as const
 
 function rehypeHeadingAnchors() {

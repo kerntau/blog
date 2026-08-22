@@ -290,18 +290,6 @@ export const WidgetManagerView: React.FC = () => {
 		}
 	}
 
-	// 快捷键支持 (Ctrl+S / Cmd+S 触发保存)
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-				e.preventDefault()
-				handleSave()
-			}
-		}
-		window.addEventListener('keydown', handleKeyDown)
-		return () => window.removeEventListener('keydown', handleKeyDown)
-	}, [widgetData])
-
 	const handleSave = async () => {
 		setSaving(true)
 		try {
@@ -321,6 +309,18 @@ export const WidgetManagerView: React.FC = () => {
 			setSaving(false)
 		}
 	}
+
+	// 快捷键支持 (Ctrl+S / Cmd+S 触发保存)
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+				e.preventDefault()
+				handleSave()
+			}
+		}
+		window.addEventListener('keydown', handleKeyDown)
+		return () => window.removeEventListener('keydown', handleKeyDown)
+	}, [widgetData])
 
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>

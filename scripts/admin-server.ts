@@ -120,9 +120,9 @@ function generateAppConfigCode(cfg: any): string {
 	const footerNav = footer.nav || []
 
 	const header = cfg.header || {}
-	const headerLogo = header.logo || '/og-image.jpg'
+	const _headerLogo = header.logo || '/og-image.jpg'
 	const showTitle = header.showTitle !== undefined ? header.showTitle : true
-	const subtitle = header.subtitle || '心中有景,花香满径'
+	const _subtitle = header.subtitle || '心中有景,花香满径'
 	const emojiTail = header.emojiTail || ['💻', '⚡', '☕', '🚀']
 
 	const link = cfg.link || { remindNoFeed: true, randomInGroup: true }
@@ -131,7 +131,6 @@ function generateAppConfigCode(cfg: any): string {
 	const widgets = cfg.widgets || {}
 
 	let code = `import type { Nav, NavItem } from '@/types/nav'
-import { Temporal } from 'temporal-polyfill'
 import blogConfig from '../blog.config'
 
 // 图标查询：https://yesicon.app/tabler
@@ -1336,7 +1335,7 @@ const server = http.createServer(async (req, res) => {
 					footerNavStr += `\t\t\t\t],\n\t\t\t},\n`
 				}
 				footerNavStr += '\t\t] satisfies Nav,'
-				appRaw = appRaw.replace(/footer:\s*\{[\s\S]*?nav:\s*\[[\s\S]*?\]\s*satisfies\s*Nav,/m, (match) => {
+				appRaw = appRaw.replace(/footer:\s*\{[\s\S]*?nav:\s*\[[\s\S]*?\]\s*satisfies\s*Nav,/, (match) => {
 					return match.replace(/nav:\s*\[[\s\S]*?\]\s*satisfies\s*Nav,/, footerNavStr)
 				})
 			}
@@ -1998,8 +1997,15 @@ const server = http.createServer(async (req, res) => {
 				exec('git log -n 5 --oneline', { cwd: rootDir }, (_err2, logStdout) => {
 					const lines = statusStdout.trim().split('\n').filter(Boolean)
 					const modifiedFiles = lines.map((l) => {
+						const match = l.match(/^([A-Z?ADMRCUD!\s]{1,2})\s+(.+)$/)
+						if (match) {
+							return {
+								status: match[1].trim(),
+								file: match[2].trim(),
+							}
+						}
 						const status = l.slice(0, 2).trim()
-						const file = l.slice(3).trim()
+						const file = l.slice(2).trim()
 						return { status, file }
 					})
 					const logs = (logStdout || '').trim().split('\n').filter(Boolean)

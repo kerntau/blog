@@ -379,43 +379,61 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 
 				{/* Git 工作区状态 */}
 				{gitStatus && (
-					<div className="admin-card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-						<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-							<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-								<Icon icon="tabler:git-branch" style={{ fontSize: 16, color: 'var(--admin-accent)' }} />
-								<span style={{ fontSize: 13, fontWeight: 700, color: 'var(--admin-text-1)' }}>Git 工作区状态</span>
-								<span style={{ fontSize: 11, color: 'var(--admin-text-3)', fontFamily: 'var(--admin-font-mono)' }}>
+					<div className="admin-card" style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+						{/* 头部：标题、分支与操作栏 */}
+						<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+							<div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+								<div style={{ width: 26, height: 26, borderRadius: 6, background: 'var(--admin-accent-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+									<Icon icon="tabler:git-branch" style={{ fontSize: 16, color: 'var(--admin-accent)' }} />
+								</div>
+								<span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--admin-text-1)', whiteSpace: 'nowrap' }}>Git 工作区状态</span>
+								<span
+									style={{
+										fontSize: 11,
+										color: 'var(--admin-text-2)',
+										fontFamily: 'var(--admin-font-mono)',
+										background: 'var(--admin-bg-subtle)',
+										padding: '1px 7px',
+										borderRadius: 4,
+										border: '1px solid var(--admin-border)',
+										display: 'inline-flex',
+										alignItems: 'center',
+										gap: 4,
+									}}
+								>
+									<Icon icon="tabler:git-fork" style={{ fontSize: 11, color: 'var(--admin-text-3)' }} />
 									{gitStatus.branch || 'main'}
 								</span>
 							</div>
-							<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+							<div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
 								<span className={`admin-badge ${gitStatus.hasChanges ? 'badge-warning' : 'badge-success'}`}>
 									{gitStatus.hasChanges ? `${gitStatus.changes.length} 项变更待提交` : '工作区整洁'}
 								</span>
 								<button
 									type="button"
 									className="admin-btn btn-ghost btn-sm"
-									style={{ padding: '2px 6px', height: 22, fontSize: 11 }}
+									style={{ padding: '3px 8px', height: 24, fontSize: 11.5, display: 'inline-flex', alignItems: 'center', gap: 4 }}
 									onClick={() => onNavigate('console')}
-									title="前往运维控制台查看详情"
+									title="前往运维控制台查看详情与提交"
 								>
 									<span>前往提交</span>
-									<Icon icon="tabler:arrow-right" style={{ fontSize: 12 }} />
+									<Icon icon="tabler:arrow-right" style={{ fontSize: 13 }} />
 								</button>
 							</div>
 						</div>
 
+						{/* 中间：变更列表 */}
 						{gitStatus.hasChanges ? (
 							<div
 								style={{
 									display: 'flex',
 									flexDirection: 'column',
 									gap: 4,
-									maxHeight: 140,
+									maxHeight: 160,
 									overflowY: 'auto',
 									background: 'var(--admin-bg-subtle)',
-									padding: '6px 8px',
-									borderRadius: 6,
+									padding: '6px',
+									borderRadius: 8,
 									border: '1px solid var(--admin-border)',
 								}}
 							>
@@ -423,8 +441,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 									const isMod = c.status.includes('M')
 									const isAdd = c.status.includes('A') || c.status.includes('?')
 									const isDel = c.status.includes('D')
-									const badgeBg = isMod ? 'rgba(245, 158, 11, 0.12)' : isAdd ? 'rgba(34, 197, 94, 0.12)' : 'rgba(239, 68, 68, 0.12)'
-									const badgeColor = isMod ? '#f59e0b' : isAdd ? '#22c55e' : '#ef4444'
+									const badgeBg = isMod ? 'rgba(245, 158, 11, 0.15)' : isAdd ? 'rgba(34, 197, 94, 0.15)' : isDel ? 'rgba(239, 68, 68, 0.15)' : 'rgba(148, 163, 184, 0.15)'
+									const badgeColor = isMod ? '#d97706' : isAdd ? '#16a34a' : isDel ? '#dc2626' : '#64748b'
+									
+									// 智能分离路径与文件名
+									const lastSlash = c.file.lastIndexOf('/')
+									const dirPath = lastSlash !== -1 ? c.file.slice(0, lastSlash + 1) : ''
+									const fileName = lastSlash !== -1 ? c.file.slice(lastSlash + 1) : c.file
 
 									return (
 										<div
@@ -433,61 +456,111 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 												display: 'flex',
 												alignItems: 'center',
 												gap: 8,
-												padding: '3px 6px',
-												borderRadius: 4,
-												fontSize: 11,
+												padding: '4px 8px',
+												borderRadius: 5,
+												fontSize: 11.5,
 												background: 'var(--admin-surface)',
-												border: '1px solid rgba(0,0,0,0.03)',
+												border: '1px solid var(--admin-border)',
+												transition: 'background 0.15s ease',
 											}}
+											title={c.file}
 										>
 											<span
 												style={{
-													fontSize: 10,
+													fontSize: 10.5,
 													fontWeight: 700,
 													fontFamily: 'var(--admin-font-mono)',
-													padding: '1px 5px',
+													padding: '1px 6px',
 													borderRadius: 3,
 													background: badgeBg,
 													color: badgeColor,
 													flexShrink: 0,
-													minWidth: 20,
+													minWidth: 22,
 													textAlign: 'center',
+													lineHeight: 1.3,
 												}}
 											>
-												{c.status.trim()}
+												{c.status.trim() || 'M'}
 											</span>
-											<span
+											<div
 												style={{
 													fontFamily: 'var(--admin-font-mono)',
-													color: 'var(--admin-text-1)',
 													overflow: 'hidden',
 													textOverflow: 'ellipsis',
 													whiteSpace: 'nowrap',
 													flex: 1,
+													lineHeight: 1.4,
 												}}
-												title={c.file}
 											>
-												{c.file}
-											</span>
+												{dirPath && <span style={{ color: 'var(--admin-text-3)', fontSize: '0.95em' }}>{dirPath}</span>}
+												<span style={{ color: 'var(--admin-text-1)', fontWeight: 550 }}>{fileName}</span>
+											</div>
 										</div>
 									)
 								})}
 							</div>
 						) : (
-							<div style={{ fontSize: 12, color: 'var(--admin-text-3)', padding: '8px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
-								<Icon icon="tabler:circle-check" style={{ color: 'var(--admin-success)' }} />
-								<span>本地所有改动已提交，暂无未保存变更。</span>
+							<div style={{ fontSize: 12, color: 'var(--admin-text-3)', padding: '10px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
+								<Icon icon="tabler:circle-check" style={{ color: 'var(--admin-success)', fontSize: 16 }} />
+								<span>本地工作区状态整洁，所有改动均已提交。</span>
 							</div>
 						)}
 
-						{gitStatus.recentCommits && gitStatus.recentCommits.length > 0 && (
-							<div style={{ borderTop: '1px solid var(--admin-border)', paddingTop: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
-								<span style={{ color: 'var(--admin-text-3)' }}>最近提交:</span>
-								<span style={{ fontFamily: 'var(--admin-font-mono)', color: 'var(--admin-text-2)', maxWidth: '80%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-									{gitStatus.recentCommits[0]}
-								</span>
-							</div>
-						)}
+						{/* 底部：最近提交记录 */}
+						{gitStatus.recentCommits && gitStatus.recentCommits.length > 0 && (() => {
+							const commitLine = gitStatus.recentCommits[0]
+							const firstSpace = commitLine.indexOf(' ')
+							const hash = firstSpace !== -1 ? commitLine.slice(0, firstSpace) : commitLine
+							const msg = firstSpace !== -1 ? commitLine.slice(firstSpace + 1) : ''
+
+							return (
+								<div
+									style={{
+										borderTop: '1px solid var(--admin-border)',
+										paddingTop: 8,
+										display: 'flex',
+										alignItems: 'center',
+										gap: 8,
+										fontSize: 11,
+										minWidth: 0,
+									}}
+								>
+									<div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--admin-text-3)', flexShrink: 0 }}>
+										<Icon icon="tabler:git-commit" style={{ fontSize: 13 }} />
+										<span>最近提交:</span>
+									</div>
+									<div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flex: 1 }}>
+										<span
+											style={{
+												fontFamily: 'var(--admin-font-mono)',
+												fontSize: 10.5,
+												fontWeight: 600,
+												color: 'var(--admin-accent)',
+												background: 'var(--admin-accent-soft)',
+												padding: '1px 5px',
+												borderRadius: 3,
+												flexShrink: 0,
+											}}
+										>
+											{hash}
+										</span>
+										<span
+											style={{
+												fontFamily: 'var(--admin-font-mono)',
+												color: 'var(--admin-text-2)',
+												overflow: 'hidden',
+												textOverflow: 'ellipsis',
+												whiteSpace: 'nowrap',
+												flex: 1,
+											}}
+											title={commitLine}
+										>
+											{msg}
+										</span>
+									</div>
+								</div>
+							)
+						})()}
 					</div>
 				)}
 			</div>

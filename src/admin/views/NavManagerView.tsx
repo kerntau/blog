@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { adminApi } from '../api'
-import type { NavConfigData, NavGroupConfig, NavItemConfig } from '../types'
+import type { NavConfigData, NavItemConfig } from '../types'
 import { IconPickerModal } from '../components/IconPickerModal'
 import { useToast } from '../components/Toast'
 import appConfig from '../../app.config'
@@ -317,7 +317,10 @@ export const NavManagerView: React.FC = () => {
 					<button
 						type="button"
 						className={`admin-btn btn-sm ${activeTab === 'main' ? 'btn-primary' : 'btn-ghost'}`}
-						onClick={() => { setActiveTab('main'); setPreviewTab('sidebar') }}
+						onClick={() => {
+							setActiveTab('main')
+							setPreviewTab('sidebar')
+						}}
 					>
 						<Icon icon="tabler:layout-sidebar" />
 						<span>1. 侧栏主菜单 ({navData.nav.reduce((acc, g) => acc + g.items.length, 0)}项)</span>
@@ -325,7 +328,10 @@ export const NavManagerView: React.FC = () => {
 					<button
 						type="button"
 						className={`admin-btn btn-sm ${activeTab === 'iconNav' ? 'btn-primary' : 'btn-ghost'}`}
-						onClick={() => { setActiveTab('iconNav'); setPreviewTab('sidebar') }}
+						onClick={() => {
+							setActiveTab('iconNav')
+							setPreviewTab('sidebar')
+						}}
 					>
 						<Icon icon="tabler:brand-github" />
 						<span>2. 侧栏底部社交图标 ({navData.iconNav.length}项)</span>
@@ -333,7 +339,10 @@ export const NavManagerView: React.FC = () => {
 					<button
 						type="button"
 						className={`admin-btn btn-sm ${activeTab === 'footer' ? 'btn-primary' : 'btn-ghost'}`}
-						onClick={() => { setActiveTab('footer'); setPreviewTab('footer') }}
+						onClick={() => {
+							setActiveTab('footer')
+							setPreviewTab('footer')
+						}}
 					>
 						<Icon icon="tabler:map-pin" />
 						<span>3. 页脚站点地图与备案 ({navData.footerNav.length}组)</span>

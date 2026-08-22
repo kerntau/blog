@@ -16,9 +16,30 @@ const OG_GRADIENT_PRESETS = [
 ]
 
 const QUICK_EMOJIS = [
-	'💻', '⚡', '☕', '🚀', '🎨', '🔮', '✨', '🌟',
-	'💡', '🎮', '🦄', '🔥', '🎯', '💎', '🌈', '🪐',
-	'🐱', '📖', '🍵', '🎈', '⚙️', '🛡️', '🤖', '🏖️',
+	'💻',
+	'⚡',
+	'☕',
+	'🚀',
+	'🎨',
+	'🔮',
+	'✨',
+	'🌟',
+	'💡',
+	'🎮',
+	'🦄',
+	'🔥',
+	'🎯',
+	'💎',
+	'🌈',
+	'🪐',
+	'🐱',
+	'📖',
+	'🍵',
+	'🎈',
+	'⚙️',
+	'🛡️',
+	'🤖',
+	'🏖️',
 ]
 
 export const SeoManagerView: React.FC = () => {
@@ -606,91 +627,134 @@ export const SeoManagerView: React.FC = () => {
 					{/* 右侧：多维度高保真同源实时全景预览 */}
 					<div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 						{/* 1. 前台 BlogHeader 完整同源实时效果 (头像 + 背景飘动 Emoji 动画) */}
-						<div className="admin-card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-								<div style={{ fontSize: 13, fontWeight: 600, color: 'var(--admin-text-1)', display: 'flex', alignItems: 'center', gap: 6 }}>
-									<Icon icon="tabler:sparkles" style={{ color: 'var(--admin-accent)' }} />
-									<span>前台顶栏头像与背景 Emoji 动效实时预览</span>
+						<div className="admin-card" style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+								<div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--admin-text-1)', display: 'flex', alignItems: 'center', gap: 7 }}>
+									<div style={{ width: 26, height: 26, borderRadius: 6, background: 'var(--admin-accent-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+										<Icon icon="tabler:sparkles" style={{ color: 'var(--admin-accent)', fontSize: 15 }} />
+									</div>
+									<span>前台 Header 与 Emoji 预览</span>
 								</div>
-								<span className="admin-badge badge-primary">同源动效</span>
+								<span className="admin-badge badge-primary">同源渲染</span>
 							</div>
 
+							{/* 模拟前台 Header 高质感展示台 */}
 							<div
 								style={{
-									padding: '24px 20px',
-									borderRadius: 12,
+									padding: '22px 20px',
+									borderRadius: 10,
 									background: 'var(--admin-bg)',
 									border: '1px solid var(--admin-border)',
 									display: 'flex',
 									alignItems: 'center',
-									gap: 16,
+									justifyContent: 'space-between',
 									position: 'relative',
 									overflow: 'hidden',
+									boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.02)',
 								}}
 							>
-								{/* 模拟 Header 区域 */}
-								<div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 12 }}>
-									{/* 头像背后的 Emoji 浮出动效 */}
-									<div
-										style={{
-											position: 'absolute',
-											left: 0,
-											top: 0,
-											width: 48,
-											height: 48,
-											pointerEvents: 'none',
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'center',
-										}}
-									>
-										{(siteInfo.emojiTail || []).map((emoji, idx) => (
-											<span
-												key={idx}
-												style={{
-													position: 'absolute',
-													fontSize: 18,
-													transform: `translate(${(idx % 2 === 0 ? -1 : 1) * (18 + idx * 8)}px, ${-16 - idx * 6}px) scale(${0.85 + (idx % 2) * 0.15})`,
-													animation: `floatEmoji 3s ease-in-out infinite alternate`,
-													animationDelay: `${idx * 0.4}s`,
-													opacity: 0.85,
-												}}
-											>
-												{emoji}
-											</span>
-										))}
+								{/* 模拟 Header 主内容 */}
+								<div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 16, zIndex: 1, minWidth: 0 }}>
+									{/* 头像 + 背后 Emoji 粒子群 */}
+									<div style={{ position: 'relative', width: 52, height: 52, flexShrink: 0 }}>
+										{/* 飘动 Emoji 序列 */}
+										<div
+											style={{
+												position: 'absolute',
+												inset: -12,
+												pointerEvents: 'none',
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'center',
+											}}
+										>
+											{(siteInfo.emojiTail || []).map((emoji, idx) => (
+												<span
+													key={idx}
+													style={{
+														position: 'absolute',
+														fontSize: 19,
+														transform: `translate(${(idx % 2 === 0 ? -1 : 1) * (18 + idx * 7)}px, ${-14 - (idx % 3) * 6}px) scale(${0.9 + (idx % 2) * 0.15})`,
+														animation: `floatEmoji 3s ease-in-out infinite alternate`,
+														animationDelay: `${idx * 0.35}s`,
+														opacity: 0.85,
+														filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
+													}}
+												>
+													{emoji}
+												</span>
+											))}
+										</div>
+
+										{/* 头像本体 */}
+										<img
+											src={siteInfo.authorAvatar}
+											alt="Header Avatar"
+											style={{
+												width: 52,
+												height: 52,
+												borderRadius: '50%',
+												objectFit: 'cover',
+												border: '2px solid var(--admin-accent)',
+												position: 'relative',
+												zIndex: 2,
+												boxShadow: '0 4px 14px var(--admin-accent-soft)',
+											}}
+											onError={e => (e.currentTarget.src = '/favicon.ico')}
+										/>
 									</div>
 
-									{/* 头像 */}
-									<img
-										src={siteInfo.authorAvatar}
-										alt="Header Avatar"
-										style={{
-											width: 48,
-											height: 48,
-											borderRadius: '50%',
-											objectFit: 'cover',
-											border: '2px solid var(--admin-accent)',
-											position: 'relative',
-											zIndex: 2,
-											boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-										}}
-										onError={e => (e.currentTarget.src = '/favicon.ico')}
-									/>
-
-									{/* 标题与副标题 */}
-									<div style={{ position: 'relative', zIndex: 2 }}>
-										<div style={{ fontSize: 16, fontWeight: 800, color: 'var(--admin-text-1)', letterSpacing: '-0.01em', display: 'flex' }}>
+									{/* 站点主标题与 Slogan */}
+									<div style={{ position: 'relative', zIndex: 2, minWidth: 0 }}>
+										<div
+											style={{
+												fontSize: 16.5,
+												fontWeight: 800,
+												color: 'var(--admin-text-1)',
+												letterSpacing: '-0.02em',
+												display: 'flex',
+												lineHeight: 1.25,
+												whiteSpace: 'nowrap',
+												overflow: 'hidden',
+												textOverflow: 'ellipsis',
+											}}
+										>
 											{siteInfo.title.split('').map((char, idx) => (
 												<span key={idx} style={getFixedDelay((idx + 1) * 0.1)}>
 													{char}
 												</span>
 											))}
 										</div>
-										<div style={{ fontSize: 12, color: 'var(--admin-text-3)', marginTop: 2 }}>
-											{siteInfo.subtitle}
+										<div
+											style={{
+												fontSize: 12,
+												color: 'var(--admin-text-3)',
+												marginTop: 3,
+												whiteSpace: 'nowrap',
+												overflow: 'hidden',
+												textOverflow: 'ellipsis',
+												maxWidth: 240,
+											}}
+											title={siteInfo.subtitle}
+										>
+											{siteInfo.subtitle || '暂无副标题'}
 										</div>
 									</div>
+								</div>
+
+								{/* 右侧微型标识 */}
+								<div
+									style={{
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'flex-end',
+										gap: 4,
+										opacity: 0.6,
+										flexShrink: 0,
+									}}
+								>
+									<Icon icon="tabler:device-desktop" style={{ fontSize: 18, color: 'var(--admin-text-3)' }} />
+									<span style={{ fontSize: 10, fontFamily: 'var(--admin-font-mono)', color: 'var(--admin-text-3)' }}>LIVE</span>
 								</div>
 							</div>
 						</div>
