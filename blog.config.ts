@@ -7,7 +7,7 @@ const basicConfig = {
 	description: '在有序的世界里，寻一处生活的归栈。用理性梳理日常，用技术温柔时光，不慌不忙，自在生长。',
 	author: {
 		name: 'kerntau',
-		avatar: '/og-image.jpg',
+		avatar: '/avatar.png',
 		email: '1722288011@qq.com',
 		homepage: 'https://blog.cot.wiki/',
 	},
@@ -21,7 +21,7 @@ const basicConfig = {
 	timeEstablished: '2025-11-10',
 	timeZone: 'Asia/Shanghai',
 	url: 'https://blog.cot.wiki/',
-	defaultCategory: '未分类',
+	defaultCategory: '前端开发',
 }
 
 // 存储 next.config 和 app.config 共用的配置
@@ -32,17 +32,19 @@ const blogConfig = {
 
 	article: {
 		categories: {
-			[basicConfig.defaultCategory]: { icon: 'tabler:circle-dashed' },
-			/** 实践可复用操作经验：工具/系统/部署/排障 */
-			技术: { icon: 'tabler:mouse', color: '#33aaff' },
-			/** 编程：代码实现/工程实践/开发方法 */
-			开发: { icon: 'tabler:code', color: '#7777ff' },
-			/** 安全：漏洞/CTF/恶意软件/安全事件分析 */
-			安全: { icon: 'tabler:bug', color: '#ff7733' },
-			/** 思考：观点讨论/复盘反思/行业或产品观察 */
-			杂谈: { icon: 'tabler:message', color: '#33bbaa' },
-			/** 记录叙事：个人经历/校园家庭/日常片段 */
-			生活: { icon: 'tabler:leaf', color: '#ff7777' },
+			[basicConfig.defaultCategory]: { icon: 'tabler:code', color: '#7777ff' },
+			'前端开发': { icon: 'tabler:browser', color: '#33aaff' },
+			'后端开发': { icon: 'tabler:server', color: '#7777ff' },
+			'数据库系统': { icon: 'tabler:database', color: '#ffaa33' },
+			'云原生与运维': { icon: 'tabler:cloud', color: '#33bbaa' },
+			'网络安全': { icon: 'tabler:shield-lock', color: '#ff7733' },
+			'人工智能': { icon: 'tabler:brain', color: '#ff5577' },
+			'技术': { icon: 'tabler:mouse', color: '#33aaff' },
+			'开发': { icon: 'tabler:code', color: '#7777ff' },
+			'安全': { icon: 'tabler:bug', color: '#ff7733' },
+			'杂谈': { icon: 'tabler:message', color: '#33bbaa' },
+			'生活': { icon: 'tabler:leaf', color: '#ff7777' },
+			'未分类': { icon: 'tabler:circle-dashed', color: '#888888' },
 		},
 		/** 文章版式，首个为默认版式 */
 		types: {
@@ -53,7 +55,6 @@ const blogConfig = {
 		order: {
 			date: '创建日期',
 			updated: '更新日期',
-			// title: '标题',
 		},
 		/** 使用 pnpm new 新建文章时自动生成自定义链接（permalink/abbrlink） */
 		useRandomPremalink: false,
@@ -72,10 +73,7 @@ const blogConfig = {
 	},
 
 	/** 向 <head> 中添加脚本 */
-	scripts: [
-		// Twikoo 评论系统
-		// { src: 'https://lib.baomitu.com/twikoo/1.6.44/twikoo.min.js', defer: true },
-	],
+	scripts: [],
 
 	/** 自己部署的 Twikoo 服务 */
 	twikoo: {
@@ -94,7 +92,7 @@ export const myFeed: FeedEntry = {
 	feed: new URL('/atom.xml', blogConfig.url).toString(),
 	icon: blogConfig.favicon,
 	avatar: blogConfig.author.avatar,
-	archs: ['Next.js', 'Vercel'],
+	archs: ['React', 'Rsbuild'],
 	date: blogConfig.timeEstablished,
 	comment: '这是我自己',
 }
