@@ -5,7 +5,7 @@
 	"private": true,
 	"packageManager": "pnpm@11.0.4",
 	"license": "MIT",
-	"homepage": "https://blog.cot.wiki",
+	"homepage": "https://keru.in",
 	"engines": {
 		"node": ">=22.17.1",
 		"pnpm": ">=10"

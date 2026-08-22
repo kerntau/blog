@@ -9,7 +9,7 @@ const basicConfig = {
 		name: 'kerntau',
 		avatar: '/avatar.webp',
 		email: '1722288011@qq.com',
-		homepage: 'https://blog.cot.wiki/',
+		homepage: 'https://keru.in/',
 	},
 	copyright: {
 		abbr: 'CC BY-NC-SA 4.0',
@@ -20,7 +20,7 @@ const basicConfig = {
 	language: 'zh-CN',
 	timeEstablished: '2025-11-10',
 	timeZone: 'Asia/Shanghai',
-	url: 'https://blog.cot.wiki/',
+	url: 'https://keru.in/',
 	defaultCategory: '前端开发',
 }
 
@@ -85,7 +85,7 @@ const blogConfig = {
 /** 用于生成 OPML 和友链页面配置 */
 export const myFeed: FeedEntry = {
 	author: blogConfig.author.name,
-	sitenick: '摸鱼处',
+	sitenick: '序栈',
 	title: blogConfig.title,
 	desc: blogConfig.subtitle || blogConfig.description,
 	link: blogConfig.url,
