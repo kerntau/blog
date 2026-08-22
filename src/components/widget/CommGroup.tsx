@@ -3,6 +3,7 @@
 import { Icon } from '@iconify/react'
 import BlogWidget from '../blog/BlogWidget'
 import Tip from '../content/Tip'
+import { getOicqGroupAvatar } from '../../utils/img'
 import styles from './CommGroup.module.scss'
 
 export default function CommGroup() {
@@ -11,7 +12,7 @@ export default function CommGroup() {
 			card
 			dim
 			title="博客/技术社区"
-			bgImg="https://p.qlogo.cn/gh/169994096/169994096/100/"
+			bgImg={getOicqGroupAvatar('169994096')}
 			bgRight
 			unoptimized
 			className={styles.commGroup}
