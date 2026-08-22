@@ -13,7 +13,7 @@ import './assets/css/main.scss'
 import './assets/css/reusable.scss'
 import './assets/css/layout.scss'
 
-const rootElement = document.getElementById('root')
+const rootElement = document.getElementById('blog-root')
 
 if (rootElement) {
 	const root = ReactDOM.createRoot(rootElement)

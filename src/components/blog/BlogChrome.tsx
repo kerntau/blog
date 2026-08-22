@@ -12,16 +12,14 @@ export default function BlogChrome({ children }: { children: ReactNode }) {
 	return (
 		<ClientProvider>
 			<SkipToContent />
-			<div id="blog-root">
-				<BlogSidebar />
-				<div id="content">
+			<BlogSidebar />
+			<div id="content">
 					<main id="main-content">
 						{children}
 						<BlogFooter />
 					</main>
 					<BlogAside />
 				</div>
-			</div>
 			<BlogPanel />
 		</ClientProvider>
 	)
