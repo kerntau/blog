@@ -1,6 +1,9 @@
-import { readdirSync, readFileSync, statSync, writeFileSync, mkdirSync } from 'node:fs'
+import { readdirSync, readFileSync, statSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { join, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { createHash } from 'node:crypto'
+import os from 'node:os'
+import pLimit from 'p-limit'
 import matter from 'gray-matter'
 import readingTime from 'reading-time'
 import { sumBy } from 'es-toolkit/math'
@@ -10,7 +13,8 @@ import XmlBuilder from 'fast-xml-builder'
 import { compile } from '@mdx-js/mdx'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
-import rehypeShiki from '@shikijs/rehype'
+import rehypeShikiFromHighlighter from '@shikijs/rehype/core'
+import { createHighlighter, type Highlighter } from 'shiki'
 import { transformerNotationDiff, transformerNotationHighlight } from '@shikijs/transformers'
 import { visit } from 'unist-util-visit'
 import blogConfig, { myFeed } from '../blog.config'
@@ -24,6 +28,8 @@ import rehypeMetaSlots from '../remark-plugins/rehype-meta-slots'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const rootDir = resolve(__dirname, '..')
 const contentDir = join(rootDir, 'content')
+const cacheDir = join(rootDir, 'node_modules', '.cache', 'cotovo-mdx')
+const CACHE_VERSION = 'v1'
 const dateFields = ['date', 'updated', 'published'] as const
 
 function rehypeHeadingAnchors() {
@@ -237,13 +243,62 @@ function normalizeArticleData(data: Record<string, any>, source = '') {
 	return normalized
 }
 
+let sharedHighlighterPromise: Promise<Highlighter> | null = null
+function getSharedHighlighter() {
+	if (!sharedHighlighterPromise) {
+		sharedHighlighterPromise = createHighlighter({
+			themes: ['catppuccin-latte', 'one-dark-pro'],
+			langs: [
+				'javascript',
+				'typescript',
+				'jsx',
+				'tsx',
+				'json',
+				'yaml',
+				'markdown',
+				'mdx',
+				'html',
+				'css',
+				'scss',
+				'bash',
+				'shell',
+				'python',
+				'go',
+				'rust',
+				'c',
+				'cpp',
+				'java',
+				'sql',
+				'toml',
+				'diff',
+			],
+		})
+	}
+	return sharedHighlighterPromise
+}
+
 async function compileMdxSource(rawBody: string, frontmatterTitle?: string) {
+	const cacheKey = createHash('md5').update(`${CACHE_VERSION}::${rawBody}::${frontmatterTitle || ''}`).digest('hex')
+	const cacheFile = join(cacheDir, `${cacheKey}.json`)
+
+	if (existsSync(cacheFile)) {
+		try {
+			const cached = JSON.parse(readFileSync(cacheFile, 'utf-8'))
+			if (cached && typeof cached.compiledCode === 'string' && Array.isArray(cached.toc)) {
+				return cached
+			}
+		} catch {
+			// 缓存损坏时自动回退重新编译
+		}
+	}
+
 	const source = preprocessMdc(rawBody)
 	const slugger = new GithubSlugger()
 	const toc: any[] = []
 	let isFirstHeading = true
 
 	try {
+		const highlighter = await getSharedHighlighter()
 		const compiled = await compile(source, {
 			outputFormat: 'function-body',
 			development: false,
@@ -285,7 +340,7 @@ async function compileMdxSource(rawBody: string, frontmatterTitle?: string) {
 				rehypeKatex,
 				rehypeMetaSlots,
 				rehypeHeadingAnchors,
-				[rehypeShiki as any, {
+				[rehypeShikiFromHighlighter as any, highlighter, {
 					themes: {
 						light: 'catppuccin-latte',
 						dark: 'one-dark-pro',
@@ -305,10 +360,19 @@ async function compileMdxSource(rawBody: string, frontmatterTitle?: string) {
 			],
 		})
 
-		return {
+		const result = {
 			compiledCode: String(compiled.value),
 			toc,
 		}
+
+		try {
+			mkdirSync(cacheDir, { recursive: true })
+			writeFileSync(cacheFile, JSON.stringify(result), 'utf-8')
+		} catch {
+			// 忽略缓存写入失败
+		}
+
+		return result
 	} catch (err) {
 		console.warn('MDX 编译异常，使用源码回退:', err)
 		return {
@@ -318,106 +382,114 @@ async function compileMdxSource(rawBody: string, frontmatterTitle?: string) {
 	}
 }
 
-async function getAllPostsData() {
-	const posts: any[] = []
-
-	async function traverse(dir: string) {
-		const files = readdirSync(dir)
-		for (const file of files) {
-			const fullPath = join(dir, file)
-			if (statSync(fullPath).isDirectory()) {
-				await traverse(fullPath)
-			} else if (fullPath.endsWith('.mdx') || fullPath.endsWith('.md')) {
-				const content = readFileSync(fullPath, 'utf-8')
-				const { data: rawData, content: body } = matter(content)
-				const data = normalizeArticleData(rawData, content)
-
-				let relativePath = fullPath
-					.replace(contentDir, '')
-					.replace(/\\/g, '/')
-					.replace(/\.(mdx|md)$/, '')
-				if (!relativePath.startsWith('/')) {
-					relativePath = '/' + relativePath
-				}
-				const stem = relativePath.replace(/^\//, '')
-
-				if (data.permalink) {
-					relativePath = data.permalink.startsWith('/') ? data.permalink : `/${data.permalink}`
-				} else if (data.url) {
-					relativePath = data.url.startsWith('/') ? data.url : `/${data.url}`
-				} else if (blogConfig.article.hidePostPrefix && relativePath.startsWith('/posts/')) {
-					relativePath = relativePath.slice('/posts'.length)
-				}
-
-				if (!data.description && data.summary) {
-					data.description = data.summary
-				}
-
-				if (!data.image && Array.isArray(data.images) && data.images.length > 0) {
-					data.image = data.images[0]
-				}
-
-				const categoryZhMap: Record<string, string> = {
-					'frontend': '前端开发',
-					'backend': '后端开发',
-					'database': '数据库系统',
-					'devops': '云原生与运维',
-					'security': '网络安全',
-					'artificial-intelligence': '人工智能',
-					'ai': '人工智能',
-				}
-
-				if (!data.categories) {
-					if (data.category) {
-						data.categories = [data.category]
-					} else {
-						data.categories = [blogConfig.defaultCategory]
-					}
-				}
-
-				if (Array.isArray(data.categories)) {
-					data.categories = data.categories.map((cat: string) => categoryZhMap[cat] || cat)
-				}
-				if (data.category) {
-					data.category = categoryZhMap[data.category] || data.category
-				}
-
-				if (!data.tags) {
-					data.tags = []
-				}
-
-				if (!data.readingTime) {
-					data.readingTime = readingTime(body)
-				}
-				const words = (readingTimeOverrides as Record<string, number>)[relativePath]
-				if (typeof words === 'number') {
-					data.readingTime = {
-						...data.readingTime,
-						words,
-					}
-				}
-
-				const { compiledCode, toc } = await compileMdxSource(body, data.title)
-
-				posts.push({
-					categories: [blogConfig.defaultCategory],
-					tags: [],
-					type: Object.keys(blogConfig.article.types)[0],
-					draft: false,
-					...data,
-					path: relativePath,
-					_stem: stem,
-					_filePath: fullPath.replace(rootDir, '').replace(/\\/g, '/').replace(/^\//, ''),
-					toc,
-					compiledCode,
-					body,
-				})
-			}
+function getPostFiles(dir: string): string[] {
+	const results: string[] = []
+	const files = readdirSync(dir)
+	for (const file of files) {
+		const fullPath = join(dir, file)
+		if (statSync(fullPath).isDirectory()) {
+			results.push(...getPostFiles(fullPath))
+		} else if (fullPath.endsWith('.mdx') || fullPath.endsWith('.md')) {
+			results.push(fullPath)
 		}
 	}
+	return results
+}
 
-	await traverse(contentDir)
-	return posts.sort((a, b) => {
+async function getAllPostsData() {
+	const files = getPostFiles(contentDir)
+	const limit = pLimit(Math.max(os.cpus().length, 4))
+
+	const posts = await Promise.all(
+		files.map(fullPath => limit(async () => {
+			const content = readFileSync(fullPath, 'utf-8')
+			const { data: rawData, content: body } = matter(content)
+			const data = normalizeArticleData(rawData, content)
+
+			let relativePath = fullPath
+				.replace(contentDir, '')
+				.replace(/\\/g, '/')
+				.replace(/\.(mdx|md)$/, '')
+			if (!relativePath.startsWith('/')) {
+				relativePath = '/' + relativePath
+			}
+			const stem = relativePath.replace(/^\//, '')
+
+			if (data.permalink) {
+				relativePath = data.permalink.startsWith('/') ? data.permalink : `/${data.permalink}`
+			} else if (data.url) {
+				relativePath = data.url.startsWith('/') ? data.url : `/${data.url}`
+			} else if (blogConfig.article.hidePostPrefix && relativePath.startsWith('/posts/')) {
+				relativePath = relativePath.slice('/posts'.length)
+			}
+
+			if (!data.description && data.summary) {
+				data.description = data.summary
+			}
+
+			if (!data.image && Array.isArray(data.images) && data.images.length > 0) {
+				data.image = data.images[0]
+			}
+
+			const categoryZhMap: Record<string, string> = {
+				'frontend': '前端开发',
+				'backend': '后端开发',
+				'database': '数据库系统',
+				'devops': '云原生与运维',
+				'security': '网络安全',
+				'artificial-intelligence': '人工智能',
+				'ai': '人工智能',
+			}
+
+			if (!data.categories) {
+				if (data.category) {
+					data.categories = [data.category]
+				} else {
+					data.categories = [blogConfig.defaultCategory]
+				}
+			}
+
+			if (Array.isArray(data.categories)) {
+				data.categories = data.categories.map((cat: string) => categoryZhMap[cat] || cat)
+			}
+			if (data.category) {
+				data.category = categoryZhMap[data.category] || data.category
+			}
+
+			if (!data.tags) {
+				data.tags = []
+			}
+
+			if (!data.readingTime) {
+				data.readingTime = readingTime(body)
+			}
+			const words = (readingTimeOverrides as Record<string, number>)[relativePath]
+			if (typeof words === 'number') {
+				data.readingTime = {
+					...data.readingTime,
+					words,
+				}
+			}
+
+			const { compiledCode, toc } = await compileMdxSource(body, data.title)
+
+			return {
+				categories: [blogConfig.defaultCategory],
+				tags: [],
+				type: Object.keys(blogConfig.article.types)[0],
+				draft: false,
+				...data,
+				path: relativePath,
+				_stem: stem,
+				_filePath: fullPath.replace(rootDir, '').replace(/\\/g, '/').replace(/^\//, ''),
+				toc,
+				compiledCode,
+				body,
+			}
+		})),
+	)
+
+	return posts.sort((a: any, b: any) => {
 		const dateA = String(a.date || a.published || '')
 		const dateB = String(b.date || b.published || '')
 		return dateB.localeCompare(dateA)
