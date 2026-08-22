@@ -67,96 +67,144 @@ const mdcLeafComponents: Record<string, string> = {
 	'md-title': 'MdTitle',
 }
 
-function parseStyle(style?: string | Record<string, string>) {
-	if (!style || typeof style !== 'string') {
-		return style
+function parseYamlProps(yamlStr: string) {
+	const props: Record<string, any> = {}
+	const lines = yamlStr.split('\n')
+	for (const line of lines) {
+		const m = line.match(/^([\w-]+):\s*(.*)$/)
+		if (m) {
+			const key = m[1]!.trim()
+			let val = m[2]!.trim()
+			if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith('\'') && val.endsWith('\''))) {
+				val = val.slice(1, -1)
+			}
+			props[key] = val
+		}
 	}
-	return Object.fromEntries(style
-		.split(';')
-		.map(rule => rule.trim())
-		.filter(Boolean)
-		.map((rule) => {
-			const [key, ...value] = rule.split(':')
-			return [
-				key!.trim().replace(/-([a-z])/g, (_, char: string) => char.toUpperCase()),
-				value.join(':').trim(),
-			]
-		}))
+	return props
 }
 
 function preprocessMdc(source: string) {
+	// 预先清理 HTML 注释，防止 MDX 语法解析器将其误作为非法 JSX 抛出异常
+	source = source.replace(/<!--[\s\S]*?-->/g, '')
+
 	let inCodeBlock = false
-	let inTemplateProp = false
-	const blockStack: string[] = []
+	const lines = source.split('\n')
+	const result: string[] = []
+	const blockStack: { colons: string, component: string }[] = []
 
-	return source
-		.replace(/<!--[\s\S]*?-->/g, '')
-		.replace(/<br\s*>/gi, '<br />')
-		.replace(/<hr\s*>/gi, '<hr />')
-		.replace(/<img\s+([^>]*?[^\/])>/gi, '<img $1 />')
-		.split('\n')
-		.map((line) => {
-			if (/^\s*```/.test(line)) {
-				inCodeBlock = !inCodeBlock
-				return line
-			}
-			if (inCodeBlock) {
-				return line
-			}
-			if (line.includes('={`')) {
-				inTemplateProp = true
-			}
-			if (inTemplateProp) {
-				if (line.includes('`}')) {
-					inTemplateProp = false
+	for (let i = 0; i < lines.length; i++) {
+		let line = lines[i]!
+
+		if (/^\s*```/.test(line)) {
+			inCodeBlock = !inCodeBlock
+			result.push(line)
+			continue
+		}
+
+		if (inCodeBlock) {
+			result.push(line)
+			continue
+		}
+
+		// 检查组件内的 YAML frontmatter 块 e.g. ::link-banner \n --- \n ... \n --- \n ::
+		const blockMatch = line.match(/^\s*(:{2,4})([a-z][\w-]*)(\{[^}\n]*\})?/i)
+		if (blockMatch) {
+			const colons = blockMatch[1]!
+			const name = blockMatch[2]!
+			const component = mdcLeafComponents[name] || name.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('')
+			const inlineProps = blockMatch[3] ? blockMatch[3].slice(1, -1).trim() : ''
+
+			let nextIdx = i + 1
+			while (nextIdx < lines.length && lines[nextIdx]!.trim() === '') nextIdx++
+			if (nextIdx < lines.length && lines[nextIdx]!.trim() === '---') {
+				let yamlEnd = nextIdx + 1
+				let yamlContent = ''
+				while (yamlEnd < lines.length && lines[yamlEnd]!.trim() !== '---') {
+					yamlContent += lines[yamlEnd] + '\n'
+					yamlEnd++
 				}
-				return line
-			}
+				if (yamlEnd < lines.length && lines[yamlEnd]!.trim() === '---') {
+					const parsed = parseYamlProps(yamlContent)
+					const propStrings = Object.entries(parsed).map(([k, v]) => {
+						if (v === 'true' || v === 'false' || (!Number.isNaN(Number(v)) && v !== '')) {
+							return `${k}={${v}}`
+						}
+						return `${k}=${JSON.stringify(v)}`
+					})
+					const allProps = [inlineProps, ...propStrings].filter(Boolean).join(' ')
 
-			const processedLine = line
-				.replace(/(`[^`\n]*`|\[[^\]\n]*\]\([^)\n]*\)|\[[^\]\n]*\])\{[^}\n]*\}/g, '$1')
-				.replace(/\s:([A-Za-z_$][\w$-]*)=(['"])(.*?)\2/g, (_full, prop: string, _quote: string, value: string) => ` ${prop}={${value}}`)
-				.replace(/\sstyle=(['"])(.*?)\1/g, (_full, _quote: string, value: string) => {
-					const styleObject = parseStyle(value) as Record<string, string>
-					return ` style={${JSON.stringify(styleObject)}}`
-				})
-
-			// Handle ::block end
-			if (/^\s*::\s*$/.test(processedLine) && blockStack.length > 0) {
-				const component = blockStack.pop()
-				return `</${component}>`
-			}
-
-			// Handle ::block start
-			const blockMatch = processedLine.match(/^\s*::([a-z][\w-]*)(\{[^}\n]*\})?/i)
-			if (blockMatch) {
-				const name = blockMatch[1]!
-				const component = mdcLeafComponents[name] || name.charAt(0).toUpperCase() + name.slice(1).replace(/-([a-z])/g, (_, c) => c.toUpperCase())
-				const props = blockMatch[2] ? blockMatch[2].slice(1, -1).trim() : ''
-				blockStack.push(component)
-				return `<${component}${props ? ` ${props}` : ''}>`
-			}
-
-			// Handle :inline and :leaf
-			const expandedDirectives = processedLine.replace(/(^|[^\w/]):([a-z][\w-]*)(\{[^}\n]*\})?/g, (full, prefix: string, name: string, attrs = '') => {
-				const component = mdcLeafComponents[name]
-				if (!component) {
-					return full
+					let afterYaml = yamlEnd + 1
+					while (afterYaml < lines.length && lines[afterYaml]!.trim() === '') afterYaml++
+					if (afterYaml < lines.length && lines[afterYaml]!.trim() === colons) {
+						result.push(`<${component}${allProps ? ` ${allProps}` : ''} />`)
+						i = afterYaml
+						continue
+					} else {
+						result.push(`<${component}${allProps ? ` ${allProps}` : ''}>`)
+						blockStack.push({ colons, component })
+						i = yamlEnd
+						continue
+					}
 				}
-				const props = attrs ? attrs.slice(1, -1).trim() : ''
-				return `${prefix}<${component}${props ? ` ${props}` : ''} />`
-			})
-
-			if (/<\/?[A-Z]/.test(expandedDirectives)) {
-				return expandedDirectives
 			}
 
-			return expandedDirectives
-				.split(/(`[^`\n]*`)/g)
-				.map((part, index) => index % 2 === 1 ? part : part.replace(/[{}]/g, brace => `\\${brace}`))
-				.join('')
+			blockStack.push({ colons, component })
+			result.push(`<${component}${inlineProps ? ` ${inlineProps}` : ''}>`)
+			continue
+		}
+
+		// 检查闭合标签 e.g. ::: 或 ::
+		const endMatch = line.match(/^\s*(:{2,4})\s*$/)
+		if (endMatch && blockStack.length > 0) {
+			const top = blockStack[blockStack.length - 1]!
+			if (top.colons.length <= endMatch[1]!.length) {
+				blockStack.pop()
+				result.push(`</${top.component}>`)
+				continue
+			}
+		}
+
+		// 处理行内带文本组件 :tip[文本]{tip="..."} 或 :quote[文本]
+		line = line.replace(/(^|[^\w/]):([a-z][\w-]*)\[(.*?)\](\{[^}\n]*\})?/g, (_m, prefix, name, text, attrs) => {
+			const comp = mdcLeafComponents[name] || name.split('-').map((s: string) => s.charAt(0).toUpperCase() + s.slice(1)).join('')
+			const props = attrs ? attrs.slice(1, -1).trim() : ''
+			return `${prefix}<${comp}${props ? ` ${props}` : ''}>${text}</${comp}>`
 		})
-		.join('\n')
+
+		// 处理行内无文本组件 :key{code="..."}
+		line = line.replace(/(^|[^\w/]):([a-z][\w-]*)(\{[^}\n]*\})?/g, (_m, prefix, name, attrs) => {
+			const comp = mdcLeafComponents[name] || name.split('-').map((s: string) => s.charAt(0).toUpperCase() + s.slice(1)).join('')
+			const props = attrs ? attrs.slice(1, -1).trim() : ''
+			return `${prefix}<${comp}${props ? ` ${props}` : ''} />`
+		})
+
+		// 处理单标签 HTML 格式兼容
+		line = line.replace(/<br\s*>/gi, '<br />').replace(/<hr\s*>/gi, '<hr />')
+
+		// 安全转义普通文本中的花括号 {} 和孤立尖括号 < (不在反引号和已转换的 JSX 标签中)
+		if (!line.startsWith('<') && !line.startsWith('`')) {
+			line = line
+				.split(/(`[^`\n]*`)/g)
+				.map((part, index) => {
+					if (index % 2 === 1) return part
+					return part
+						.replace(/\{/g, '&#123;')
+						.replace(/\}/g, '&#125;')
+						.replace(/<(?![a-zA-Z/])/g, '&lt;')
+				})
+				.join('')
+		}
+
+		result.push(line)
+	}
+
+	while (blockStack.length > 0) {
+		const top = blockStack.pop()!
+		result.push(`</${top.component}>`)
+	}
+
+	return result.join('\n')
 }
 
 function extractRawFrontmatterValue(source: string, field: string) {
@@ -189,10 +237,11 @@ function normalizeArticleData(data: Record<string, any>, source = '') {
 	return normalized
 }
 
-async function compileMdxSource(rawBody: string) {
+async function compileMdxSource(rawBody: string, frontmatterTitle?: string) {
 	const source = preprocessMdc(rawBody)
 	const slugger = new GithubSlugger()
 	const toc: any[] = []
+	let isFirstHeading = true
 
 	try {
 		const compiled = await compile(source, {
@@ -202,6 +251,20 @@ async function compileMdxSource(rawBody: string) {
 				remarkMath,
 				remarkMusic,
 				() => (tree: any) => {
+					// 过滤与 frontmatter title 重复的第一个一级大标题，防止正文重复渲染
+					tree.children = tree.children.filter((node: any) => {
+						if (node.type === 'heading' && isFirstHeading) {
+							isFirstHeading = false
+							if (node.depth === 1) {
+								const text = (node.children || []).map((c: any) => c.value || '').join('').trim()
+								if (!frontmatterTitle || text === frontmatterTitle.trim()) {
+									return false
+								}
+							}
+						}
+						return true
+					})
+
 					visit(tree, 'heading', (node: any) => {
 						const text = node.children
 							.map((c: any) => c.value || '')
@@ -224,12 +287,19 @@ async function compileMdxSource(rawBody: string) {
 				rehypeHeadingAnchors,
 				[rehypeShiki as any, {
 					themes: {
-						light: 'github-light',
-						dark: 'github-dark',
+						light: 'catppuccin-latte',
+						dark: 'one-dark-pro',
 					},
 					transformers: [
 						transformerNotationDiff(),
 						transformerNotationHighlight(),
+						{
+							name: 'transformer-line-numbers',
+							line(node: any, line: number) {
+								node.properties = node.properties || {}
+								node.properties['data-line'] = String(line)
+							},
+						},
 					],
 				}],
 			],
@@ -257,12 +327,15 @@ async function getAllPostsData() {
 			const fullPath = join(dir, file)
 			if (statSync(fullPath).isDirectory()) {
 				await traverse(fullPath)
-			} else if (fullPath.endsWith('.mdx')) {
+			} else if (fullPath.endsWith('.mdx') || fullPath.endsWith('.md')) {
 				const content = readFileSync(fullPath, 'utf-8')
 				const { data: rawData, content: body } = matter(content)
 				const data = normalizeArticleData(rawData, content)
 
-				let relativePath = fullPath.replace(contentDir, '').replace(/\\/g, '/').replace(/\.mdx$/, '')
+				let relativePath = fullPath
+					.replace(contentDir, '')
+					.replace(/\\/g, '/')
+					.replace(/\.(mdx|md)$/, '')
 				if (!relativePath.startsWith('/')) {
 					relativePath = '/' + relativePath
 				}
@@ -270,8 +343,47 @@ async function getAllPostsData() {
 
 				if (data.permalink) {
 					relativePath = data.permalink.startsWith('/') ? data.permalink : `/${data.permalink}`
+				} else if (data.url) {
+					relativePath = data.url.startsWith('/') ? data.url : `/${data.url}`
 				} else if (blogConfig.article.hidePostPrefix && relativePath.startsWith('/posts/')) {
 					relativePath = relativePath.slice('/posts'.length)
+				}
+
+				if (!data.description && data.summary) {
+					data.description = data.summary
+				}
+
+				if (!data.image && Array.isArray(data.images) && data.images.length > 0) {
+					data.image = data.images[0]
+				}
+
+				const categoryZhMap: Record<string, string> = {
+					'frontend': '前端开发',
+					'backend': '后端开发',
+					'database': '数据库系统',
+					'devops': '云原生与运维',
+					'security': '网络安全',
+					'artificial-intelligence': '人工智能',
+					'ai': '人工智能',
+				}
+
+				if (!data.categories) {
+					if (data.category) {
+						data.categories = [data.category]
+					} else {
+						data.categories = [blogConfig.defaultCategory]
+					}
+				}
+
+				if (Array.isArray(data.categories)) {
+					data.categories = data.categories.map((cat: string) => categoryZhMap[cat] || cat)
+				}
+				if (data.category) {
+					data.category = categoryZhMap[data.category] || data.category
+				}
+
+				if (!data.tags) {
+					data.tags = []
 				}
 
 				if (!data.readingTime) {
@@ -285,7 +397,7 @@ async function getAllPostsData() {
 					}
 				}
 
-				const { compiledCode, toc } = await compileMdxSource(body)
+				const { compiledCode, toc } = await compileMdxSource(body, data.title)
 
 				posts.push({
 					categories: [blogConfig.defaultCategory],
@@ -313,7 +425,7 @@ async function getAllPostsData() {
 }
 
 function calculateStats(posts: any[]) {
-	const blogPosts = posts.filter(p => p._stem.startsWith('posts/'))
+	const blogPosts = posts.filter(p => !p.draft && p._stem !== 'link' && p._stem !== 'theme' && !p._stem.startsWith('previews/'))
 	const totalWords = sumBy(blogPosts, p => p.readingTime?.words ?? 0)
 
 	const annual: Record<string, { posts: number, words: number }> = {}
@@ -342,26 +454,40 @@ function calculateStats(posts: any[]) {
 	}
 }
 
+function stripMarkdown(text: string) {
+	return text
+		.replace(/```[\s\S]*?```/g, '')
+		.replace(/`([^`]+)`/g, '$1')
+		.replace(/!\[(.*?)\]\(.*?\)/g, '$1')
+		.replace(/\[(.*?)\]\(.*?\)/g, '$1')
+		.replace(/(\*\*|__)(.*?)\1/g, '$2')
+		.replace(/(\*|_)(.*?)\1/g, '$2')
+		.replace(/~~(.*?)~~/g, '$1')
+		.replace(/^:::.*$/gm, '')
+		.replace(/^::.*$/gm, '')
+		.replace(/<[^>]+>/g, '')
+		.replace(/^>\s+/gm, '')
+		.replace(/^#{1,6}\s+/gm, '')
+		.replace(/\s+/g, ' ')
+		.trim()
+}
+
 function generateSearchIndex(posts: any[]) {
 	const slugger = new GithubSlugger()
 	const index: any[] = []
 
 	posts.forEach((p) => {
 		try {
+			if (p.draft) return
 			const { body: content } = p
 			slugger.reset()
 			const postTitle = p.title || ''
-			const articlePath = p.path.replace(/^\//, '').replace(/\//g, ' > ')
 
-			const cleanContent = content
-				.replace(/!\[.*?\]\(.*?\)/g, '')
-				.replace(/\[(.*?)\]\(.*?\)/g, '$1')
-
-			const lines = cleanContent.split('\n')
+			const lines = content.split('\n')
 			let currentSection = {
 				id: p.path,
 				title: postTitle,
-				titles: [articlePath],
+				titles: [] as string[],
 				content: '',
 				level: 1,
 			}
@@ -371,13 +497,15 @@ function generateSearchIndex(posts: any[]) {
 			lines.forEach((line: string) => {
 				const headingMatch = line.match(/^(#{1,6})\s+(.*)$/)
 				if (headingMatch) {
-					if (currentSection.content.trim() || currentSection.level === 1) {
-						index.push({ ...currentSection, content: currentSection.content.trim().slice(0, 800) })
+					const cleanText = stripMarkdown(currentSection.content)
+					if (cleanText || currentSection.level === 1) {
+						index.push({ ...currentSection, content: cleanText.slice(0, 800) })
 					}
 
 					const level = headingMatch[1]!.length
-					const title = headingMatch[2]!.trim()
-					const slug = slugger.slug(title)
+					const rawTitle = headingMatch[2]!.trim()
+					const title = stripMarkdown(rawTitle)
+					const slug = slugger.slug(title || rawTitle)
 
 					while (hierarchy.length > 0 && hierarchy[hierarchy.length - 1]!.level >= level) {
 						hierarchy.pop()
@@ -389,7 +517,7 @@ function generateSearchIndex(posts: any[]) {
 					currentSection = {
 						id: `${p.path}#${slug}`,
 						title: title,
-						titles: [articlePath, ...parentTitles],
+						titles: [...parentTitles],
 						content: '',
 						level: level,
 					}
@@ -398,8 +526,9 @@ function generateSearchIndex(posts: any[]) {
 				}
 			})
 
-			if (currentSection.content.trim() || currentSection.level === 1) {
-				index.push({ ...currentSection, content: currentSection.content.trim().slice(0, 800) })
+			const cleanText = stripMarkdown(currentSection.content)
+			if (cleanText || currentSection.level === 1) {
+				index.push({ ...currentSection, content: cleanText.slice(0, 800) })
 			}
 		} catch (e) {
 			console.error(`Failed to index post ${p.path}:`, e)

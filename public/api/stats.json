@@ -1,12 +1,16 @@
 {
   "total": {
-    "posts": 2,
-    "words": 5124
+    "posts": 52,
+    "words": 48505
   },
   "annual": {
+    "2025": {
+      "posts": 32,
+      "words": 27704
+    },
     "2026": {
-      "posts": 2,
-      "words": 5124
+      "posts": 20,
+      "words": 20801
     }
   }
 }

@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <id>https://blog.cot.wiki/</id>
   <title>kerntau</title>
-  <updated>2026-08-22T02:14:33.083Z</updated>
+  <updated>2026-08-22T04:37:23.614Z</updated>
   <description>在有序的世界里，寻一处生活的归栈。用理性梳理日常，用技术温柔时光，不慌不忙，自在生长。</description>
   <author>
     <name>kerntau</name>
@@ -13,9 +13,144 @@
   <link href="https://blog.cot.wiki/" rel="alternate"></link>
   <generator uri="https://blog.cot.wiki" version="1.0.0">Cotovo Blog Engine (Rsbuild)</generator>
   <icon>/favicon.ico</icon>
-  <logo>/og-image.jpg</logo>
+  <logo>/avatar.png</logo>
   <rights>© 2026 kerntau</rights>
   <subtitle>全栈探索者 · AI 极客</subtitle>
+  <entry>
+    <id>https://blog.cot.wiki/future-web-development-http3-webtransport-webgpu</id>
+    <title>未来 Web 开发新纪元：HTTP/3、WebTransport 与 WebGPU 展望</title>
+    <updated>2026-07-20T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>未来 Web 开发新纪元：HTTP/3、WebTransport 与 WebGPU 展望</div><a href="https://blog.cot.wiki/future-web-development-http3-webtransport-webgpu">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/future-web-development-http3-webtransport-webgpu"></link>
+    <summary>未来 Web 开发新纪元：HTTP/3、WebTransport 与 WebGPU 展望</summary>
+    <category term="前端开发"></category>
+    <published>2026-07-20T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/serverless-architecture-cold-start-optimization</id>
+    <title>理解 Serverless 无服务器架构：Cold Start 优化与冷启动原理</title>
+    <updated>2026-07-08T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>理解 Serverless 无服务器架构：Cold Start 优化与冷启动原理</div><a href="https://blog.cot.wiki/serverless-architecture-cold-start-optimization">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/serverless-architecture-cold-start-optimization"></link>
+    <summary>理解 Serverless 无服务器架构：Cold Start 优化与冷启动原理</summary>
+    <category term="云原生与运维"></category>
+    <published>2026-07-08T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/enterprise-code-quality-cicd-pipeline-evolution</id>
+    <title>企业级代码质量与 CI/CD 自动化流水线演进指南</title>
+    <updated>2026-06-27T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>企业级代码质量与 CI/CD 自动化流水线演进指南</div><a href="https://blog.cot.wiki/enterprise-code-quality-cicd-pipeline-evolution">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/enterprise-code-quality-cicd-pipeline-evolution"></link>
+    <summary>企业级代码质量与 CI/CD 自动化流水线演进指南</summary>
+    <category term="云原生与运维"></category>
+    <published>2026-06-27T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/solidjs-fine-grained-reactivity-frontend-exploration</id>
+    <title>基于 SolidJS 与 Fine-grained Reactivity 的响应式前端探索</title>
+    <updated>2026-06-15T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>基于 SolidJS 与 Fine-grained Reactivity 的响应式前端探索</div><a href="https://blog.cot.wiki/solidjs-fine-grained-reactivity-frontend-exploration">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/solidjs-fine-grained-reactivity-frontend-exploration"></link>
+    <summary>基于 SolidJS 与 Fine-grained Reactivity 的响应式前端探索</summary>
+    <category term="前端开发"></category>
+    <published>2026-06-15T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/cpu-cache-line-false-sharing-optimization</id>
+    <title>理解计算机底层：从 CPU Cache Line 到伪共享 (False Sharing) 优化</title>
+    <updated>2026-06-04T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>理解计算机底层：从 CPU Cache Line 到伪共享 (False Sharing) 优化</div><a href="https://blog.cot.wiki/cpu-cache-line-false-sharing-optimization">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/cpu-cache-line-false-sharing-optimization"></link>
+    <summary>理解计算机底层：从 CPU Cache Line 到伪共享 (False Sharing) 优化</summary>
+    <category term="后端开发"></category>
+    <published>2026-06-04T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/database-sharding-shardingsphere-global-unique-id</id>
+    <title>数据库分库分表 ShardingSphere 实战与全局唯一 ID 生成算法</title>
+    <updated>2026-05-23T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>数据库分库分表 ShardingSphere 实战与全局唯一 ID 生成算法</div><a href="https://blog.cot.wiki/database-sharding-shardingsphere-global-unique-id">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/database-sharding-shardingsphere-global-unique-id"></link>
+    <summary>数据库分库分表 ShardingSphere 实战与全局唯一 ID 生成算法</summary>
+    <category term="数据库系统"></category>
+    <published>2026-05-23T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/enterprise-sso-saml2-identity-provider-platform</id>
+    <title>使用 Single-Sign-On (SSO) 与 SAML 2.0 构建企业级统一身份平台</title>
+    <updated>2026-05-12T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>使用 Single-Sign-On (SSO) 与 SAML 2.0 构建企业级统一身份平台</div><a href="https://blog.cot.wiki/enterprise-sso-saml2-identity-provider-platform">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/enterprise-sso-saml2-identity-provider-platform"></link>
+    <summary>使用 Single-Sign-On (SSO) 与 SAML 2.0 构建企业级统一身份平台</summary>
+    <category term="网络安全"></category>
+    <published>2026-05-12T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/rust-web-framework-actix-web-axum-benchmark</id>
+    <title>Rust Web 框架 Actix-web 与 Axum 架构性能深度实测</title>
+    <updated>2026-04-30T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>Rust Web 框架 Actix-web 与 Axum 架构性能深度实测</div><a href="https://blog.cot.wiki/rust-web-framework-actix-web-axum-benchmark">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/rust-web-framework-actix-web-axum-benchmark"></link>
+    <summary>Rust Web 框架 Actix-web 与 Axum 架构性能深度实测</summary>
+    <category term="后端开发"></category>
+    <published>2026-04-30T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/opentelemetry-jaeger-distributed-tracing</id>
+    <title>分布式链路追踪 OpenTelemetry 规范与 Jaeger 集成应用</title>
+    <updated>2026-04-18T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>分布式链路追踪 OpenTelemetry 规范与 Jaeger 集成应用</div><a href="https://blog.cot.wiki/opentelemetry-jaeger-distributed-tracing">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/opentelemetry-jaeger-distributed-tracing"></link>
+    <summary>分布式链路追踪 OpenTelemetry 规范与 Jaeger 集成应用</summary>
+    <category term="云原生与运维"></category>
+    <published>2026-04-18T16:00:00Z</published>
+  </entry>
   <entry>
     <id>https://blog.cot.wiki/2026/xz-start</id>
     <title>序栈：启程</title>
@@ -32,6 +167,21 @@
     <published>2026-04-16T04:30:00Z</published>
   </entry>
   <entry>
+    <id>https://blog.cot.wiki/shell-script-automation-defensive-bash-guide</id>
+    <title>Shell 脚本编写自动化运维利器与防御性 Bash 编程规范</title>
+    <updated>2026-04-07T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>Shell 脚本编写自动化运维利器与防御性 Bash 编程规范</div><a href="https://blog.cot.wiki/shell-script-automation-defensive-bash-guide">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/shell-script-automation-defensive-bash-guide"></link>
+    <summary>Shell 脚本编写自动化运维利器与防御性 Bash 编程规范</summary>
+    <category term="云原生与运维"></category>
+    <published>2026-04-07T16:00:00Z</published>
+  </entry>
+  <entry>
     <id>https://blog.cot.wiki/2026/xz</id>
     <title>序栈：第一章</title>
     <updated>2026-04-04T05:50:00Z</updated>
@@ -45,5 +195,575 @@
     <summary>序栈：第一章</summary>
     <category term="技术"></category>
     <published>2026-04-04T05:50:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/javascript-async-await-promise-concurrency-control</id>
+    <title>理解 JavaScript Async/Await 与 Promise 异步并发控制原理</title>
+    <updated>2026-03-26T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>理解 JavaScript Async/Await 与 Promise 异步并发控制原理</div><a href="https://blog.cot.wiki/javascript-async-await-promise-concurrency-control">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/javascript-async-await-promise-concurrency-control"></link>
+    <summary>理解 JavaScript Async/Await 与 Promise 异步并发控制原理</summary>
+    <category term="前端开发"></category>
+    <published>2026-03-26T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/global-distributed-network-latency-cdn-edge-dispatch</id>
+    <title>跨国分布式系统网络延迟优化与 CDN 边缘节点调度</title>
+    <updated>2026-03-14T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>跨国分布式系统网络延迟优化与 CDN 边缘节点调度</div><a href="https://blog.cot.wiki/global-distributed-network-latency-cdn-edge-dispatch">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/global-distributed-network-latency-cdn-edge-dispatch"></link>
+    <summary>跨国分布式系统网络延迟优化与 CDN 边缘节点调度</summary>
+    <category term="云原生与运维"></category>
+    <published>2026-03-14T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/tailwindcss-v4-architecture-jit-engine</id>
+    <title>Tailwind CSS v4 架构重构与 JIT 引擎性能跃升实战</title>
+    <updated>2026-03-03T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>Tailwind CSS v4 架构重构与 JIT 引擎性能跃升实战</div><a href="https://blog.cot.wiki/tailwindcss-v4-architecture-jit-engine">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/tailwindcss-v4-architecture-jit-engine"></link>
+    <summary>Tailwind CSS v4 架构重构与 JIT 引擎性能跃升实战</summary>
+    <category term="前端开发"></category>
+    <published>2026-03-03T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/raft-consensus-protocol-distributed-kv-store</id>
+    <title>基于 Raft 强一致性共识协议的分布式 Key-Value 数据库设计</title>
+    <updated>2026-02-20T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>基于 Raft 强一致性共识协议的分布式 Key-Value 数据库设计</div><a href="https://blog.cot.wiki/raft-consensus-protocol-distributed-kv-store">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/raft-consensus-protocol-distributed-kv-store"></link>
+    <summary>基于 Raft 强一致性共识协议的分布式 Key-Value 数据库设计</summary>
+    <category term="后端开发"></category>
+    <published>2026-02-20T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/sql-injection-xss-prevention-web-security</id>
+    <title>SQL 注入与 XSS 防御全景指南：Web 应用漏洞原理与修复</title>
+    <updated>2026-02-08T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>SQL 注入与 XSS 防御全景指南：Web 应用漏洞原理与修复</div><a href="https://blog.cot.wiki/sql-injection-xss-prevention-web-security">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/sql-injection-xss-prevention-web-security"></link>
+    <summary>SQL 注入与 XSS 防御全景指南：Web 应用漏洞原理与修复</summary>
+    <category term="网络安全"></category>
+    <published>2026-02-08T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/frontend-design-system-tokens-automation</id>
+    <title>前端 Design System 组件库架构设计与 Token 自动化交付</title>
+    <updated>2026-01-27T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>前端 Design System 组件库架构设计与 Token 自动化交付</div><a href="https://blog.cot.wiki/frontend-design-system-tokens-automation">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/frontend-design-system-tokens-automation"></link>
+    <summary>前端 Design System 组件库架构设计与 Token 自动化交付</summary>
+    <category term="前端开发"></category>
+    <published>2026-01-27T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/multi-tenancy-saas-architecture-data-isolation</id>
+    <title>多租户 (Multi-tenancy) SaaS 架构设计与数据隔离策略</title>
+    <updated>2026-01-16T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>多租户 (Multi-tenancy) SaaS 架构设计与数据隔离策略</div><a href="https://blog.cot.wiki/multi-tenancy-saas-architecture-data-isolation">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/multi-tenancy-saas-architecture-data-isolation"></link>
+    <summary>多租户 (Multi-tenancy) SaaS 架构设计与数据隔离策略</summary>
+    <category term="后端开发"></category>
+    <published>2026-01-16T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/pytorch-2-dynamic-graph-compilation-cuda-optimization</id>
+    <title>PyTorch 2.x 动态图编译与 CUDA 深度优化最佳实践</title>
+    <updated>2026-01-04T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>PyTorch 2.x 动态图编译与 CUDA 深度优化最佳实践</div><a href="https://blog.cot.wiki/pytorch-2-dynamic-graph-compilation-cuda-optimization">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/pytorch-2-dynamic-graph-compilation-cuda-optimization"></link>
+    <summary>PyTorch 2.x 动态图编译与 CUDA 深度优化最佳实践</summary>
+    <category term="人工智能"></category>
+    <published>2026-01-04T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/microservices-gateway-kong-apisix-envoy-benchmark</id>
+    <title>微服务网关选型：Kong、APISIX 与 Envoy 性能性能评测</title>
+    <updated>2025-12-23T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>微服务网关选型：Kong、APISIX 与 Envoy 性能性能评测</div><a href="https://blog.cot.wiki/microservices-gateway-kong-apisix-envoy-benchmark">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/microservices-gateway-kong-apisix-envoy-benchmark"></link>
+    <summary>微服务网关选型：Kong、APISIX 与 Envoy 性能性能评测</summary>
+    <category term="云原生与运维"></category>
+    <published>2025-12-23T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/linux-io-multiplexing-select-poll-epoll</id>
+    <title>深入理解 Linux IO 多路复用：select、poll 与 epoll 源码演进</title>
+    <updated>2025-12-12T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>深入理解 Linux IO 多路复用：select、poll 与 epoll 源码演进</div><a href="https://blog.cot.wiki/linux-io-multiplexing-select-poll-epoll">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/linux-io-multiplexing-select-poll-epoll"></link>
+    <summary>深入理解 Linux IO 多路复用：select、poll 与 epoll 源码演进</summary>
+    <category term="后端开发"></category>
+    <published>2025-12-12T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/webrtc-realtime-audio-video-sfu-architecture</id>
+    <title>WebRTC 实时音视频通信原理与 SFU 流媒体服务端架构</title>
+    <updated>2025-12-01T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>WebRTC 实时音视频通信原理与 SFU 流媒体服务端架构</div><a href="https://blog.cot.wiki/webrtc-realtime-audio-video-sfu-architecture">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/webrtc-realtime-audio-video-sfu-architecture"></link>
+    <summary>WebRTC 实时音视频通信原理与 SFU 流媒体服务端架构</summary>
+    <category term="前端开发"></category>
+    <published>2025-12-01T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/grpc-protobuf-high-performance-microservices</id>
+    <title>gRPC 与 Protocol Buffers 在高性能微服务通信中的应用</title>
+    <updated>2025-11-19T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>gRPC 与 Protocol Buffers 在高性能微服务通信中的应用</div><a href="https://blog.cot.wiki/grpc-protobuf-high-performance-microservices">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/grpc-protobuf-high-performance-microservices"></link>
+    <summary>gRPC 与 Protocol Buffers 在高性能微服务通信中的应用</summary>
+    <category term="后端开发"></category>
+    <published>2025-11-19T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/flutter-3-cross-platform-impeller-engine</id>
+    <title>Flutter 3.x 跨平台渲染原理与 Impeller 引擎深度解析</title>
+    <updated>2025-11-08T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>Flutter 3.x 跨平台渲染原理与 Impeller 引擎深度解析</div><a href="https://blog.cot.wiki/flutter-3-cross-platform-impeller-engine">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/flutter-3-cross-platform-impeller-engine"></link>
+    <summary>Flutter 3.x 跨平台渲染原理与 Impeller 引擎深度解析</summary>
+    <category term="前端开发"></category>
+    <published>2025-11-08T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/mongodb-sharded-cluster-high-availability-indexes</id>
+    <title>MongoDB 分片集群高可用设计与索引使用陷阱</title>
+    <updated>2025-10-27T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>MongoDB 分片集群高可用设计与索引使用陷阱</div><a href="https://blog.cot.wiki/mongodb-sharded-cluster-high-availability-indexes">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/mongodb-sharded-cluster-high-availability-indexes"></link>
+    <summary>MongoDB 分片集群高可用设计与索引使用陷阱</summary>
+    <category term="数据库系统"></category>
+    <published>2025-10-27T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/frontend-testing-evolution-vitest-playwright</id>
+    <title>前端自动化测试体系演进：Vitest 与 Playwright 最佳组合</title>
+    <updated>2025-10-15T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>前端自动化测试体系演进：Vitest 与 Playwright 最佳组合</div><a href="https://blog.cot.wiki/frontend-testing-evolution-vitest-playwright">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/frontend-testing-evolution-vitest-playwright"></link>
+    <summary>前端自动化测试体系演进：Vitest 与 Playwright 最佳组合</summary>
+    <category term="前端开发"></category>
+    <published>2025-10-15T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/rust-ownership-lifetime-lockfree-concurrency</id>
+    <title>Rust 所有权模型、生命周期与无锁并发数据结构探秘</title>
+    <updated>2025-10-04T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>Rust 所有权模型、生命周期与无锁并发数据结构探秘</div><a href="https://blog.cot.wiki/rust-ownership-lifetime-lockfree-concurrency">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/rust-ownership-lifetime-lockfree-concurrency"></link>
+    <summary>Rust 所有权模型、生命周期与无锁并发数据结构探秘</summary>
+    <category term="后端开发"></category>
+    <published>2025-10-04T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/oauth-2-1-oidc-security-authentication-evolution</id>
+    <title>OAuth 2.1 与 OIDC 身份认证协议演进与安全防范</title>
+    <updated>2025-09-22T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>OAuth 2.1 与 OIDC 身份认证协议演进与安全防范</div><a href="https://blog.cot.wiki/oauth-2-1-oidc-security-authentication-evolution">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/oauth-2-1-oidc-security-authentication-evolution"></link>
+    <summary>OAuth 2.1 与 OIDC 身份认证协议演进与安全防范</summary>
+    <category term="网络安全"></category>
+    <published>2025-09-22T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/istio-service-mesh-traffic-management</id>
+    <title>Istio Service Mesh 服务网格流量治理与无损发布</title>
+    <updated>2025-09-11T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>Istio Service Mesh 服务网格流量治理与无损发布</div><a href="https://blog.cot.wiki/istio-service-mesh-traffic-management">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/istio-service-mesh-traffic-management"></link>
+    <summary>Istio Service Mesh 服务网格流量治理与无损发布</summary>
+    <category term="云原生与运维"></category>
+    <published>2025-09-11T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/clickhouse-columnar-database-realtime-analytics</id>
+    <title>ClickHouse 列式数据库千万级实时分析实战</title>
+    <updated>2025-08-30T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>ClickHouse 列式数据库千万级实时分析实战</div><a href="https://blog.cot.wiki/clickhouse-columnar-database-realtime-analytics">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/clickhouse-columnar-database-realtime-analytics"></link>
+    <summary>ClickHouse 列式数据库千万级实时分析实战</summary>
+    <category term="数据库系统"></category>
+    <published>2025-08-30T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/v8-engine-garbage-collection-memory-leak</id>
+    <title>深入浅出 Chrome V8 引擎垃圾回收 (GC) 机制与内存泄漏排查</title>
+    <updated>2025-08-18T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>深入浅出 Chrome V8 引擎垃圾回收 (GC) 机制与内存泄漏排查</div><a href="https://blog.cot.wiki/v8-engine-garbage-collection-memory-leak">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/v8-engine-garbage-collection-memory-leak"></link>
+    <summary>深入浅出 Chrome V8 引擎垃圾回收 (GC) 机制与内存泄漏排查</summary>
+    <category term="前端开发"></category>
+    <published>2025-08-18T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/zero-trust-network-architecture-hybrid-cloud</id>
+    <title>零信任网络架构 (Zero Trust) 在跨云混合设施中的落地实践</title>
+    <updated>2025-08-07T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>零信任网络架构 (Zero Trust) 在跨云混合设施中的落地实践</div><a href="https://blog.cot.wiki/zero-trust-network-architecture-hybrid-cloud">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/zero-trust-network-architecture-hybrid-cloud"></link>
+    <summary>零信任网络架构 (Zero Trust) 在跨云混合设施中的落地实践</summary>
+    <category term="网络安全"></category>
+    <published>2025-08-07T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/fullstack-wasm-offline-pwa-storage</id>
+    <title>全栈 WebAssembly 离线应用开发与 PWA 离线存储方案</title>
+    <updated>2025-07-27T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>全栈 WebAssembly 离线应用开发与 PWA 离线存储方案</div><a href="https://blog.cot.wiki/fullstack-wasm-offline-pwa-storage">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/fullstack-wasm-offline-pwa-storage"></link>
+    <summary>全栈 WebAssembly 离线应用开发与 PWA 离线存储方案</summary>
+    <category term="前端开发"></category>
+    <published>2025-07-27T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/graphql-vs-rest-api-architecture-selection</id>
+    <title>GraphQL 与 REST API 在大型分布式 Web 架构中的选型思考</title>
+    <updated>2025-07-15T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>GraphQL 与 REST API 在大型分布式 Web 架构中的选型思考</div><a href="https://blog.cot.wiki/graphql-vs-rest-api-architecture-selection">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/graphql-vs-rest-api-architecture-selection"></link>
+    <summary>GraphQL 与 REST API 在大型分布式 Web 架构中的选型思考</summary>
+    <category term="后端开发"></category>
+    <published>2025-07-15T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/gitops-argocd-fluxcd-k8s-comparison</id>
+    <title>GitOps 部署模式演进：ArgoCD 与 FluxCD 在 K8s 中的对比</title>
+    <updated>2025-07-03T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>GitOps 部署模式演进：ArgoCD 与 FluxCD 在 K8s 中的对比</div><a href="https://blog.cot.wiki/gitops-argocd-fluxcd-k8s-comparison">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/gitops-argocd-fluxcd-k8s-comparison"></link>
+    <summary>GitOps 部署模式演进：ArgoCD 与 FluxCD 在 K8s 中的对比</summary>
+    <category term="云原生与运维"></category>
+    <published>2025-07-03T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/nginx-performance-tuning-tls-1-3-optimization</id>
+    <title>Nginx 高性能反向代理与 TLS 1.3 握手优化探秘</title>
+    <updated>2025-06-22T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>Nginx 高性能反向代理与 TLS 1.3 握手优化探秘</div><a href="https://blog.cot.wiki/nginx-performance-tuning-tls-1-3-optimization">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/nginx-performance-tuning-tls-1-3-optimization"></link>
+    <summary>Nginx 高性能反向代理与 TLS 1.3 握手优化探秘</summary>
+    <category term="云原生与运维"></category>
+    <published>2025-06-22T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/modern-css-container-queries-tailwind-best-practices</id>
+    <title>现代 CSS 革命：Container Queries、Cascade Layers 与 TailWind 最佳配合</title>
+    <updated>2025-06-10T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>现代 CSS 革命：Container Queries、Cascade Layers 与 TailWind 最佳配合</div><a href="https://blog.cot.wiki/modern-css-container-queries-tailwind-best-practices">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/modern-css-container-queries-tailwind-best-practices"></link>
+    <summary>现代 CSS 革命：Container Queries、Cascade Layers 与 TailWind 最佳配合</summary>
+    <category term="前端开发"></category>
+    <published>2025-06-10T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/llm-agent-architecture-langchain-practice</id>
+    <title>LLM 大语言模型 Agent 智能体架构设计与 LangChain 最佳实践</title>
+    <updated>2025-05-30T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>LLM 大语言模型 Agent 智能体架构设计与 LangChain 最佳实践</div><a href="https://blog.cot.wiki/llm-agent-architecture-langchain-practice">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/llm-agent-architecture-langchain-practice"></link>
+    <summary>LLM 大语言模型 Agent 智能体架构设计与 LangChain 最佳实践</summary>
+    <category term="人工智能"></category>
+    <published>2025-05-30T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/elasticsearch-vector-search-rag-llm</id>
+    <title>Elasticsearch 8.x 向量检索与 RAG 大模型检索增强实战</title>
+    <updated>2025-05-19T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>Elasticsearch 8.x 向量检索与 RAG 大模型检索增强实战</div><a href="https://blog.cot.wiki/elasticsearch-vector-search-rag-llm">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/elasticsearch-vector-search-rag-llm"></link>
+    <summary>Elasticsearch 8.x 向量检索与 RAG 大模型检索增强实战</summary>
+    <category term="人工智能"></category>
+    <published>2025-05-19T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/distributed-transaction-saga-tcc-comparison</id>
+    <title>分布式事务最终一致性方案：Saga 与 TCC 模式对比</title>
+    <updated>2025-05-07T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>分布式事务最终一致性方案：Saga 与 TCC 模式对比</div><a href="https://blog.cot.wiki/distributed-transaction-saga-tcc-comparison">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/distributed-transaction-saga-tcc-comparison"></link>
+    <summary>分布式事务最终一致性方案：Saga 与 TCC 模式对比</summary>
+    <category term="后端开发"></category>
+    <published>2025-05-07T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/micro-frontends-architecture-enterprise-evolution</id>
+    <title>前端微服务 (Micro-Frontends) 架构在大型企业应用中的演进</title>
+    <updated>2025-04-26T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>前端微服务 (Micro-Frontends) 架构在大型企业应用中的演进</div><a href="https://blog.cot.wiki/micro-frontends-architecture-enterprise-evolution">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/micro-frontends-architecture-enterprise-evolution"></link>
+    <summary>前端微服务 (Micro-Frontends) 架构在大型企业应用中的演进</summary>
+    <category term="前端开发"></category>
+    <published>2025-04-26T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/kafka-high-throughput-tuning-zero-copy</id>
+    <title>Kafka 百万级消息吞吐调优与零拷贝技术原理</title>
+    <updated>2025-04-13T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>Kafka 百万级消息吞吐调优与零拷贝技术原理</div><a href="https://blog.cot.wiki/kafka-high-throughput-tuning-zero-copy">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/kafka-high-throughput-tuning-zero-copy"></link>
+    <summary>Kafka 百万级消息吞吐调优与零拷贝技术原理</summary>
+    <category term="后端开发"></category>
+    <published>2025-04-13T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/linux-kernel-ebpf-cloud-native-security</id>
+    <title>Linux 内核 eBPF 技术在云原生网络安全中的实践</title>
+    <updated>2025-04-02T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>Linux 内核 eBPF 技术在云原生网络安全中的实践</div><a href="https://blog.cot.wiki/linux-kernel-ebpf-cloud-native-security">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/linux-kernel-ebpf-cloud-native-security"></link>
+    <summary>Linux 内核 eBPF 技术在云原生网络安全中的实践</summary>
+    <category term="网络安全"></category>
+    <published>2025-04-02T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/webassembly-rust-high-performance-rendering</id>
+    <title>WebAssembly 与 Rust 打造高性能前端图形渲染引擎</title>
+    <updated>2025-03-22T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>WebAssembly 与 Rust 打造高性能前端图形渲染引擎</div><a href="https://blog.cot.wiki/webassembly-rust-high-performance-rendering">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/webassembly-rust-high-performance-rendering"></link>
+    <summary>WebAssembly 与 Rust 打造高性能前端图形渲染引擎</summary>
+    <category term="前端开发"></category>
+    <published>2025-03-22T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/nextjs-app-router-performance-isr-strategy</id>
+    <title>Next.js App Router 极致性能调优与 ISR 策略</title>
+    <updated>2025-03-11T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>Next.js App Router 极致性能调优与 ISR 策略</div><a href="https://blog.cot.wiki/nextjs-app-router-performance-isr-strategy">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/nextjs-app-router-performance-isr-strategy"></link>
+    <summary>Next.js App Router 极致性能调优与 ISR 策略</summary>
+    <category term="前端开发"></category>
+    <published>2025-03-11T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/redis-cache-breakthrough-breakdown-avalanche</id>
+    <title>Redis 缓存击穿、穿透与雪崩在千万级系统中的治理</title>
+    <updated>2025-02-26T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>Redis 缓存击穿、穿透与雪崩在千万级系统中的治理</div><a href="https://blog.cot.wiki/redis-cache-breakthrough-breakdown-avalanche">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/redis-cache-breakthrough-breakdown-avalanche"></link>
+    <summary>Redis 缓存击穿、穿透与雪崩在千万级系统中的治理</summary>
+    <category term="后端开发"></category>
+    <published>2025-02-26T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/kubernetes-container-observability-architecture</id>
+    <title>Docker 与 Kubernetes 容器可观测性架构设计</title>
+    <updated>2025-02-15T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>Docker 与 Kubernetes 容器可观测性架构设计</div><a href="https://blog.cot.wiki/kubernetes-container-observability-architecture">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/kubernetes-container-observability-architecture"></link>
+    <summary>Docker 与 Kubernetes 容器可观测性架构设计</summary>
+    <category term="云原生与运维"></category>
+    <published>2025-02-15T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/postgresql-index-tuning-deadlock-troubleshooting</id>
+    <title>PostgreSQL 索引优化与高并发死锁排查实战</title>
+    <updated>2025-02-03T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>PostgreSQL 索引优化与高并发死锁排查实战</div><a href="https://blog.cot.wiki/postgresql-index-tuning-deadlock-troubleshooting">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/postgresql-index-tuning-deadlock-troubleshooting"></link>
+    <summary>PostgreSQL 索引优化与高并发死锁排查实战</summary>
+    <category term="数据库系统"></category>
+    <published>2025-02-03T16:00:00Z</published>
+  </entry>
+  <entry>
+    <id>https://blog.cot.wiki/react-19-server-components-guide</id>
+    <title>React 19 Server Components 架构落地指南</title>
+    <updated>2025-01-23T16:00:00Z</updated>
+    <author>
+      <name>kerntau</name>
+    </author>
+    <content type="html">
+      <![CDATA[<div>React 19 Server Components 架构落地指南</div><a href="https://blog.cot.wiki/react-19-server-components-guide">阅读全文</a>]]>
+    </content>
+    <link href="https://blog.cot.wiki/react-19-server-components-guide"></link>
+    <summary>React 19 Server Components 架构落地指南</summary>
+    <category term="前端开发"></category>
+    <published>2025-01-23T16:00:00Z</published>
   </entry>
 </feed>
