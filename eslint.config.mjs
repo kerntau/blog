@@ -38,14 +38,6 @@ export default antfu({
 		'style/quote-props': 'off',
 		'style/quotes': 'off',
 		'ts/consistent-type-imports': 'off',
-		'vue/block-lang': ['warn', {
-			script: { lang: ['ts', 'tsx'] },
-			style: { lang: ['scss'] },
-		}],
-		'vue/enforce-style-attribute': ['warn', {
-			allow: ['scoped'],
-		}],
-		'vue/html-indent': ['error', 'tab', { baseIndent: 0 }],
 		'yaml/indent': ['error', 2],
 	},
 }, {
