@@ -2,7 +2,7 @@
 	contain: paint;
 	position: fixed;
 	inset-inline-end: min(1rem, 5%);
-	bottom: min(2rem, 5%);
+	bottom: max(min(2rem, 5%), env(safe-area-inset-bottom, 0px));
 	border-radius: 0.5rem;
 	background-color: var(--c-bg-a50);
 	backdrop-filter: blur(0.5rem);
@@ -10,7 +10,7 @@
 	transition: transform 0.1s;
 	z-index: var(--z-index-popover);
 
-	@media (max-height: 480px) { /* breakpoint-phone */
+	@media (max-height: 528px) { /* breakpoint-phone */
 		display: flex;
 	}
 
@@ -21,11 +21,14 @@
 	button {
 		display: block;
 		padding: 0.5rem;
+		min-width: 2.4rem;
+		min-height: 2.4rem;
 		transition: all 0.2s;
 		background: none;
 		border: none;
 		cursor: pointer;
 		color: inherit;
+		touch-action: manipulation;
 
 		&:hover {
 			background-color: var(--c-bg-a80);

@@ -31,12 +31,13 @@ export default function BlogSidebar() {
 	const isLinkActive = (url: string) => hydrated && pathname === url
 
 	return (
-		<aside 
-			id="blog-sidebar" 
-			className={`${styles.sidebar} ${state === 'sidebar' ? styles.show : ''}`}
-		>
+		<>
 			<Mask show={state === 'sidebar'} className="mobile-only" onClick={close} />
-			<BlogHeader className={styles.sidebarHeader} />
+			<aside
+				id="blog-sidebar"
+				className={`${styles.sidebar} ${state === 'sidebar' ? styles.show : ''}`}
+			>
+				<BlogHeader className={styles.sidebarHeader} />
 
 				<nav className={`${styles.sidebarNav} scrollcheck-y`}>
 					<div className={`${styles.searchBtn} ${styles.navItem} gradient-card`} onClick={() => setIsOpen(true)}>
@@ -51,8 +52,8 @@ export default function BlogSidebar() {
 							<menu className={styles.navMenu}>
 								{group.items.map((item, iIdx) => (
 									<li key={iIdx}>
-										<UtilLink 
-											to={item.url} 
+										<UtilLink
+											to={item.url}
 											className={`${styles.navItem} ${isLinkActive(item.url) ? styles.routerLinkActive : ''}`}
 										>
 											<Icon icon={item.icon} />
@@ -73,5 +74,6 @@ export default function BlogSidebar() {
 					<IconNavList list={appConfig.footer.iconNav} />
 				</footer>
 			</aside>
+		</>
 	)
 }

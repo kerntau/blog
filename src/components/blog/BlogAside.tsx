@@ -13,11 +13,23 @@ export default function BlogAside() {
 		return null
 	}
 
+	const handleAsideClick = (e: React.MouseEvent) => {
+		const target = e.target as HTMLElement
+		const link = target.closest('a')
+		if (link && state === 'aside') {
+			layoutStore.close()
+		}
+	}
+
 	return (
 		<>
 			<Mask show={state === 'aside'} className="widescreen-only" onClick={() => layoutStore.close()} />
 
-			<aside id="blog-aside" className={`${styles.blogAside} ${state === 'aside' ? `${styles.show} show` : ''}`}>
+			<aside
+				id="blog-aside"
+				className={`${styles.blogAside} ${state === 'aside' ? `${styles.show} show` : ''}`}
+				onClick={handleAsideClick}
+			>
 				{asideWidgets.map((name) => {
 					const Widget = widgetMap[name]
 					return Widget ? <Widget key={name} /> : null
