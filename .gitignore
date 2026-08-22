@@ -1,4 +1,5 @@
-# Next dev/build outputs
+# Rsbuild / Web build outputs
+dist
 .next
 tsconfig.tsbuildinfo
 

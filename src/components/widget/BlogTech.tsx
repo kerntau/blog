@@ -22,7 +22,7 @@ export default function BlogTech() {
 
 	const techstack = [
 		{ label: 'React', value: packageJson.dependencies.react },
-		{ label: 'Next', value: packageJson.dependencies.next },
+		{ label: 'Rsbuild', value: (packageJson.devDependencies as any)['@rsbuild/core'] || '^2.0.0' },
 		{ label: 'Node', value: packageJson.engines.node },
 		{ label: 'pnpm', value: packageJson.packageManager?.split('@')[1] || '--' },
 	]
