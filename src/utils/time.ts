@@ -1,21 +1,6 @@
 import { Temporal } from 'temporal-polyfill'
 import blogConfig from '../../blog.config'
 
-export function isSameUnit(date1: string, date2: string, unit: Temporal.DateTimeUnit) {
-	try {
-		const p1 = toZonedTemporal(date1).toPlainDateTime()
-		const p2 = toZonedTemporal(date2).toPlainDateTime()
-		return p1.until(p2, {
-			largestUnit: unit,
-			smallestUnit: unit,
-			roundingMode: 'trunc',
-		}).blank
-	}
-	catch {
-		return false
-	}
-}
-
 /** 检查两个时间相对现在是否相差显著 */
 export function isTimeDiffSignificant(
 	date1?: string,

@@ -65,10 +65,6 @@ export function getPromptLanguage(prompt: string | boolean) {
 	return 'text'
 }
 
-export function joinWith(strings: (string | undefined)[], separator = '\n') {
-	return strings.filter(Boolean).join(separator)
-}
-
 export function highlightHtml(text: string, words: string | string[] | undefined, className?: string) {
 	const validTerms = toArray(words)
 		.filter((t): t is string => !!t?.trim())
@@ -85,8 +81,13 @@ export function highlightHtml(text: string, words: string | string[] | undefined
 		.replace(/\n+/g, '<br>')
 }
 
-export function removeHtmlTags(str?: string) {
-	if (typeof str !== 'string')
-		return ''
-	return str.replace(/<[^>]+(>|$)/g, '')
+/** 递归提取 React 节点 / JSX 中的纯文本内容 */
+export function extractNodeText(node: any): string {
+	if (node === null || node === undefined || typeof node === 'boolean') return ''
+	if (typeof node === 'string' || typeof node === 'number') return String(node)
+	if (Array.isArray(node)) return node.map(extractNodeText).join('')
+	if (node && typeof node === 'object' && 'props' in node && node.props?.children) {
+		return extractNodeText(node.props.children)
+	}
+	return ''
 }

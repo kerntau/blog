@@ -27,6 +27,8 @@ const archIcons = {
 	'PHP': 'simple-icons:php',
 	'Python': 'simple-icons:python',
 	'React': 'simple-icons:react',
+	'Rsbuild': 'tabler:bolt',
+	'Rspack': 'tabler:bolt',
 	'Typecho': 'icon-park-solid:align-text-left-one', // 不准确
 	'Valaxy': 'tabler:letter-v', // 不准确
 	'Vercel': 'simple-icons:vercel',
@@ -40,10 +42,10 @@ const archIcons = {
 	'虚拟主机': 'tabler:cloud-upload',
 }
 
-export type Arch = keyof typeof archIcons
+export type Arch = keyof typeof archIcons | (string & {})
 
 export function getArchIcon(arch: Arch) {
-	return archIcons[arch] ?? ''
+	return (archIcons as Record<string, string>)[arch] ?? ''
 }
 
 /** BlogTech Widget 构建平台图标映射 */
@@ -78,7 +80,7 @@ const mainDomainIcons: Record<string, string> = {
 	'tmall.com': 'ri:taobao-fill',
 	'v2ex.com': 'simple-icons:v2ex',
 	'vercel.app': 'simple-icons:vercel',
-	'zabaur.app': 'tabler:square-letter-z-filled',
+	'zeabur.app': 'tabler:square-letter-z-filled',
 	'zhihu.com': 'ri:zhihu-line',
 }
 
@@ -142,7 +144,7 @@ const file2icon: Record<string, string> = {
 	'stylelint.config.mjs': 'catppuccin:stylelint',
 	'tailwind.config.js': 'catppuccin:tailwind',
 	'tsconfig.json': 'catppuccin:typescript-config',
-	'verccel.json': 'catppuccin:vercel',
+	'vercel.json': 'catppuccin:vercel',
 	'vite.config.js': 'catppuccin:vite',
 	'vite.config.ts': 'catppuccin:vite',
 	'webpack.config.js': 'catppuccin:webpack',

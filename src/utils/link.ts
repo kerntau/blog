@@ -1,5 +1,4 @@
 import { fromUrl, parseDomain, ParseResultType } from 'parse-domain'
-import { isPathFile } from 'site-config-stack/urls'
 
 const domainTip: Record<string, string> = {
 	'github.io': 'GitHub Pages 域名',
@@ -36,10 +35,12 @@ export function getGithubUsername(url?: string) {
 	return url.match(githubUsernameRegex)?.[1] ?? ''
 }
 
+const filePathRegex = /\.[a-z0-9]+$/i
+
 export function isExtLink(url?: string) {
-	return url
-		? url.includes(':') || !!isPathFile(url)
-		: false
+	if (!url)
+		return false
+	return url.includes(':') || filePathRegex.test(url.split('?')[0]!.split('#')[0]!)
 }
 
 export function safelyDecodeUriComponent(str: string) {

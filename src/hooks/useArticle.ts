@@ -1,7 +1,7 @@
 'use client'
 
 import { useSearchParams, useRouter, usePathname } from '@/lib/compat-navigation'
-import { useMemo, useTransition } from 'react'
+import { useState, useEffect, useMemo, useTransition } from 'react'
 import type { ArticleOrderType, ArticleProps } from '../types/article'
 import { orderBy } from 'es-toolkit/array'
 import appConfig from '../app.config'
@@ -16,8 +16,17 @@ interface UseCategoryOptions {
 export function useCategory(list: ArticleProps[], options?: UseCategoryOptions) {
 	const { bindQuery } = options || {}
 	const searchParams = useSearchParams()
+	const queryCategory = bindQuery ? searchParams?.get(bindQuery) ?? undefined : undefined
 
-	const category = bindQuery ? searchParams?.get(bindQuery) ?? undefined : undefined
+	const [localCategory, setLocalCategory] = useState<string | undefined>(queryCategory)
+
+	useEffect(() => {
+		if (bindQuery) {
+			setLocalCategory(queryCategory)
+		}
+	}, [bindQuery, queryCategory])
+
+	const category = bindQuery ? queryCategory : localCategory
 
 	const categories = useMemo(() => {
 		return [...new Set(list.map(item => item.categories?.[0]).filter(Boolean))] as string[]
@@ -30,7 +39,9 @@ export function useCategory(list: ArticleProps[], options?: UseCategoryOptions) 
 	const router = useRouter()
 	const pathname = usePathname()
 	const [isPending, startTransition] = useTransition()
+
 	const setCategory = (newCategory?: string) => {
+		setLocalCategory(newCategory)
 		if (bindQuery) {
 			const params = new URLSearchParams(searchParams?.toString())
 			if (!newCategory) {
@@ -70,11 +81,24 @@ export function useArticleSort(list: ArticleProps[], options?: UseArticleSortOpt
 
 	const searchParams = useSearchParams()
 
-	const sortOrder = (bindOrderQuery ? searchParams?.get(bindOrderQuery) : null) as ArticleOrderType | null ?? initialOrder
-
-	const isAscending = bindDirectionQuery
+	const querySortOrder = (bindOrderQuery ? searchParams?.get(bindOrderQuery) : null) as ArticleOrderType | null ?? initialOrder
+	const queryIsAscending = bindDirectionQuery
 		? searchParams?.get(bindDirectionQuery) === 'true'
 		: initialAscend
+
+	const [localSortOrder, setLocalSortOrder] = useState<ArticleOrderType>(querySortOrder)
+	const [localIsAscending, setLocalIsAscending] = useState<boolean>(queryIsAscending)
+
+	useEffect(() => {
+		if (bindOrderQuery) setLocalSortOrder(querySortOrder)
+	}, [bindOrderQuery, querySortOrder])
+
+	useEffect(() => {
+		if (bindDirectionQuery) setLocalIsAscending(queryIsAscending)
+	}, [bindDirectionQuery, queryIsAscending])
+
+	const sortOrder = bindOrderQuery ? querySortOrder : localSortOrder
+	const isAscending = bindDirectionQuery ? queryIsAscending : localIsAscending
 
 	const listSorted = useMemo(() => {
 		return orderBy(
@@ -87,7 +111,9 @@ export function useArticleSort(list: ArticleProps[], options?: UseArticleSortOpt
 	const router = useRouter()
 	const pathname = usePathname()
 	const [isPending, startTransition] = useTransition()
+
 	const setSortOrder = (newOrder: ArticleOrderType) => {
+		setLocalSortOrder(newOrder)
 		if (bindOrderQuery) {
 			const params = new URLSearchParams(searchParams?.toString())
 			params.set(bindOrderQuery, newOrder)
@@ -98,6 +124,7 @@ export function useArticleSort(list: ArticleProps[], options?: UseArticleSortOpt
 	}
 
 	const setIsAscending = (asc: boolean) => {
+		setLocalIsAscending(asc)
 		if (bindDirectionQuery) {
 			const params = new URLSearchParams(searchParams?.toString())
 			params.set(bindDirectionQuery, asc ? 'true' : 'false')
