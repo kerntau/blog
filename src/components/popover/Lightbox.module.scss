@@ -1,7 +1,7 @@
 .overlay {
 	position: fixed;
 	inset: 0;
-	background-color: rgba(0, 0, 0, 0.85);
+	background-color: rgba(0, 0, 0, 0.85); // BikariyaImageViewer defaults
 	backdrop-filter: blur(10px);
 	z-index: 2500;
 	display: flex;
@@ -26,35 +26,45 @@
 	max-width: 100%;
 	max-height: 80vh;
 	border-radius: 0.5rem;
-	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
 .imageInner {
 	object-fit: contain;
 }
 
-.caption {
-	margin-top: 1.5rem;
-	color: #fff;
-	background: rgba(0, 0, 0, 0.5);
-	padding: 0.5rem 1rem;
-	border-radius: 2rem;
-	font-size: 0.9em;
-}
+.tooltip {
+	display: flex;
+	align-items: center;
+	position: fixed;
+	inset-inline: 0;
+	bottom: clamp(2rem, 10vh, 5rem);
+	width: fit-content;
+	max-width: min(40rem, 80%);
+	margin-inline: auto;
+	border: 1px solid var(--c-border);
+	border-radius: 0.5em;
+	box-shadow: var(--box-shadow-2), var(--box-shadow-3);
+	background-color: var(--c-bg-a80);
+	backdrop-filter: blur(1rem) saturate(2);
+	z-index: 2501;
 
-.closeBtn {
-	position: absolute;
-	top: 2rem;
-	right: 2rem;
-	background: none;
-	border: none;
-	color: #fff;
-	font-size: 2rem;
-	cursor: pointer;
-	opacity: 0.5;
-	transition: opacity 0.2s;
+	.caption {
+		margin-inline-end: -0.5em;
+		padding: 0.5em 1em;
+	}
 
-	&:hover {
-		opacity: 1;
+	.close {
+		align-self: stretch;
+		padding: 0.5em;
+		cursor: pointer;
+		background: none;
+		border: none;
+		color: inherit;
+		display: flex;
+		align-items: center;
+		
+		&:hover {
+			opacity: 0.8;
+		}
 	}
 }

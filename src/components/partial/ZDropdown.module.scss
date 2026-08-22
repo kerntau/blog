@@ -1,35 +1,7 @@
-.dropdownContainer {
-	position: relative;
-	display: inline-block;
-	outline: none;
-}
-
 .dropdownTrigger {
 	display: inline-flex;
 	align-items: center;
 	cursor: pointer;
-}
-
-.dropdownContent {
-	position: absolute;
-	top: 100%;
-	z-index: var(--z-index-popover);
-	min-width: max-content;
-	margin-top: 0.3em;
-
-	&.bottom-start {
-		left: 0;
-	}
-
-	&.bottom {
-		left: 50%;
-		transform: translateX(-50%);
-	}
-
-	&.bottom-end {
-		right: 0;
-		left: auto;
-	}
 }
 
 .tippyBox {

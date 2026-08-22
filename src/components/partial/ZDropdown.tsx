@@ -1,71 +1,93 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, cloneElement, isValidElement } from 'react'
+import {
+	useFloating,
+	autoUpdate,
+	offset,
+	flip,
+	shift,
+	useHover,
+	useFocus,
+	useDismiss,
+	useRole,
+	useInteractions,
+	FloatingPortal,
+	useClick,
+} from '@floating-ui/react'
 import styles from './ZDropdown.module.scss'
 
-interface ZDropdownProps {
+export interface ZDropdownProps {
 	children: React.ReactNode
 	content: (props: { hide: () => void }) => React.ReactNode
-	tabIndex?: number
-	trigger?: 'click' | 'focusin'
-	placement?: 'bottom-start' | 'bottom' | 'bottom-end'
+	trigger?: 'click' | 'focusin' | 'hover'
+	placement?: 'bottom-start' | 'bottom' | 'bottom-end' | 'top' | 'top-start' | 'top-end'
+	interactive?: boolean
 }
 
 export default function ZDropdown({
 	children,
 	content,
 	placement = 'bottom-start',
+	trigger = 'click',
+	interactive = true,
 }: ZDropdownProps) {
 	const [isOpen, setIsOpen] = useState(false)
-	const containerRef = useRef<HTMLDivElement>(null)
 
-	const hide = useCallback(() => {
-		setIsOpen(false)
-	}, [])
+	const { refs, floatingStyles, context } = useFloating({
+		open: isOpen,
+		onOpenChange: setIsOpen,
+		placement,
+		whileElementsMounted: autoUpdate,
+		middleware: [
+			offset(0), // Nuxt used [0, 0] offset for dropdown
+			flip({ fallbackAxisSideDirection: 'start' }),
+			shift({ padding: 5 }),
+		],
+	})
 
-	useEffect(() => {
-		if (!isOpen) return
+	const click = useClick(context, { enabled: trigger === 'click' })
+	const hover = useHover(context, { enabled: trigger === 'hover', handleClose: interactive ? undefined : null })
+	const focus = useFocus(context, { enabled: trigger === 'focusin' || trigger === 'hover' })
+	const dismiss = useDismiss(context)
+	const role = useRole(context, { role: 'menu' })
 
-		const handleClickOutside = (e: MouseEvent) => {
-			if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-				setIsOpen(false)
-			}
-		}
+	const { getReferenceProps, getFloatingProps } = useInteractions([
+		click,
+		hover,
+		focus,
+		dismiss,
+		role,
+	])
 
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === 'Escape') {
-				setIsOpen(false)
-			}
-		}
-
-		document.addEventListener('mousedown', handleClickOutside)
-		document.addEventListener('keydown', handleKeyDown)
-		return () => {
-			document.removeEventListener('mousedown', handleClickOutside)
-			document.removeEventListener('keydown', handleKeyDown)
-		}
-	}, [isOpen])
-
-	const toggle = (e: React.MouseEvent) => {
-		e.stopPropagation()
-		setIsOpen(prev => !prev)
-	}
+	const hide = () => setIsOpen(false)
 
 	return (
-		<div className={styles.dropdownContainer} ref={containerRef}>
-			<div className={styles.dropdownTrigger} onClick={toggle}>
-				{children}
-			</div>
+		<>
+			{isValidElement(children) ? cloneElement(children as React.ReactElement, getReferenceProps({
+				ref: refs.setReference,
+				...((children as React.ReactElement).props || {}),
+			})) : (
+				<span ref={refs.setReference} {...getReferenceProps()} className={styles.dropdownTrigger}>
+					{children}
+				</span>
+			)}
 
-			{isOpen && (
-				<div className={`${styles.dropdownContent} ${styles[placement] || ''}`}>
-					<div className={styles.tippyBox}>
+			<FloatingPortal>
+				{isOpen && (
+					<div
+						className="tippy-box"
+						ref={refs.setFloating}
+						style={{ ...floatingStyles, outline: 'none' }}
+						{...getFloatingProps()}
+						data-placement={context.placement.split('-')[0]}
+					>
 						<div className={styles.tippyContent}>
 							{content({ hide })}
 						</div>
 					</div>
-				</div>
-			)}
-		</div>
+				)}
+			</FloatingPortal>
+		</>
 	)
 }
