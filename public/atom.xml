@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <id>https://blog.cot.wiki/</id>
   <title>kerntau</title>
-  <updated>2026-08-22T11:30:24.067Z</updated>
+  <updated>2026-08-22T12:43:10.098Z</updated>
   <description>在有序的世界里，寻一处生活的归栈。用理性梳理日常，用技术温柔时光，不慌不忙，自在生长。</description>
   <author>
     <name>kerntau</name>
@@ -13,9 +13,9 @@
   <link href="https://blog.cot.wiki/" rel="alternate"></link>
   <generator uri="https://blog.cot.wiki" version="1.0.0">Blog Engine (Rsbuild)</generator>
   <icon>/favicon.ico</icon>
-  <logo>/avatar.png</logo>
+  <logo>/avatar.webp</logo>
   <rights>© 2026 kerntau</rights>
-  <subtitle>全栈探索者 · AI 极客</subtitle>
+  <subtitle>心中有景,花香满径</subtitle>
   <entry>
     <id>https://blog.cot.wiki/future-web-development-http3-webtransport-webgpu</id>
     <title>未来 Web 开发新纪元：HTTP/3、WebTransport 与 WebGPU 展望</title>
