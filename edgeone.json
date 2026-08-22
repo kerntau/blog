@@ -16,6 +16,15 @@
           "value": "application/xml"
         }
       ],
+      "source": "/friends.opml"
+    },
+    {
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml"
+        }
+      ],
       "source": "/cotovo.opml"
     }
   ]

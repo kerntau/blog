@@ -7,4 +7,3 @@ export default function CardList({ children }: { children?: React.ReactNode }) {
 		</div>
 	)
 }
-

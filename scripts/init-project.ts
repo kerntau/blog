@@ -32,7 +32,7 @@ date: ${Temporal.Now.plainDateISO().toString()}
 description: 这是你的第一篇博客文章。
 ---
 
-欢迎使用 Cotovo 博客！你可以开始在 \`content/posts\` 目录下书写你的文章。
+欢迎使用博客系统！你可以开始在 \`content/posts\` 目录下书写你的文章。
 `
 
 fs.rmSync('./content', { recursive: true, force: true })

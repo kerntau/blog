@@ -27,4 +27,3 @@ export default function ZDlGroup({ items, size = 'medium', className = '' }: ZDl
 		</dl>
 	)
 }
-

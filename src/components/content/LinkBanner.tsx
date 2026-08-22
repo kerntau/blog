@@ -27,4 +27,3 @@ export default function LinkBanner({ banner, image, title, description, link }: 
 		</UtilLink>
 	)
 }
-
