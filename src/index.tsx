@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import BlogChrome from './components/blog/BlogChrome'
+import { ThemeProvider } from 'next-themes'
 import AppRoutes from './routes'
 
 // 导入全局与基础样式
@@ -20,9 +20,9 @@ if (rootElement) {
 	root.render(
 		<React.StrictMode>
 			<BrowserRouter>
-				<BlogChrome>
+				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					<AppRoutes />
-				</BlogChrome>
+				</ThemeProvider>
 			</BrowserRouter>
 		</React.StrictMode>,
 	)

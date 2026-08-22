@@ -1,5 +1,5 @@
 {
-	"name": "cotovo-blog",
+	"name": "blog-v3",
 	"type": "module",
 	"version": "1.0.0",
 	"private": true,
@@ -11,14 +11,15 @@
 		"pnpm": ">=10"
 	},
 	"scripts": {
-		"dev": "tsx scripts/build-static.ts && rsbuild dev",
+		"dev": "tsx scripts/dev.ts",
 		"build": "tsx scripts/build-static.ts && rsbuild build",
 		"preview": "rsbuild preview",
 		"lint": "eslint \"src/**/*.{ts,tsx}\" \"scripts/**/*.ts\" \"remark-plugins/**/*.ts\" \"*.config.*\" \"blog.config.ts\"",
 		"init-project": "tsx scripts/init-project",
 		"new": "tsx scripts/new-blog",
 		"check:feed": "tsx scripts/framework/get-feed",
-		"check:feed/all": "tsx scripts/framework/check-all-feeds"
+		"check:feed/all": "tsx scripts/framework/check-all-feeds",
+		"admin": "tsx scripts/admin-server.ts"
 	},
 	"dependencies": {
 		"@floating-ui/react": "^0.27.6",
