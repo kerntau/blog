@@ -1,7 +1,15 @@
+@use "@/assets/css/variable" as *;
+
 .homePage {
 	margin: 1rem;
 
 	:global(.float-in-leave-to) {
 		position: absolute;
 	}
+}
+
+.homePageContent {
+	padding: 0;
+	margin: 0;
+	list-style: none;
 }

@@ -49,7 +49,7 @@ export default function HomePage() {
 
 	return (
 		<>
-			<BlogHeader className="mobile-only" as="h1" />
+			<BlogHeader className="mobile-only" as="h1" to="/" />
 
 			{listRecommended.length > 0 && page === 1 && !category && (
 				<PostSlide list={listRecommended} />
@@ -75,7 +75,7 @@ export default function HomePage() {
 					</ZSecret>
 				</PostOrderToggle>
 
-				<menu className={styles.homePageContent}>
+				<menu className={`${styles.homePageContent} proper-height`}>
 					<AnimatePresence mode="wait">
 						<motion.div
 							key={`${category || 'all'}-${sortOrder}-${isAscending}-${page}`}
@@ -86,14 +86,13 @@ export default function HomePage() {
 							style={{ display: 'contents' }}
 						>
 							{listPaged.map((article, index) => (
-								<div key={article.path}>
-									<PostArticle
-										{...article}
-										to={article.path}
-										useUpdated={sortOrder === 'updated'}
-										priority={index < 2}
-									/>
-								</div>
+								<PostArticle
+									key={article.path}
+									{...article}
+									to={article.path}
+									useUpdated={sortOrder === 'updated'}
+									priority={index < 2}
+								/>
 							))}
 						</motion.div>
 					</AnimatePresence>

@@ -21,7 +21,7 @@
 	}
 
 	pre {
-		--start-offset: 3.8em;
+		--start-offset: 4em;
 
 		margin: 0;
 		padding: 1rem;
@@ -32,41 +32,9 @@
 
 		&.wrap {
 			white-space: pre-wrap;
-			word-break: break-all;
-		}
-
-		:global(code) {
-			display: block;
-			margin: 0 !important;
-			padding: 0 !important;
-			border: none !important;
-			background: transparent !important;
-			font-family: inherit;
-			font-size: inherit;
-			color: inherit;
-			white-space: inherit;
-			box-shadow: none !important;
 		}
 
 		:global(.line) {
-			display: block;
-			position: relative;
-			min-height: 1.4em;
-
-			&::before {
-				content: var(--line-indicator, "") attr(data-line);
-				position: absolute;
-				inset-inline-start: calc(-1 * var(--start-offset));
-				width: calc(var(--start-offset) - 0.8em);
-				padding-inline-end: 0.5em;
-				background-color: var(--c-bg-2);
-				text-align: end;
-				color: var(--line-indicator-color, var(--c-text-3));
-				font-size: 0.9em;
-				opacity: 0.5;
-				user-select: none;
-			}
-
 			&.diff {
 				background-color: var(--ld-bg-active);
 
@@ -85,7 +53,7 @@
 
 			&.highlighted {
 				--line-indicator-color: var(--c-text-1);
-				background-color: var(--ld-bg-active, var(--c-primary-soft));
+				background-color: var(--ld-bg-active);
 
 				&.error {
 					--line-indicator-color: var(--c-error);
@@ -98,8 +66,41 @@
 				}
 			}
 
-			> :global(span) {
-				background-color: transparent !important;
+			&.focused {
+				--line-indicator: "👉 ";
+				--line-indicator-color: var(--c-text-1);
+
+				display: inline-block;
+				position: relative;
+				box-shadow: 0 0 10rem 4rem var(--c-bg-2);
+				transition: box-shadow 0.2s;
+
+				@supports (color: color-mix(in srgb, transparent, transparent)) {
+					box-shadow: 0 0 0 100vmax color-mix(in srgb, transparent, var(--c-bg-2));
+				}
+
+				pre:hover > & {
+					box-shadow: none;
+				}
+			}
+
+			// 行号指示器
+			&::before {
+				content: var(--line-indicator, "") attr(data-line);
+				position: fixed;
+				inset-inline-start: 0;
+				width: var(--start-offset);
+				padding-inline-end: 1em;
+				background-color: var(--c-bg-2);
+				text-align: end;
+				color: var(--line-indicator-color, var(--c-text-3));
+				box-sizing: border-box;
+				z-index: 1;
+			}
+
+			> :global(.highlighted-word) {
+				border-radius: 0.2em;
+				box-shadow: inset 0 0 0 1em var(--ld-bg-active);
 			}
 		}
 	}
@@ -119,10 +120,9 @@
 		border-radius: 0 0 0.5em 0.5em;
 		background-color: var(--c-border);
 		word-break: break-all;
-		display: flex;
+		display: inline-flex;
 		align-items: center;
 		gap: 0.3em;
-		min-height: 1.5em;
 	}
 
 	.language {
@@ -133,7 +133,7 @@
 		font-size: 0.8em;
 	}
 
-.operations {
+	.operations {
 		position: absolute;
 		opacity: 0;
 		inset-inline-end: 0;
@@ -143,8 +143,8 @@
 		transition: opacity 0.2s;
 
 		button {
-			opacity: 0.5;
-			padding: 0.3em 0.5em;
+			opacity: 0.4;
+			padding: 0.2em 0.4em;
 			transition: opacity 0.2s;
 			background: none;
 			border: none;
@@ -154,12 +154,7 @@
 
 			&:hover, &:active {
 				opacity: 1;
-				color: var(--c-primary);
 			}
-		}
-
-		@media (max-width: 768px) {
-			opacity: 0.8;
 		}
 	}
 }
@@ -170,14 +165,11 @@
 }
 
 .toggleBtn {
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	display: block;
 	position: relative;
-	opacity: 0.4;
+	opacity: 0.3;
 	width: 100%;
-	min-height: 2.2rem;
-	padding: 0.4em;
+	padding: 0.2em;
 	border: none;
 	background-color: var(--c-bg-3);
 	color: var(--c-text);
@@ -185,6 +177,7 @@
 	cursor: pointer;
 	touch-action: manipulation;
 	transition: opacity 0.2s;
+	text-align: center;
 
 	&:hover, &:active {
 		opacity: 1;
@@ -192,8 +185,8 @@
 }
 
 .toggleIcon {
-	margin-inline-end: 0.4em;
-	transition: transform 0.2s;
+	margin-inline-end: 0.2em;
+	transition: all 0.2s;
 
 	&.isCollapsed {
 		transform: rotate(180deg);

@@ -79,7 +79,7 @@ export function ProsePre({
 
 	return (
 		<figure
-			className={`${styles.zCodeblock} ${collapsible ? styles.collapsible : ''} ${collapsible && isCollapsed ? styles.collapsed : ''} ${className}`}
+			className={`z-codeblock ${styles.zCodeblock} ${collapsible ? styles.collapsible : ''} ${collapsible ? 'collapsible' : ''} ${collapsible && isCollapsed ? `${styles.collapsed} collapsed` : ''} ${className}`}
 			style={{
 				'--collapsed-rows': compConf.collapsedRows,
 				'--tab-size': compConf.tabSize,
@@ -89,8 +89,7 @@ export function ProsePre({
 			<figcaption className={styles.figcaption}>
 				{filename ? (
 					<span className={styles.filename}>
-						<Icon icon={icon} />
-						<span>{filename}</span>
+						<Icon icon={icon} /> <span>{filename}</span>
 					</span>
 				) : (
 					<span />
@@ -100,7 +99,7 @@ export function ProsePre({
 
 				<div className={styles.operations}>
 					<button type="button" onClick={() => setIsWrap(!isWrap)}>
-						{isWrap ? '横向滚动' : '自动换行'}
+						{isWrap ? '换行' : '自动'}
 					</button>
 					<button type="button" onClick={handleCopy}>
 						{isCopied ? '已复制' : '复制'}
@@ -111,7 +110,7 @@ export function ProsePre({
 			<pre
 				ref={preRef}
 				{...props}
-				className={`${className} ${isWrap ? styles.wrap : ''} scrollcheck-x`}
+				className={`${className} ${isWrap ? styles.wrap : ''} ${isWrap ? 'wrap' : ''} shiki scrollcheck-x`}
 			>
 				{children}
 			</pre>

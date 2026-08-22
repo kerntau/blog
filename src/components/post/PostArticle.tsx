@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react'
 import { Icon } from '@iconify/react'
-import Image from '@/lib/compat-image'
+import Image from '@/components/util/Image'
 import UtilLink from '../util/UtilLink'
 import UtilDate from '../util/UtilDate'
 import type { ArticleProps } from '../../types/article'
