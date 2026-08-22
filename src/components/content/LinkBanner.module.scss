@@ -1,16 +1,36 @@
 .linkBanner {
+	line-height: 1.4;
+	text-decoration: none;
+	color: inherit;
 	display: block;
-	margin: 2rem 0;
-	border-radius: 1rem;
-	overflow: hidden;
-	transition: opacity 0.2s;
 
-	&:hover {
-		opacity: 0.9;
+	:global(article) & {
+		max-width: 528px; /* $breakpoint-phone */
+		margin: 2rem auto;
+	}
+
+	.linkBannerBg {
+		display: block;
+		width: 100%;
+		aspect-ratio: 2.4;
+		margin-bottom: -5%;
+		mask-image: linear-gradient(#FFF 50%, transparent);
+		object-fit: cover;
+	}
+
+	.linkBannerInfo {
+		padding: 0.5em 1em;
+	}
+
+	.linkBannerTitle {
+		font-size: 1.2em;
+		color: var(--c-text);
+	}
+
+	.linkBannerDesc {
+		margin-top: 0.5em;
+		font-size: 0.8em;
+		color: var(--c-text-2);
 	}
 }
 
-.image {
-	width: 100%;
-	aspect-ratio: 3 / 1;
-}

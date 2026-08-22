@@ -2,7 +2,6 @@ import UtilLink from '../util/UtilLink'
 import Pic from './Pic'
 import styles from './LinkCard.module.scss'
 
-import { useMemo } from 'react'
 import { getDomain } from '../../utils/link'
 import { joinWith } from '../../utils/str'
 

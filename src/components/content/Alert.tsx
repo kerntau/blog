@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { Icon } from '@iconify/react'
 import appConfig from '../../app.config'
 import styles from './Alert.module.scss'
@@ -55,10 +56,19 @@ export default function Alert({
 }: AlertProps) {
 	const card = appConfig.component.alert.defaultStyle === 'flat' ? propsCard : !flat
 	const config = typeMap[type] || typeMap.tip
-	
+
 	const icon = propsIcon || config.icon
 	const color = propsColor || config.color
-	const title = propsTitle || config.title
+
+	const childrenArray = React.Children.toArray(children)
+	const titleSlot = childrenArray.find((child: any) =>
+		child.props?.slot === 'title'
+		|| child.props?.['data-slot'] === 'title'
+		|| (typeof child.props?.className === 'string' && child.props.className.includes('slot-title')),
+	)
+	const restChildren = childrenArray.filter(child => child !== titleSlot)
+
+	const title = titleSlot || propsTitle || config.title
 
 	return (
 		<div className={`${styles.alert} ${card ? styles.card : ''}`} style={{ '--c-primary': color } as any}>
@@ -66,7 +76,7 @@ export default function Alert({
 				<Icon icon={icon} />
 				<div>{title}</div>
 			</div>
-			{children || (text && <p>{text}</p>)}
+			{restChildren.length > 0 ? restChildren : (text && <p>{text}</p>)}
 		</div>
 	)
 }

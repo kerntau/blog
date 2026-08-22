@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Icon } from '@iconify/react'
 import ZButton from '../partial/ZButton'
 import ZTooltip from '../partial/ZTooltip'
 import styles from './ProseTable.module.scss'
