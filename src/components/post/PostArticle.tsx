@@ -5,7 +5,7 @@ import UtilLink from '../util/UtilLink'
 import UtilDate from '../util/UtilDate'
 import type { ArticleProps } from '../../types/article'
 import { isTimeDiffSignificant } from '../../utils/time'
-import appConfig from '../../app.config'
+import { getCategoryColor, getCategoryIcon } from '../../utils/article'
 import { formatNumber } from '../../utils/str'
 import styles from './PostArticle.module.scss'
 
@@ -32,9 +32,8 @@ export default forwardRef<HTMLAnchorElement, PostArticleProps>(({
 	const showAllDate = isTimeDiffSignificant(date, updated)
 
 	const categoryStr = categories?.[0]
-	const catConfig = categoryStr ? appConfig.article.categories?.[categoryStr as keyof typeof appConfig.article.categories] : null
-	const catColor = catConfig?.color
-	const catIcon = catConfig?.icon || appConfig.article.categories?.[appConfig.defaultCategory as keyof typeof appConfig.article.categories]?.icon || 'tabler:circle-dashed'
+	const catColor = getCategoryColor(categoryStr)
+	const catIcon = getCategoryIcon(categoryStr)
 
 	return (
 		<UtilLink ref={ref} to={to} className={`${styles.articleCard} card upraise`} style={style}>

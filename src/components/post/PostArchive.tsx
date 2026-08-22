@@ -4,7 +4,7 @@ import type { ArticleProps } from '../../types/article'
 import UtilLink from '../util/UtilLink'
 import UtilDate from '../util/UtilDate'
 import { isTimeDiffSignificant, isSameUnit } from '../../utils/time'
-import appConfig from '../../app.config'
+import { getCategoryColor, getCategoryIcon } from '../../utils/article'
 import styles from './PostArchive.module.scss'
 
 interface PostArchiveProps extends ArticleProps {
@@ -20,9 +20,8 @@ export default forwardRef<HTMLLIElement, PostArchiveProps>((props, ref) => {
 	const mainDate = useUpdated ? updated : date
 
 	const categoryStr = categories?.[0]
-	const catConfig = categoryStr ? appConfig.article.categories?.[categoryStr as keyof typeof appConfig.article.categories] : null
-	const catColor = catConfig?.color
-	const catIcon = catConfig?.icon || (categoryStr ? (appConfig.article.categories?.[appConfig.defaultCategory as keyof typeof appConfig.article.categories]?.icon || 'tabler:circle-dashed') : undefined)
+	const catColor = getCategoryColor(categoryStr)
+	const catIcon = categoryStr ? getCategoryIcon(categoryStr) : undefined
 
 	return (
 		<li ref={ref} className={styles.articleItem} style={style}>

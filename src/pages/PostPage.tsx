@@ -34,7 +34,7 @@ export default function PostPage() {
 		return (
 			<ZError
 				icon="line-md:document-delete-twotone"
-				title="内容为空或页面不存在"
+				title="此篇为白纸或页面不存在"
 			/>
 		)
 	}
