@@ -41,31 +41,28 @@ export default function PreviewPage() {
 			</div>
 			<p>勇敢的探索者。这里是一些尚未发布的文章。</p>
 
-			<motion.menu layout className={`${styles.previewList} proper-height`}>
-				<AnimatePresence mode="popLayout">
-					{listCategorized.map((article, index) => (
-						<motion.div
-							layout
-							initial={{ opacity: 0, y: 30 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: 30, scale: 0.95 }}
-							transition={{ 
-								duration: 0.2, 
-								delay: index * 0.05,
-								layout: { type: 'spring', stiffness: 300, damping: 30 },
-							}}
-							key={article.path}
-							style={{ margin: 0, padding: 0 }}
-						>
-							<PostArticle
-								{...article}
-								to={article.path}
-								useUpdated={sortOrder === 'updated'}
-							/>
-						</motion.div>
-					))}
+			<menu className={`${styles.previewList} proper-height`}>
+				<AnimatePresence mode="wait">
+					<motion.div
+						key={`${category || 'all'}-${sortOrder}-${isAscending}`}
+						initial={{ opacity: 0, y: 10 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -10 }}
+						transition={{ duration: 0.2, ease: 'easeOut' }}
+						style={{ display: 'contents' }}
+					>
+						{listCategorized.map((article) => (
+							<div key={article.path}>
+								<PostArticle
+									{...article}
+									to={article.path}
+									useUpdated={sortOrder === 'updated'}
+								/>
+							</div>
+						))}
+					</motion.div>
 				</AnimatePresence>
-			</motion.menu>
+			</menu>
 		</div>
 	)
 }

@@ -2,7 +2,6 @@
 import { createElement, type ReactNode } from 'react'
 import * as runtime from 'react/jsx-runtime'
 import { getPostByPath } from './content'
-import type { ArticleProps } from '../types/article'
 
 import ProseA from '../components/content/ProseA'
 import ProsePre from '../components/content/ProsePre'
@@ -135,12 +134,12 @@ export function getCompiledMDX(path: string, components?: Record<string, any>) {
 	const post = getPostByPath(path)
 	if (!post) return null
 
-	const { data, body, toc } = post as any
-	const content = renderCompiledMdx((data as any)?.compiledCode, body, components)
+	const { data, body, toc } = post
+	const content = renderCompiledMdx(data.compiledCode, body, components)
 
 	return {
 		content,
-		frontmatter: data as ArticleProps,
+		frontmatter: data,
 		toc: toc || [],
 	}
 }

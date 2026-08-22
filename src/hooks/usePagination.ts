@@ -32,31 +32,33 @@ export default function usePagination<T>(list: T[], options?: UsePaginationOptio
 	const [internalPage, setInternalPage] = useState(getPageFromQuery())
 
 	const page = bindQuery ? getPageFromQuery() : internalPage
+	const safePage = Math.min(page, Math.max(1, totalPages))
 
 	const setPage = useCallback((newPage: number) => {
-		if (newPage < 1 || newPage > totalPages) return
+		const targetPage = Math.max(1, Math.min(newPage, totalPages))
 
 		if (bindQuery) {
-			const params = new URLSearchParams(searchParams?.toString())
-			if (newPage === initialPage) {
+			const params = new URLSearchParams(window.location.search)
+			if (targetPage === initialPage) {
 				params.delete(bindQuery)
 			} else {
-				params.set(bindQuery, newPage.toString())
+				params.set(bindQuery, targetPage.toString())
 			}
-			router.push(`${pathname}?${params.toString()}`, { scroll: true })
+			const query = params.toString()
+			router.push(query ? `${pathname}?${query}` : pathname, { scroll: true })
 		} else {
-			setInternalPage(newPage)
+			setInternalPage(targetPage)
 		}
-	}, [bindQuery, searchParams, pathname, router, initialPage, totalPages])
+	}, [bindQuery, pathname, router, initialPage, totalPages])
 
 	const listPaged = useMemo(() => {
-		const start = (page - 1) * perPage
+		const start = (safePage - 1) * perPage
 		return list.slice(start, start + perPage)
-	}, [list, page, perPage])
+	}, [list, safePage, perPage])
 
 	return {
 		totalPages,
-		page,
+		page: safePage,
 		setPage,
 		listPaged,
 	}

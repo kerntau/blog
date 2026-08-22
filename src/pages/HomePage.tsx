@@ -75,34 +75,29 @@ export default function HomePage() {
 					</ZSecret>
 				</PostOrderToggle>
 
-				<motion.menu layout className={styles.homePageContent}>
-					<AnimatePresence mode="popLayout" initial={false}>
-						{listPaged.map((article, index) => (
-							<motion.div
-								key={article.path}
-								layout
-								initial={{ opacity: 0, scale: 0.9 }}
-								animate={{ opacity: 1, scale: 1 }}
-								exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-								transition={{
-									type: 'spring',
-									stiffness: 400,
-									damping: 35,
-									mass: 1,
-									opacity: { duration: 0.25 },
-									delay: index * 0.02,
-								}}
-							>
-								<PostArticle
-									{...article}
-									to={article.path}
-									useUpdated={sortOrder === 'updated'}
-									priority={index < 2}
-								/>
-							</motion.div>
-						))}
+				<menu className={styles.homePageContent}>
+					<AnimatePresence mode="wait">
+						<motion.div
+							key={`${category || 'all'}-${sortOrder}-${isAscending}-${page}`}
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -10 }}
+							transition={{ duration: 0.2, ease: 'easeOut' }}
+							style={{ display: 'contents' }}
+						>
+							{listPaged.map((article, index) => (
+								<div key={article.path}>
+									<PostArticle
+										{...article}
+										to={article.path}
+										useUpdated={sortOrder === 'updated'}
+										priority={index < 2}
+									/>
+								</div>
+							))}
+						</motion.div>
 					</AnimatePresence>
-				</motion.menu>
+				</menu>
 
 				<ZPagination page={page} setPage={setPage} totalPages={totalPages} sticky avoid />
 			</div>

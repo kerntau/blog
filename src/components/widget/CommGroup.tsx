@@ -6,25 +6,44 @@ import Tip from '../content/Tip'
 import { getOicqGroupAvatar } from '../../utils/img'
 import styles from './CommGroup.module.scss'
 
-export default function CommGroup() {
+import appConfig from '../../app.config'
+
+interface CommGroupProps {
+	customData?: {
+		title?: string
+		groupName?: string
+		account?: string
+		icon?: string
+		bgImg?: string
+	}
+}
+
+export default function CommGroup({ customData }: CommGroupProps = {}) {
+	const conf = customData || (appConfig as any).widgets?.commGroup
+	const title = conf?.title || '博客/技术社区'
+	const groupName = conf?.groupName || '纸网接入点'
+	const account = conf?.account || '169994096'
+	const icon = conf?.icon || 'ri:qq-fill'
+	const bgImg = conf?.bgImg || (/^\d+$/.test(account) ? getOicqGroupAvatar(account) : undefined)
+
 	return (
 		<BlogWidget
 			card
 			dim
-			title="博客/技术社区"
-			bgImg={getOicqGroupAvatar('169994096')}
+			title={title}
+			bgImg={bgImg}
 			bgRight
 			unoptimized
 			className={styles.commGroup}
 		>
 			<div className={`${styles.title} text-creative`}>
-				纸网接入点
+				{groupName}
 			</div>
 
 			<div className={styles.tip}>
-				<Tip copy icon text="169994096">
-					<Icon icon="ri:qq-fill" />
-					169994096
+				<Tip copy icon text={account}>
+					<Icon icon={icon} />
+					{account}
 				</Tip>
 			</div>
 		</BlogWidget>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useSearchParams, useRouter, usePathname } from '@/lib/compat-navigation'
-import { useState, useMemo, useTransition, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import type { ArticleOrderType, ArticleProps } from '../types/article'
 import { orderBy } from 'es-toolkit/array'
 import appConfig from '../app.config'
@@ -18,49 +18,49 @@ export function useCategory(list: ArticleProps[], options?: UseCategoryOptions) 
 	const searchParams = useSearchParams()
 	const router = useRouter()
 	const pathname = usePathname()
-	const [isPending, startTransition] = useTransition()
 
-	// 若未绑定 URL 参数，则由本地状态托管
-	const [localCategory, setLocalCategory] = useState<string | undefined>(undefined)
+	const queryCategory = bindQuery ? (searchParams?.get(bindQuery) ?? undefined) : undefined
+	const [localCategory, setLocalCategory] = useState<string | undefined>(queryCategory)
 
-	// 状态唯一事实来源 (Single Source of Truth)
-	const category = bindQuery
-		? (searchParams?.get(bindQuery) ?? undefined)
-		: localCategory
+	useEffect(() => {
+		if (bindQuery) {
+			setLocalCategory(searchParams?.get(bindQuery) ?? undefined)
+		}
+	}, [bindQuery, searchParams])
 
+	const category = localCategory
+
+	// 提取全部可用分类（从全量博文或传入列表中提取，确保下拉菜单项完整且不丢失）
 	const categories = useMemo(() => {
 		return [...new Set(list.map(item => item.categories?.[0]).filter(Boolean))] as string[]
 	}, [list])
 
 	const listCategorized = useMemo(() => {
-		return list.filter(item => !category || item.categories?.[0] === category)
+		if (!category) return list
+		return list.filter(item => item.categories?.[0] === category)
 	}, [list, category])
 
 	const setCategory = useCallback((newCategory?: string) => {
+		setLocalCategory(newCategory)
 		if (bindQuery) {
-			const params = new URLSearchParams(searchParams?.toString())
+			const params = new URLSearchParams(window.location.search)
 			if (!newCategory) {
 				params.delete(bindQuery)
 			}
 			else {
 				params.set(bindQuery, newCategory)
 			}
-			startTransition(() => {
-				const query = params.toString()
-				router.push(query ? `${pathname}?${query}` : pathname, { scroll: true })
-			})
+			const query = params.toString()
+			router.push(query ? `${pathname}?${query}` : pathname, { scroll: true })
 		}
-		else {
-			setLocalCategory(newCategory)
-		}
-	}, [bindQuery, searchParams, pathname, router])
+	}, [bindQuery, pathname, router])
 
 	return {
 		category,
 		setCategory,
 		categories,
 		listCategorized,
-		isPending,
+		isPending: false,
 	}
 }
 
@@ -82,20 +82,32 @@ export function useArticleSort(list: ArticleProps[], options?: UseArticleSortOpt
 	const searchParams = useSearchParams()
 	const router = useRouter()
 	const pathname = usePathname()
-	const [isPending, startTransition] = useTransition()
 
-	// 仅在未绑定 URL 时使用本地状态
-	const [localSortOrder, setLocalSortOrder] = useState<ArticleOrderType>(initialOrder)
-	const [localIsAscending, setLocalIsAscending] = useState<boolean>(initialAscend)
-
-	// 状态唯一事实来源：优先直接由 URL 派生
-	const sortOrder = bindOrderQuery
+	const querySortOrder = bindOrderQuery
 		? ((searchParams?.get(bindOrderQuery) as ArticleOrderType | null) ?? initialOrder)
-		: localSortOrder
+		: initialOrder
+	const [localSortOrder, setLocalSortOrder] = useState<ArticleOrderType>(querySortOrder)
 
-	const isAscending = bindDirectionQuery
+	const queryIsAscending = bindDirectionQuery
 		? (searchParams?.get(bindDirectionQuery) === 'true')
-		: localIsAscending
+		: initialAscend
+	const [localIsAscending, setLocalIsAscending] = useState<boolean>(queryIsAscending)
+
+	useEffect(() => {
+		if (bindOrderQuery) {
+			const q = searchParams?.get(bindOrderQuery) as ArticleOrderType | null
+			setLocalSortOrder(q ?? initialOrder)
+		}
+	}, [bindOrderQuery, searchParams, initialOrder])
+
+	useEffect(() => {
+		if (bindDirectionQuery) {
+			setLocalIsAscending(searchParams?.get(bindDirectionQuery) === 'true')
+		}
+	}, [bindDirectionQuery, searchParams])
+
+	const sortOrder = localSortOrder
+	const isAscending = localIsAscending
 
 	const listSorted = useMemo(() => {
 		return orderBy(
@@ -106,30 +118,22 @@ export function useArticleSort(list: ArticleProps[], options?: UseArticleSortOpt
 	}, [list, sortOrder, isAscending])
 
 	const setSortOrder = useCallback((newOrder: ArticleOrderType) => {
+		setLocalSortOrder(newOrder)
 		if (bindOrderQuery) {
-			const params = new URLSearchParams(searchParams?.toString())
+			const params = new URLSearchParams(window.location.search)
 			params.set(bindOrderQuery, newOrder)
-			startTransition(() => {
-				router.push(`${pathname}?${params.toString()}`, { scroll: true })
-			})
+			router.push(`${pathname}?${params.toString()}`, { scroll: true })
 		}
-		else {
-			setLocalSortOrder(newOrder)
-		}
-	}, [bindOrderQuery, searchParams, pathname, router])
+	}, [bindOrderQuery, pathname, router])
 
 	const setIsAscending = useCallback((asc: boolean) => {
+		setLocalIsAscending(asc)
 		if (bindDirectionQuery) {
-			const params = new URLSearchParams(searchParams?.toString())
+			const params = new URLSearchParams(window.location.search)
 			params.set(bindDirectionQuery, asc ? 'true' : 'false')
-			startTransition(() => {
-				router.push(`${pathname}?${params.toString()}`, { scroll: true })
-			})
+			router.push(`${pathname}?${params.toString()}`, { scroll: true })
 		}
-		else {
-			setLocalIsAscending(asc)
-		}
-	}, [bindDirectionQuery, searchParams, pathname, router])
+	}, [bindDirectionQuery, pathname, router])
 
 	return {
 		sortOrder,
@@ -137,6 +141,6 @@ export function useArticleSort(list: ArticleProps[], options?: UseArticleSortOpt
 		isAscending,
 		setIsAscending,
 		listSorted,
-		isPending,
+		isPending: false,
 	}
 }

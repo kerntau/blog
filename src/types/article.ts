@@ -26,6 +26,7 @@ export interface ArticleSchema {
 
 export interface ArticleProps extends ArticleSchema {
 	path: string
+	compiledCode?: string
 
 	meta?: {
 		coverDim?: boolean

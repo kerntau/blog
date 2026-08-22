@@ -8,10 +8,17 @@ import { timeElapse } from '../../utils/time'
 import { formatNumber } from '../../utils/str'
 import appConfig from '../../app.config'
 
-import generatedPostsData from '../../data/generated-posts.json'
+import { getStats } from '../../lib/content'
 
-export default function BlogStats() {
-	const [stats, setStats] = useState<any>(() => (generatedPostsData as any)?.stats || null)
+interface BlogStatsProps {
+	customData?: {
+		birthYear?: number
+		wordCount?: string
+	}
+}
+
+export default function BlogStats({ customData: _customData }: BlogStatsProps = {}) {
+	const [stats, setStats] = useState<any>(() => getStats())
 
 	useEffect(() => {
 		fetch('/api/stats.json')
@@ -50,7 +57,7 @@ export default function BlogStats() {
 		},
 		{
 			label: '总字数',
-			value: stats?.total?.words ? formatNumber(stats.total.words) : '--',
+			value: stats?.total?.words ? formatNumber(stats.total.words) : (appConfig.component?.stats?.wordCount || '约10万'),
 			tip: yearlyTip,
 		}
 	]
