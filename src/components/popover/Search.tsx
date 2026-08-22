@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/lib/compat-navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import MiniSearch from 'minisearch'
 import { Icon } from '@iconify/react'

@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import Image from '@/lib/compat-image'
 import { Icon } from '@iconify/react'
 import { Temporal } from 'temporal-polyfill'
 import type { FeedEntry } from '../../types/feed'

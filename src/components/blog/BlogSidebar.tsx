@@ -12,7 +12,7 @@ import UtilLink from '../util/UtilLink'
 import Key from '../content/Key'
 import styles from './BlogSidebar.module.scss'
 
-import { usePathname } from 'next/navigation'
+import { usePathname } from '@/lib/compat-navigation'
 import { useEffect, useState } from 'react'
 import { useTextSelection } from '../../hooks/useTextSelection'
 import { useDebounce } from '../../hooks/useDebounce'
@@ -31,13 +31,12 @@ export default function BlogSidebar() {
 	const isLinkActive = (url: string) => hydrated && pathname === url
 
 	return (
-		<>
+		<aside 
+			id="blog-sidebar" 
+			className={`${styles.sidebar} ${state === 'sidebar' ? styles.show : ''}`}
+		>
 			<Mask show={state === 'sidebar'} className="mobile-only" onClick={close} />
-			<aside 
-				id="blog-sidebar" 
-				className={`${styles.sidebar} ${state === 'sidebar' ? styles.show : ''}`}
-			>
-				<BlogHeader className={styles.sidebarHeader} />
+			<BlogHeader className={styles.sidebarHeader} />
 
 				<nav className={`${styles.sidebarNav} scrollcheck-y`}>
 					<div className={`${styles.searchBtn} ${styles.navItem} gradient-card`} onClick={() => setIsOpen(true)}>
@@ -74,6 +73,5 @@ export default function BlogSidebar() {
 					<IconNavList list={appConfig.footer.iconNav} />
 				</footer>
 			</aside>
-		</>
 	)
 }

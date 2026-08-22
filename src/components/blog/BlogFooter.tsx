@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/lib/compat-link'
 import appConfig from '../../app.config'
 import styles from './BlogFooter.module.scss'
 import { getFixedDelay } from '../../utils/anim'

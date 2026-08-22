@@ -1,5 +1,5 @@
-import Image from 'next/image'
-import Link from 'next/link'
+import Image from '@/lib/compat-image'
+import Link from '@/lib/compat-link'
 import appConfig from '../../app.config'
 import styles from './BlogHeader.module.scss'
 import { getFixedDelay } from '../../utils/anim'

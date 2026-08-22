@@ -1,4 +1,4 @@
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from '@/lib/compat-navigation'
 import { useCallback, useMemo, useState } from 'react'
 import appConfig from '../app.config'
 

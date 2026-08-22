@@ -1,6 +1,6 @@
 'use client'
 
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from '@/lib/compat-navigation'
 import { useMemo, useTransition } from 'react'
 import type { ArticleOrderType, ArticleProps } from '../types/article'
 import { orderBy } from 'es-toolkit/array'

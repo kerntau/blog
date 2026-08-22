@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
+import Image from '@/lib/compat-image'
 import Lightbox from '../popover/Lightbox'
 import styles from './Pic.module.scss'
 

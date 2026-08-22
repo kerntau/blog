@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react'
-import Link from 'next/link'
+import Link from '@/lib/compat-link'
 import { isExtLink } from '../../utils/link'
 
 interface UtilLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {

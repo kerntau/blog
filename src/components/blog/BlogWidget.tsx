@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import Image from '@/lib/compat-image'
 import styles from './BlogWidget.module.scss'
 
 interface BlogWidgetProps {
