@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <id>https://keru.in/</id>
   <title>序栈</title>
-  <updated>2026-08-23T02:10:19.908Z</updated>
+  <updated>2026-08-23T02:32:26.145Z</updated>
   <description>在有序的世界里，寻一处生活的归栈。用理性梳理日常，用技术温柔时光，不慌不忙，自在生长。</description>
   <author>
     <name>kerntau</name>
@@ -11,7 +11,7 @@
   </author>
   <link href="https://keru.in/atom.xml" rel="self"></link>
   <link href="https://keru.in/" rel="alternate"></link>
-  <generator uri="https://blog.cot.wiki" version="1.0.0">Blog Engine (Rsbuild)</generator>
+  <generator uri="https://keru.in/" version="1.0.0">Blog Engine (Rsbuild)</generator>
   <icon>/favicon.ico</icon>
   <logo>/avatar.webp</logo>
   <rights>© 2026 kerntau</rights>
