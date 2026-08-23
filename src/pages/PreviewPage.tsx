@@ -51,15 +51,25 @@ export default function PreviewPage() {
 						transition={{ duration: 0.2, ease: 'easeOut' }}
 						style={{ display: 'contents' }}
 					>
-						{listCategorized.map((article) => (
-							<div key={article.path}>
-								<PostArticle
-									{...article}
-									to={article.path}
-									useUpdated={sortOrder === 'updated'}
-								/>
+						{listCategorized.length === 0 ? (
+							<div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--c-text-3)' }}>
+								<Icon icon="tabler:file-unknown" style={{ fontSize: '2.5rem', opacity: 0.5, marginBottom: '0.5rem' }} />
+								<div>暂无未发布的草稿或预览文章</div>
+								<div style={{ fontSize: '0.85rem', marginTop: '0.4rem' }}>
+									在文章 Frontmatter 中设置 <code>draft: true</code> 即可在此独立预览
+								</div>
 							</div>
-						))}
+						) : (
+							listCategorized.map((article) => (
+								<div key={article.path}>
+									<PostArticle
+										{...article}
+										to={article.path}
+										useUpdated={sortOrder === 'updated'}
+									/>
+								</div>
+							))
+						)}
 					</motion.div>
 				</AnimatePresence>
 			</menu>

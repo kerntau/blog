@@ -54,10 +54,10 @@ const appConfig = {
 		copyright: `© 2026 kerntau`,
 		/** 侧边栏底部图标导航 */
 		iconNav: [
-			{ icon: 'tabler:home', text: '个人主页', url: 'https://keru.in/' },
 			{ icon: 'tabler:brand-github', text: 'GitHub: kerntau', url: 'https://github.com/kerntau' },
 			{ icon: 'ri:bilibili-line', text: 'Bilibili', url: 'https://space.bilibili.com/9655855' },
 			{ icon: 'tabler:rss', text: 'Atom订阅', url: '/atom.xml' },
+			{ icon: 'tabler:brand-twitter', text: 'X (Twitter)', url: 'https://x.com/Kerntao' },
 		] satisfies NavItem[],
 		/** 页脚站点地图 */
 		nav: [
@@ -87,10 +87,10 @@ const appConfig = {
 
 	/** 左侧栏顶部 Logo (与博主头像保持同一权威数据源) */
 	header: {
-		logo: blogConfig.author.avatar,
+		logo: '/avatar.webp',
 		/** 展示标题文本，否则展示纯 Logo */
 		showTitle: true,
-		subtitle: blogConfig.subtitle,
+		subtitle: '心中有景,花香满径',
 		emojiTail: ['🌈', '☕', '💡', '🦄', '🎯'],
 	},
 
@@ -108,8 +108,8 @@ const appConfig = {
 			title: '',
 			items: [
 				{ icon: 'tabler:files', text: '文章', url: '/' },
-				{ icon: 'tabler:link', text: '友链', url: '/link' },
 				{ icon: 'tabler:archive', text: '归档', url: '/archive' },
+				{ icon: 'tabler:link', text: '友链', url: '/link' },
 			],
 		},
 	] satisfies Nav,
@@ -168,17 +168,14 @@ const appConfig = {
 		log: {
 			title: '更新日志',
 			items: [
-				{ date: '2025-07-26', content: '重构至 React 19 + Rsbuild，迁移架构' },
-				{ date: '2024-08-11', content: '重构至 Next.js / Content 架构' },
-				{ date: '2023-05-24', content: '迁移为 Hexo，使用 Butterfly 主题' },
-				{ date: '2020-08-24', content: '使用 blog 独立域名' },
+				{ date: '2025-07-26', content: '重构至 React 19 + Rsbuild' },
 				{ date: blogConfig.timeEstablished, content: '发布第一篇文章' },
 			],
 		},
 		pageAsideMappings: {
 			link: ['blog-stats', 'comm-group'],
 			archive: ['blog-stats', 'blog-log'],
-			home: ['blog-stats', 'blog-tech', 'comm-group'],
+			home: ['blog-stats', 'blog-tech', 'blog-weather'],
 			post: ['toc'],
 		},
 	},

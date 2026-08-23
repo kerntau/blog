@@ -5,6 +5,7 @@ import type { ArticleProps } from '../../types/article'
 import appConfig from '../../app.config'
 import useCopy from '../../hooks/useCopy'
 import UtilDate from '../util/UtilDate'
+import UtilLink from '../util/UtilLink'
 import ZButton from '../partial/ZButton'
 import Pic from '../content/Pic'
 import { isTimeDiffSignificant } from '../../utils/time'
@@ -53,10 +54,14 @@ export default function PostHeader(props: ArticleProps) {
 						)}
 
 						{categories && categories.length > 0 && (
-							<span>
+							<UtilLink
+								to={`/categories?category=${encodeURIComponent(categories[0])}`}
+								style={{ color: 'inherit', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+								title={`查看《${categories[0]}》分类全部文章`}
+							>
 								<Icon icon={getCategoryIcon(categories[0])} />
 								{categories[0]}
-							</span>
+							</UtilLink>
 						)}
 
 						<span>

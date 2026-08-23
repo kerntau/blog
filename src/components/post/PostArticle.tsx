@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Icon } from '@iconify/react'
 import Image from '@/components/util/Image'
 import UtilLink from '../util/UtilLink'
@@ -29,11 +30,19 @@ export default forwardRef<HTMLAnchorElement, PostArticleProps>(({
 	style,
 	priority,
 }, ref) => {
+	const navigate = useNavigate()
 	const showAllDate = isTimeDiffSignificant(date, updated)
 
 	const categoryStr = categories?.[0]
 	const catColor = getCategoryColor(categoryStr)
 	const catIcon = getCategoryIcon(categoryStr)
+
+	const handleCategoryClick = (e: React.MouseEvent) => {
+		if (!categoryStr) return
+		e.preventDefault()
+		e.stopPropagation()
+		navigate(`/categories?category=${encodeURIComponent(categoryStr)}`)
+	}
 
 	return (
 		<UtilLink ref={ref} to={to} className={`${styles.articleCard} card upraise`} style={style}>
@@ -69,7 +78,11 @@ export default forwardRef<HTMLAnchorElement, PostArticleProps>(({
 					)}
 
 					{categoryStr && (
-						<span style={{ color: catColor }}>
+						<span
+							style={{ color: catColor, cursor: 'pointer', zIndex: 2 }}
+							onClick={handleCategoryClick}
+							title={`查看《${categoryStr}》分类`}
+						>
 							<Icon icon={catIcon} />
 							{categoryStr}
 						</span>

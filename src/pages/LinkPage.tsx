@@ -17,7 +17,8 @@ export default function LinkPage() {
 	const setAside = useLayoutStore(s => s.setAside)
 
 	useEffect(() => {
-		setAside([])
+		const widgets = (appConfig.widgets as any)?.pageAsideMappings?.link || []
+		setAside(widgets)
 	}, [setAside])
 
 	const copyFields = {

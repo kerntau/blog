@@ -3,6 +3,7 @@ import BlogChrome from './components/blog/BlogChrome'
 import HomePage from './pages/HomePage'
 import ArchivePage from './pages/ArchivePage'
 import LinkPage from './pages/LinkPage'
+import CategoriesPage from './pages/CategoriesPage'
 import PreviewPage from './pages/PreviewPage'
 import PostPage from './pages/PostPage'
 import AdminApp from './admin/AdminApp'
@@ -28,6 +29,22 @@ export function AppRoutes() {
 				element={(
 					<BlogChrome>
 						<ArchivePage />
+					</BlogChrome>
+				)}
+			/>
+			<Route
+				path="/categories"
+				element={(
+					<BlogChrome>
+						<CategoriesPage />
+					</BlogChrome>
+				)}
+			/>
+			<Route
+				path="/category"
+				element={(
+					<BlogChrome>
+						<CategoriesPage />
 					</BlogChrome>
 				)}
 			/>

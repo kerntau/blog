@@ -12,9 +12,13 @@ export function getAllPosts(): ParsedPost[] {
 	return (generatedData.posts || []) as ParsedPost[]
 }
 
+export function getPreviewPosts(): ParsedPost[] {
+	return getAllPosts().filter(p => p.draft || p._stem.startsWith('previews/'))
+}
+
 export function getPostsByStemPrefix(prefix = 'posts/'): ParsedPost[] {
 	if (prefix === 'previews/' || prefix.startsWith('previews')) {
-		return getAllPosts().filter(p => !p.draft && p._stem.startsWith('previews/'))
+		return getPreviewPosts()
 	}
 	return getAllPosts().filter(p => !p.draft && p._stem !== 'link' && p._stem !== 'theme' && !p._stem.startsWith('previews/'))
 }

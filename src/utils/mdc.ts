@@ -6,6 +6,7 @@
 export const MDC_LEAF_COMPONENTS: Record<string, string> = {
 	'alert': 'Alert',
 	'badge': 'Badge',
+	'blur': 'Blur',
 	'blog-header': 'BlogHeader',
 	'copy': 'Copy',
 	'emoji-clock': 'EmojiClock',
@@ -187,7 +188,7 @@ export function preprocessMdc(source: string): string {
 					return part
 						.replace(/\{/g, '&#123;')
 						.replace(/\}/g, '&#125;')
-						.replace(/<(?!\/?(?:Alert|Badge|BlogHeader|Copy|EmojiClock|Tip|Pic|Tab|Folding|Timeline|MusicScore|VideoEmbed|Poetry|LinkCard|LinkBanner|Chat|Key|Quote|CardList|MdTitle|a|p|div|span|strong|em|code|pre|blockquote|ul|ol|li|table|thead|tbody|tr|th|td|hr|br|img|h1|h2|h3|h4|h5|h6)\b)/gi, '&lt;')
+						.replace(/<(?!\/?(?:Alert|Badge|Blur|BlogHeader|Copy|EmojiClock|Tip|Pic|Tab|Folding|Timeline|MusicScore|VideoEmbed|Poetry|LinkCard|LinkBanner|Chat|Key|Quote|CardList|MdTitle|a|p|div|span|strong|em|code|pre|blockquote|ul|ol|li|table|thead|tbody|tr|th|td|hr|br|img|h1|h2|h3|h4|h5|h6)\b)/gi, '&lt;')
 				})
 				.join('')
 		}

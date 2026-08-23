@@ -11,10 +11,10 @@ import PostArchive from '@/components/post/PostArchive'
 import ZSecret from '@/components/partial/ZSecret'
 import ZToggle from '@/components/partial/ZToggle'
 import ZSlider from '@/components/partial/ZSlider'
-import appConfig from '@/app.config'
 import { toZonedTemporal } from '@/utils/time'
 import { getFixedDelay } from '@/utils/anim'
 import { formatNumber } from '@/utils/str'
+import appConfig from '@/app.config'
 import styles from './ArchivePage.module.scss'
 
 export default function ArchivePage() {
@@ -22,7 +22,8 @@ export default function ArchivePage() {
 	const setAside = useLayoutStore(s => s.setAside)
 
 	useEffect(() => {
-		setAside(['blog-stats', 'blog-log'])
+		const widgets = (appConfig.widgets as any)?.pageAsideMappings?.archive || ['blog-stats', 'blog-log']
+		setAside(widgets)
 	}, [setAside])
 
 	const [showTuning, setShowTuning] = useState(false)

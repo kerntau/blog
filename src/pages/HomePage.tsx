@@ -13,6 +13,7 @@ import PostArticle from '@/components/post/PostArticle'
 import ZPagination from '@/components/partial/ZPagination'
 import ZSecret from '@/components/partial/ZSecret'
 import UtilLink from '@/components/util/UtilLink'
+import appConfig from '@/app.config'
 import styles from './HomePage.module.scss'
 
 export default function HomePage() {
@@ -22,7 +23,8 @@ export default function HomePage() {
 	const setAside = useLayoutStore(s => s.setAside)
 
 	useEffect(() => {
-		setAside(['blog-stats', 'blog-tech', 'comm-group'])
+		const widgets = (appConfig.widgets as any)?.pageAsideMappings?.home || ['blog-weather', 'blog-stats', 'blog-tech', 'comm-group']
+		setAside(widgets)
 	}, [setAside])
 
 	const { listSorted, isAscending, setIsAscending, sortOrder, setSortOrder } = useArticleSort(allPosts, {
