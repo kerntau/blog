@@ -1,6 +1,4 @@
-'use client'
-
-import React, { useState, cloneElement, isValidElement } from 'react'
+import React, { useState } from 'react'
 import {
 	useFloating,
 	autoUpdate,
@@ -34,15 +32,15 @@ export default function ZDropdown({
 }: ZDropdownProps) {
 	const [isOpen, setIsOpen] = useState(false)
 
-	const { refs, floatingStyles, context } = useFloating({
+	const { refs, floatingStyles, isPositioned, context } = useFloating({
 		open: isOpen,
 		onOpenChange: setIsOpen,
 		placement,
 		whileElementsMounted: autoUpdate,
 		middleware: [
-			offset(0), // Nuxt used [0, 0] offset for dropdown
+			offset(6),
 			flip({ fallbackAxisSideDirection: 'start' }),
-			shift({ padding: 5 }),
+			shift({ padding: 8 }),
 		],
 	})
 
@@ -64,21 +62,25 @@ export default function ZDropdown({
 
 	return (
 		<>
-			{isValidElement(children) ? cloneElement(children as React.ReactElement, getReferenceProps({
-				ref: refs.setReference,
-				...((children as React.ReactElement).props || {}),
-			})) : (
-				<span ref={refs.setReference} {...getReferenceProps()} className={styles.dropdownTrigger}>
-					{children}
-				</span>
-			)}
+			<span
+				ref={refs.setReference}
+				{...getReferenceProps()}
+				className={styles.dropdownTrigger}
+			>
+				{children}
+			</span>
 
 			<FloatingPortal>
 				{isOpen && (
 					<div
-						className="tippy-box"
+						className={styles.tippyBox}
 						ref={refs.setFloating}
-						style={{ ...floatingStyles, outline: 'none' }}
+						style={{
+							...floatingStyles,
+							outline: 'none',
+							zIndex: 9999,
+							visibility: isPositioned ? 'visible' : 'hidden',
+						}}
 						{...getFloatingProps()}
 						data-placement={context.placement.split('-')[0]}
 					>
