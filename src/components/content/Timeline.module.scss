@@ -2,7 +2,6 @@
 	position: relative;
 	padding-inline-start: 1.5em;
 	font-size: 0.9em;
-	margin: 1.5rem 0;
 
 	&::before {
 		content: "";
@@ -17,20 +16,16 @@
 .timelineCaption {
 	opacity: 0.8;
 	font-size: 0.9em;
-	font-weight: bold;
-	margin: 1rem 0 0.5rem;
-	position: relative;
 
 	&::before {
 		content: "";
 		position: absolute;
-		inset-inline-start: -1.25em;
+		inset-inline-start: 0.3em;
 		width: 0.8em;
 		height: 0.8em;
-		margin-top: 0.3em;
+		margin-top: 0.5em;
 		border-radius: 1em;
-		background-color: var(--c-primary);
-		z-index: 1;
+		background-color: var(--c-text-2);
 	}
 }
 
@@ -38,7 +33,6 @@
 	width: fit-content;
 	max-width: 100%;
 	margin-bottom: 1em;
-	padding: 0.5rem 1rem;
-	margin-inline-start: 0;
-	border-radius: 0.5rem;
+	padding: 0 1em;
 }
+

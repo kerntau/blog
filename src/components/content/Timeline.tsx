@@ -20,7 +20,7 @@ export default function Timeline({ children }: TimelineProps) {
 				if (match) {
 					return <dt key={i} className={styles.timelineCaption}>{match.groups?.caption}</dt>
 				}
-				return <dd key={i} className={`${styles.timelineBody} gradient-card`}>{child}</dd>
+				return <dd key={i} className={`${styles.timelineBody} card`}>{child}</dd>
 			})}
 		</dl>
 	)

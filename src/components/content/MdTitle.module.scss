@@ -1,5 +1,19 @@
 .mdTitle {
-	margin-top: -1em;
-	margin-bottom: 2em;
-	color: var(--c-text-3);
+	margin: 0.5em 0;
+	font-size: 1.1em;
+	font-weight: bold;
+
+	&::before {
+		content: "#";
+		position: absolute;
+		opacity: 0;
+		font-size: 0.8em;
+		transform: translate(-0.9em, 0.3em);
+		transition: opacity 0.2s;
+	}
+
+	&:hover::before {
+		opacity: 0.5;
+	}
 }
+
