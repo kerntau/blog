@@ -438,6 +438,17 @@ export const PostListView: React.FC<PostListViewProps> = ({ onEditPost, onNewPos
 							</div>
 
 							<div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+								<a
+									href={`/${post.permalink || post.relativePath.replace(/\.(?:md|mdx)$/i, '')}`}
+									target="_blank"
+									rel="noreferrer"
+									className="admin-btn btn-ghost btn-sm"
+									title="在前台新标签页查看实际效果"
+									style={{ textDecoration: 'none', color: 'inherit' }}
+								>
+									<Icon icon="tabler:external-link" style={{ fontSize: 14 }} />
+								</a>
+
 								<button
 									type="button"
 									className="admin-btn btn-ghost btn-sm"
@@ -450,7 +461,7 @@ export const PostListView: React.FC<PostListViewProps> = ({ onEditPost, onNewPos
 								<button
 									type="button"
 									className="admin-btn btn-secondary btn-sm"
-									title="在 VS Code 中打开"
+									title="在 VS Code 中打开源文件"
 									onClick={() => handleOpenVsCode(post)}
 								>
 									<Icon icon="tabler:brand-vscode" style={{ fontSize: 15 }} />

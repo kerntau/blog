@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { Icon } from '@iconify/react'
-import { adminApi } from '../api'
-import { renderCompiledMdx } from '../../lib/mdx'
+import React, { useMemo } from 'react'
+import { parseAndRenderClientMdc } from '../utils/clientMdcParser'
 import PostHeader from '../../components/post/PostHeader'
 import PostFooter from '../../components/post/PostFooter'
 import PostExcerpt from '../../components/post/PostExcerpt'
@@ -12,128 +10,101 @@ interface MarkdownPreviewProps {
 	content: string
 	frontmatter?: Partial<ArticleProps>
 	showChrome?: boolean
+	scrollContainerRef?: React.RefObject<HTMLDivElement | null>
+}
+
+// 错误边界防止子组件渲染意外异常
+class PreviewErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error?: Error }> {
+	constructor(props: { children: React.ReactNode }) {
+		super(props)
+		this.state = { hasError: false }
+	}
+
+	static getDerivedStateFromError(error: Error) {
+		return { hasError: true, error }
+	}
+
+	componentDidCatch(error: Error) {
+		console.warn('实时预览局部渲染提示:', error)
+	}
+
+	render() {
+		if (this.state.hasError) {
+			return (
+				<div style={{
+					padding: '16px 20px',
+					margin: '16px 0',
+					borderRadius: '8px',
+					background: 'var(--admin-warning-soft)',
+					border: '1px solid var(--admin-warning)',
+					color: 'var(--admin-warning)',
+					fontSize: '13px',
+				}}>
+					<div style={{ fontWeight: 600, marginBottom: 4 }}>渲染容错中</div>
+					<div style={{ opacity: 0.85 }}>正在编辑的内容结构暂未闭合，已自动启用弹性容错回退模式。</div>
+				</div>
+			)
+		}
+		return this.props.children
+	}
 }
 
 export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
 	content,
 	frontmatter = {},
 	showChrome = true,
+	scrollContainerRef,
 }) => {
-	const [debouncedContent, setDebouncedContent] = useState(content)
-	const [compiledCode, setCompiledCode] = useState<string>('')
-	const [compileError, setCompileError] = useState<string | null>(null)
-	const [compiling, setCompiling] = useState(false)
-	const latestReqId = useRef(0)
-
-	// 150ms 防抖更新
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			setDebouncedContent(content)
-		}, 150)
-		return () => clearTimeout(timer)
-	}, [content])
-
-	// 触发后端同源 MDX 编译管道
-	useEffect(() => {
-		if (!debouncedContent.trim()) {
-			setCompiledCode('')
-			setCompileError(null)
-			return
+	// 纯前端 0 延迟即时 Markdown + MDC 宽容解析 (0ms 击键即渲染)
+	const { renderedElements } = useMemo(() => {
+		if (!content || !content.trim()) {
+			return {
+				renderedElements: (
+					<div style={{
+						padding: '48px 0',
+						textAlign: 'center',
+						color: 'var(--admin-text-3)',
+						fontSize: '14px',
+					}}>
+						在此输入文章内容，右侧将 0 延迟同源实时呈现...
+					</div>
+				),
+				toc: [],
+			}
 		}
 
-		const reqId = ++latestReqId.current
-		setCompiling(true)
-
-		adminApi.compilePostMdx(debouncedContent, frontmatter.title)
-			.then((res) => {
-				if (reqId === latestReqId.current) {
-					if (res && res.compiledCode) {
-						setCompiledCode(res.compiledCode)
-						setCompileError(null)
-					}
-					else {
-						setCompiledCode('')
-					}
-				}
+		try {
+			return parseAndRenderClientMdc(content, {
+				title: frontmatter.title,
+				skipFirstH1: true,
 			})
-			.catch((err) => {
-				if (reqId === latestReqId.current) {
-					setCompileError(err.message || 'MDX 编译异常')
-				}
-			})
-			.finally(() => {
-				if (reqId === latestReqId.current) {
-					setCompiling(false)
-				}
-			})
-	}, [debouncedContent, frontmatter.title])
-
-	// 使用前台同源 renderCompiledMdx 运行 React JSX runner
-	const renderedMdxContent = renderCompiledMdx(compiledCode, debouncedContent)
+		}
+		catch (err: any) {
+			console.warn('实时解析异常，回退纯文本:', err)
+			return {
+				renderedElements: <pre className="mdx-raw-fallback">{content}</pre>,
+				toc: [],
+			}
+		}
+	}, [content, frontmatter.title])
 
 	const postTypeClass = getPostTypeClassName(frontmatter.type, { prefix: 'md' })
 
 	return (
-		<div className="admin-live-preview-container" style={{ position: 'relative', width: '100%', minHeight: '100%' }}>
-			{/* 编译中与错误指示微标 */}
-			<div
-				style={{
-					position: 'sticky',
-					top: 8,
-					right: 8,
-					zIndex: 10,
-					display: 'flex',
-					justifyContent: 'flex-end',
-					pointerEvents: 'none',
-					paddingRight: 10,
-				}}
-			>
-				{compiling && (
-					<div
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							gap: 4,
-							background: 'var(--admin-surface)',
-							border: '1px solid var(--admin-border)',
-							padding: '3px 8px',
-							borderRadius: 12,
-							fontSize: 11,
-							color: 'var(--admin-text-3)',
-							boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)',
-						}}
-					>
-						<Icon icon="tabler:loader-2" style={{ animation: 'spin 1s linear infinite' }} />
-						<span>同源编译中...</span>
-					</div>
-				)}
-			</div>
-
-			{/* MDX 语法错误横条 */}
-			{compileError && (
-				<div
-					style={{
-						margin: '8px 16px',
-						padding: '8px 12px',
-						background: 'var(--admin-danger-soft)',
-						border: '1px solid var(--admin-danger)',
-						borderRadius: 6,
-						color: 'var(--admin-danger)',
-						fontSize: 12,
-					}}
-				>
-					<div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
-						<Icon icon="tabler:alert-triangle" />
-						<span>MDX 语法解析提示（正在展示回退视图）</span>
-					</div>
-					<div style={{ marginTop: 4, fontSize: 11, fontFamily: 'var(--admin-font-mono)' }}>
-						{compileError}
-					</div>
-				</div>
-			)}
-
+		<div
+			ref={scrollContainerRef}
+			id="admin-preview-scroll-viewport"
+			className="admin-live-preview-container"
+			style={{
+				position: 'relative',
+				width: '100%',
+				height: '100%',
+				overflowY: 'auto',
+				scrollBehavior: 'smooth',
+			}}
+		>
 			{/* 前台真实文章容器 (100% 像素级复用) */}
-			<div style={{ padding: '24px 20px', maxWidth: 840, margin: '0 auto', width: '100%' }}>
+			<div style={{ padding: '24px 24px 48px', maxWidth: 860, margin: '0 auto', width: '100%' }}>
 				{showChrome && (
 					<>
 						{/* 真实 PostHeader */}
@@ -145,10 +116,10 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
 							categories={frontmatter.categories}
 							tags={frontmatter.tags}
 							readingTime={{
-								text: `${Math.ceil(debouncedContent.length / 400)} min read`,
-								minutes: Math.ceil(debouncedContent.length / 400),
-								time: Math.ceil(debouncedContent.length / 400) * 60000,
-								words: debouncedContent.length,
+								text: `${Math.max(1, Math.ceil(content.length / 400))} min read`,
+								minutes: Math.max(1, Math.ceil(content.length / 400)),
+								time: Math.max(1, Math.ceil(content.length / 400)) * 60000,
+								words: content.length,
 							}}
 							image={frontmatter.image}
 						/>
@@ -160,13 +131,15 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
 					</>
 				)}
 
-				{/* 真实 PostArticle 样式上下文 */}
-				<article className={`article ${postTypeClass}`} style={{ marginTop: showChrome ? 16 : 0 }}>
-					{renderedMdxContent}
+				{/* 真实 PostArticle 样式上下文与 ErrorBoundary 保护 */}
+				<article className={`article ${postTypeClass}`} style={{ marginTop: showChrome ? 20 : 0 }}>
+					<PreviewErrorBoundary>
+						{renderedElements}
+					</PreviewErrorBoundary>
 				</article>
 
 				{showChrome && frontmatter.title && (
-					<div style={{ marginTop: 32 }}>
+					<div style={{ marginTop: 36 }}>
 						<PostFooter
 							path={frontmatter.path || ''}
 							title={frontmatter.title}

@@ -37,20 +37,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
 
 	const staticActions: CommandOption[] = useMemo(() => [
 		{
-			id: 'action-new-post',
-			title: '新建文章 (New Post)',
-			subtitle: '进入 MDX 编辑器开始创作',
-			icon: 'tabler:file-plus',
-			category: 'action',
-			action: () => {
-				onNavigate('posts-new')
-				onClose()
-			},
-		},
-		{
 			id: 'action-dashboard',
 			title: '概览仪表盘 (Dashboard)',
-			subtitle: '查看文章统计、更新趋势与系统指标',
+			subtitle: '总览 · 网站指标、最近内容与系统状态',
 			icon: 'tabler:layout-dashboard',
 			category: 'action',
 			action: () => {
@@ -59,9 +48,20 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
 			},
 		},
 		{
+			id: 'action-new-post',
+			title: '新建文章 (New Post)',
+			subtitle: '内容 · 进入 MDX 编辑器开始创作',
+			icon: 'tabler:file-plus',
+			category: 'action',
+			action: () => {
+				onNavigate('posts-new')
+				onClose()
+			},
+		},
+		{
 			id: 'action-posts',
-			title: '文章工坊 (Post Workshop)',
-			subtitle: '文章列表、草稿箱、分类与多维筛选',
+			title: '文章管理 (Posts)',
+			subtitle: '内容 · 文章列表、筛选、批量操作与历史版本',
 			icon: 'tabler:file-text',
 			category: 'action',
 			action: () => {
@@ -71,8 +71,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
 		},
 		{
 			id: 'action-categories',
-			title: '分类与标签治理 (Categories & Tags)',
-			subtitle: '管理分类图标、主题色与标签矩阵',
+			title: '分类与标签 (Categories & Tags)',
+			subtitle: '内容 · 管理分类图标、主题色与标签矩阵',
 			icon: 'tabler:category',
 			category: 'action',
 			action: () => {
@@ -82,8 +82,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
 		},
 		{
 			id: 'action-feeds',
-			title: '友链治理 (Friend Feeds)',
-			subtitle: '友链分组、FeedCard 实时预览与智能嗅探',
+			title: '友链管理 (Feeds & Friends)',
+			subtitle: '内容 · 友链分组、FeedCard 实时预览与智能嗅探',
 			icon: 'tabler:users-group',
 			category: 'action',
 			action: () => {
@@ -92,9 +92,20 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
 			},
 		},
 		{
+			id: 'action-assets',
+			title: '媒体资源 (Media & Assets)',
+			subtitle: '内容 · 静态图片与文件上传、反向引用安全扫描',
+			icon: 'tabler:photo',
+			category: 'action',
+			action: () => {
+				onNavigate('assets')
+				onClose()
+			},
+		},
+		{
 			id: 'action-nav',
-			title: '导航可视化管理 (Navigation)',
-			subtitle: '拖拽排序、一二级菜单与侧栏导航配置',
+			title: '导航管理 (Navigation)',
+			subtitle: '展示 · 主侧栏导航、底部图标与页脚站点地图',
 			icon: 'tabler:compass',
 			category: 'action',
 			action: () => {
@@ -104,8 +115,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
 		},
 		{
 			id: 'action-widgets',
-			title: '侧栏挂件管理 (Widget Manager)',
-			subtitle: 'BlogStats, BlogTech, CommGroup 等挂件布局',
+			title: '侧栏挂件 (Aside Widgets)',
+			subtitle: '展示 · 博客统计、技术栈、社区群、更新日志卡片内容维护',
 			icon: 'tabler:layout-sidebar',
 			category: 'action',
 			action: () => {
@@ -114,64 +125,20 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
 			},
 		},
 		{
-			id: 'action-pages',
-			title: '页面管理 (Page Builder)',
-			subtitle: '首页、归档、友链等页面元数据与配置',
-			icon: 'tabler:layout',
-			category: 'action',
+			id: 'action-settings',
+			title: '站点设置 (Site Settings)',
+			subtitle: '设置 · 基础信息、作者、SEO、展示策略与内容渲染',
+			icon: 'tabler:settings',
+			category: 'setting',
 			action: () => {
-				onNavigate('pages')
-				onClose()
-			},
-		},
-		{
-			id: 'action-theme',
-			title: '主题与外观管理 (Themes & Appearance)',
-			subtitle: '明暗模式、卡片风格、代码块与排版参数',
-			icon: 'tabler:palette',
-			category: 'action',
-			action: () => {
-				onNavigate('themes')
-				onClose()
-			},
-		},
-		{
-			id: 'action-seo',
-			title: 'SEO 与站点信息 (SEO & Site Info)',
-			subtitle: '全局与文章 SEO 元数据、OpenGraph 卡片配置',
-			icon: 'tabler:world-search',
-			category: 'action',
-			action: () => {
-				onNavigate('seo')
-				onClose()
-			},
-		},
-		{
-			id: 'action-assets',
-			title: '媒体资产库 (Media Assets)',
-			subtitle: '图片上传、检索与博文引用反查',
-			icon: 'tabler:photo',
-			category: 'action',
-			action: () => {
-				onNavigate('assets')
-				onClose()
-			},
-		},
-		{
-			id: 'action-preview-center',
-			title: '独立预览中心 (Preview Center)',
-			subtitle: '多页面、多设备多尺寸实时预览',
-			icon: 'tabler:device-laptop',
-			category: 'action',
-			action: () => {
-				onNavigate('preview-center')
+				onNavigate('settings')
 				onClose()
 			},
 		},
 		{
 			id: 'action-backup',
-			title: '本地数据管理与备份 (Backup & Audit)',
-			subtitle: '全量快照备份、数据还原与操作审计流水',
+			title: '数据备份与体检 (Backup & Integrity)',
+			subtitle: '系统 · 全量数据导出备份、JSON一键还原与体检修复',
 			icon: 'tabler:database',
 			category: 'action',
 			action: () => {
@@ -181,8 +148,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
 		},
 		{
 			id: 'action-console',
-			title: '构建运维控制台 (Build Console)',
-			subtitle: '触发全站静态索引与 Atom XML 构建',
+			title: '构建与运行 (Build & DevOps)',
+			subtitle: '系统 · 触发全站静态索引与 Atom XML 构建刷新',
 			icon: 'tabler:terminal-2',
 			category: 'action',
 			action: () => {

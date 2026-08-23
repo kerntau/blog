@@ -10,12 +10,8 @@ import { CategoryTagView } from './views/CategoryTagView'
 import { FeedManagerView } from './views/FeedManagerView'
 import { NavManagerView } from './views/NavManagerView'
 import { WidgetManagerView } from './views/WidgetManagerView'
-import { PageBuilderView } from './views/PageBuilderView'
-import { ThemeAppearanceView } from './views/ThemeAppearanceView'
-import { SeoManagerView } from './views/SeoManagerView'
-import { PreviewCenterView } from './views/PreviewCenterView'
+import { SettingsView } from './views/SettingsView'
 import { BackupManagerView } from './views/BackupManagerView'
-import { ConfigManagerView } from './views/ConfigManagerView'
 import { AssetManagerView } from './views/AssetManagerView'
 import { ConsoleView } from './views/ConsoleView'
 import { CommandPalette } from './components/CommandPalette'
@@ -82,6 +78,10 @@ export const AdminAppContent: React.FC = () => {
 			setEditingPostPath(params?.path)
 			setActiveTab('editor')
 		}
+		else if (tab === 'seo' || tab === 'themes') {
+			// 旧路由平滑重定向至统一设置中心
+			setActiveTab('settings')
+		}
 		else {
 			setActiveTab(tab)
 		}
@@ -91,7 +91,7 @@ export const AdminAppContent: React.FC = () => {
 		setTheme(theme === 'dark' ? 'light' : 'dark')
 	}
 
-	// 监听快捷键 (Ctrl+K 呼出命令面板, ? 呼出快捷键帮助)
+	// 快捷键监听 (Ctrl+K 命令面板, ? 帮助)
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			const activeTag = (document.activeElement?.tagName || '').toLowerCase()
@@ -131,27 +131,30 @@ export const AdminAppContent: React.FC = () => {
 						/>
 					</div>
 					<div className="brand-info">
-						<span className="brand-title">{siteProfile.authorName} 控制台</span>
-						<span className="brand-badge">Local CMS</span>
+						<span className="brand-title">{siteProfile.title} 控制台</span>
+						<span className="brand-badge">Native Admin</span>
 					</div>
 				</div>
 
 				<nav className="sidebar-nav">
-					<div className="nav-group-title">创作与内容</div>
+					{/* 1. 总览 */}
+					<div className="nav-group-title">总览</div>
 					<div
 						className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
 						onClick={() => handleNavigate('dashboard')}
 					>
 						<Icon icon="tabler:layout-dashboard" className="nav-icon" />
-						<span>概览看板</span>
+						<span>概览仪表盘</span>
 					</div>
 
+					{/* 2. 内容 */}
+					<div className="nav-group-title" style={{ marginTop: 10 }}>内容管理</div>
 					<div
 						className={`nav-item ${activeTab === 'posts' || activeTab === 'editor' ? 'active' : ''}`}
 						onClick={() => handleNavigate('posts')}
 					>
 						<Icon icon="tabler:file-text" className="nav-icon" />
-						<span>文章工坊</span>
+						<span>文章管理</span>
 					</div>
 
 					<div
@@ -162,15 +165,24 @@ export const AdminAppContent: React.FC = () => {
 						<span>分类与标签</span>
 					</div>
 
-					<div className="nav-group-title" style={{ marginTop: 10 }}>挂件与页面</div>
 					<div
-						className={`nav-item ${activeTab === 'widgets' ? 'active' : ''}`}
-						onClick={() => handleNavigate('widgets')}
+						className={`nav-item ${activeTab === 'feeds' ? 'active' : ''}`}
+						onClick={() => handleNavigate('feeds')}
 					>
-						<Icon icon="tabler:layout-sidebar" className="nav-icon" />
-						<span>侧栏挂件工坊</span>
+						<Icon icon="tabler:users-group" className="nav-icon" />
+						<span>友链管理</span>
 					</div>
 
+					<div
+						className={`nav-item ${activeTab === 'assets' ? 'active' : ''}`}
+						onClick={() => handleNavigate('assets')}
+					>
+						<Icon icon="tabler:photo" className="nav-icon" />
+						<span>媒体资源</span>
+					</div>
+
+					{/* 3. 展示 */}
+					<div className="nav-group-title" style={{ marginTop: 10 }}>展示管理</div>
 					<div
 						className={`nav-item ${activeTab === 'navigation' ? 'active' : ''}`}
 						onClick={() => handleNavigate('navigation')}
@@ -180,62 +192,31 @@ export const AdminAppContent: React.FC = () => {
 					</div>
 
 					<div
-						className={`nav-item ${activeTab === 'pages' ? 'active' : ''}`}
-						onClick={() => handleNavigate('pages')}
+						className={`nav-item ${activeTab === 'widgets' ? 'active' : ''}`}
+						onClick={() => handleNavigate('widgets')}
 					>
-						<Icon icon="tabler:layout" className="nav-icon" />
-						<span>自定义页面</span>
+						<Icon icon="tabler:layout-sidebar" className="nav-icon" />
+						<span>侧栏挂件</span>
 					</div>
 
-					<div className="nav-group-title" style={{ marginTop: 10 }}>站点与品牌</div>
+					{/* 4. 设置 */}
+					<div className="nav-group-title" style={{ marginTop: 10 }}>全局配置</div>
 					<div
-						className={`nav-item ${activeTab === 'seo' ? 'active' : ''}`}
-						onClick={() => handleNavigate('seo')}
+						className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+						onClick={() => handleNavigate('settings')}
 					>
-						<Icon icon="tabler:sparkles" className="nav-icon" />
-						<span>站点身份与头像</span>
+						<Icon icon="tabler:settings" className="nav-icon" />
+						<span>站点设置</span>
 					</div>
 
-					<div
-						className={`nav-item ${activeTab === 'themes' ? 'active' : ''}`}
-						onClick={() => handleNavigate('themes')}
-					>
-						<Icon icon="tabler:palette" className="nav-icon" />
-						<span>主题与排版</span>
-					</div>
-
-					<div className="nav-group-title" style={{ marginTop: 10 }}>资产与互联</div>
-					<div
-						className={`nav-item ${activeTab === 'feeds' ? 'active' : ''}`}
-						onClick={() => handleNavigate('feeds')}
-					>
-						<Icon icon="tabler:users-group" className="nav-icon" />
-						<span>友链与订阅源</span>
-					</div>
-
-					<div
-						className={`nav-item ${activeTab === 'assets' ? 'active' : ''}`}
-						onClick={() => handleNavigate('assets')}
-					>
-						<Icon icon="tabler:photo" className="nav-icon" />
-						<span>媒体资产库</span>
-					</div>
-
-					<div
-						className={`nav-item ${activeTab === 'preview-center' ? 'active' : ''}`}
-						onClick={() => handleNavigate('preview-center')}
-					>
-						<Icon icon="tabler:device-laptop" className="nav-icon" />
-						<span>多端预览中心</span>
-					</div>
-
-					<div className="nav-group-title" style={{ marginTop: 10 }}>运维与数据</div>
+					{/* 5. 系统 */}
+					<div className="nav-group-title" style={{ marginTop: 10 }}>系统运维</div>
 					<div
 						className={`nav-item ${activeTab === 'backup' ? 'active' : ''}`}
 						onClick={() => handleNavigate('backup')}
 					>
 						<Icon icon="tabler:database" className="nav-icon" />
-						<span>数据备份与审计</span>
+						<span>数据备份与体检</span>
 					</div>
 
 					<div
@@ -243,20 +224,12 @@ export const AdminAppContent: React.FC = () => {
 						onClick={() => handleNavigate('console')}
 					>
 						<Icon icon="tabler:terminal-2" className="nav-icon" />
-						<span>构建与运维</span>
-					</div>
-
-					<div
-						className={`nav-item ${activeTab === 'config' ? 'active' : ''}`}
-						onClick={() => handleNavigate('config')}
-					>
-						<Icon icon="tabler:code" className="nav-icon" />
-						<span>全局配置源码</span>
+						<span>构建与运行</span>
 					</div>
 				</nav>
 
 				<div className="sidebar-footer">
-					<a href="/" target="_blank" rel="noreferrer" className="footer-btn" title="查看前台博客">
+					<a href="/" target="_blank" rel="noreferrer" className="footer-btn" title="在新标签页查看前台站点">
 						<Icon icon="tabler:external-link" />
 						<span>前台站点</span>
 					</a>
@@ -283,25 +256,21 @@ export const AdminAppContent: React.FC = () => {
 
 						<div className="page-title">
 							{activeTab === 'dashboard' && '概览仪表盘'}
-							{activeTab === 'posts' && '文章内容管理'}
+							{activeTab === 'posts' && '文章管理'}
 							{activeTab === 'editor' && (editingPostPath ? '编辑文章' : '新建文章')}
-							{activeTab === 'categories' && '分类与标签治理'}
-							{activeTab === 'feeds' && '友链与订阅源治理'}
-							{activeTab === 'pages' && '页面管理 (Page Builder)'}
-							{activeTab === 'navigation' && '导航可视化管理'}
-							{activeTab === 'widgets' && '侧边栏挂件工坊 (Widget Studio)'}
-							{activeTab === 'themes' && '主题与排版管理'}
-							{activeTab === 'seo' && '站点身份、头像与品牌工坊'}
-							{activeTab === 'assets' && '媒体资产库'}
-							{activeTab === 'preview-center' && '全站独立预览中心'}
-							{activeTab === 'backup' && '本地数据管理与备份'}
-							{activeTab === 'console' && '构建与运维控制台'}
-							{activeTab === 'config' && '全局配置源码中心'}
+							{activeTab === 'categories' && '分类与标签'}
+							{activeTab === 'feeds' && '友链管理'}
+							{activeTab === 'assets' && '媒体资源'}
+							{activeTab === 'navigation' && '导航管理'}
+							{activeTab === 'widgets' && '侧栏挂件'}
+							{activeTab === 'settings' && '站点设置'}
+							{activeTab === 'backup' && '数据备份与体检'}
+							{activeTab === 'console' && '构建与运行'}
 						</div>
 					</div>
 
 					<div className="topbar-right">
-						{/* 搜索快捷键触发条 */}
+						{/* 全局快捷搜索条 (Ctrl+K) */}
 						<div
 							style={{
 								display: 'flex',
@@ -317,14 +286,14 @@ export const AdminAppContent: React.FC = () => {
 								userSelect: 'none',
 							}}
 							onClick={() => setShowCommandPalette(true)}
-							title="全局搜索与快捷命令 (Ctrl+K)"
+							title="全局功能搜索与快捷命令 (Ctrl+K / ⌘K)"
 						>
 							<Icon icon="tabler:search" />
 							<span>搜索功能 / 文章...</span>
 							<span className="admin-badge badge-secondary" style={{ fontSize: 10, padding: '1px 4px' }}>⌘K</span>
 						</div>
 
-						{/* 服务状态指示 */}
+						{/* API 服务状态指示 */}
 						<div
 							style={{
 								display: 'flex',
@@ -433,29 +402,21 @@ export const AdminAppContent: React.FC = () => {
 
 					{activeTab === 'feeds' && <FeedManagerView />}
 
-					{activeTab === 'pages' && <PageBuilderView />}
-
-					{activeTab === 'navigation' && <NavManagerView />}
-
-					{activeTab === 'widgets' && <WidgetManagerView />}
-
-					{activeTab === 'themes' && <ThemeAppearanceView />}
-
-					{activeTab === 'seo' && <SeoManagerView />}
-
 					{activeTab === 'assets' && (
 						<AssetManagerView
 							onNavigatePost={path => handleNavigate('posts-edit', { path })}
 						/>
 					)}
 
-					{activeTab === 'preview-center' && <PreviewCenterView />}
+					{activeTab === 'navigation' && <NavManagerView />}
+
+					{activeTab === 'widgets' && <WidgetManagerView />}
+
+					{activeTab === 'settings' && <SettingsView />}
 
 					{activeTab === 'backup' && <BackupManagerView />}
 
 					{activeTab === 'console' && <ConsoleView />}
-
-					{activeTab === 'config' && <ConfigManagerView />}
 				</div>
 			</main>
 
