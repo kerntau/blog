@@ -120,25 +120,40 @@ const appConfig = {
 		allowAscending: false,
 	},
 
+	themes: {
+		light: {
+			icon: 'tabler:sun',
+			tip: '浅色模式',
+		},
+		system: {
+			icon: 'tabler:device-desktop',
+			tip: '跟随系统',
+		},
+		dark: {
+			icon: 'tabler:moon',
+			tip: '深色模式',
+		},
+	},
+
 	widgets: {
 		tech: {
 			title: '技术信息',
 			services: [
-				{ label: '部署平台', value: 'vercel', icon: 'logos:vercel-icon', iconColor: '#0052D9' },
+				{ label: '部署平台', value: 'vercel', icon: 'simple-icons:vercel', iconColor: '' },
 				{ label: '图片存储', value: '图仓', icon: 'tabler:photo', iconColor: '#3b6cba' },
 				{ label: '开源协议', value: 'MIT', icon: 'tabler:license', iconColor: '#F59E0B' },
-				{ label: '文章许可', value: blogConfig.copyright.abbr, icon: '', iconColor: '' },
-				{ label: '规范域名', value: 'keru.in', icon: '', iconColor: '' },
+				{ label: '文章许可', value: blogConfig.copyright.abbr, icon: 'tabler:creative-commons', iconColor: '#10B981' },
+				{ label: '规范域名', value: 'keru.in', icon: 'tabler:link', iconColor: '#6366F1' },
 			],
 			techstack: [
 				{ name: 'React', version: '^19.1.0', icon: 'logos:react', iconColor: '' },
-				{ name: 'Rsbuild', version: '^2.1.13', icon: 'tabler:bolt', iconColor: '#F85D00' },
-				{ name: 'TS', version: '^6.0.3', icon: 'devicon:typescript', iconColor: '' },
-				{ name: 'Sass', version: '^1.99.0', icon: 'logos:sass', iconColor: '' },
+				{ name: 'Rsbuild', version: '^2.1.13', icon: '/icons/rsbuild.svg', iconColor: '' },
+				{ name: 'TS', version: '^6.0.3', icon: 'logos:typescript-icon', iconColor: '' },
+				{ name: 'Sass', version: '^1.99.0', icon: 'simple-icons:sass', iconColor: '#CC6699' },
 				{ name: 'MDX', version: '^3.1.1', icon: 'simple-icons:mdx', iconColor: '#FCB32C' },
 				{ name: 'Motion', version: '^12.38.0', icon: 'simple-icons:framer', iconColor: '#0055FF' },
 				{ name: 'Node', version: '^22.17', icon: 'logos:nodejs-icon', iconColor: '' },
-				{ name: 'pnpm', version: '^11.0.4', icon: 'logos:pnpm', iconColor: '' },
+				{ name: 'pnpm', version: '^11.0.4', icon: 'simple-icons:pnpm', iconColor: '#F69220' },
 			],
 		},
 		commGroup: {
@@ -163,21 +178,6 @@ const appConfig = {
 			archive: ['blog-stats', 'blog-log'],
 			home: ['blog-stats', 'blog-tech', 'comm-group'],
 			post: ['toc'],
-		},
-	},
-
-	themes: {
-		light: {
-			icon: 'tabler:sun',
-			tip: '浅色模式',
-		},
-		system: {
-			icon: 'tabler:device-desktop',
-			tip: '跟随系统',
-		},
-		dark: {
-			icon: 'tabler:moon',
-			tip: '深色模式',
 		},
 	},
 }

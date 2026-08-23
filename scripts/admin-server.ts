@@ -1997,16 +1997,10 @@ const server = http.createServer(async (req, res) => {
 				exec('git log -n 5 --oneline', { cwd: rootDir }, (_err2, logStdout) => {
 					const lines = statusStdout.trim().split('\n').filter(Boolean)
 					const modifiedFiles = lines.map((l) => {
-						const match = l.match(/^([A-Z?ADMRCUD!\s]{1,2})\s+(.+)$/)
-						if (match) {
-							return {
-								status: match[1].trim(),
-								file: match[2].trim(),
-							}
+						return {
+							status: l.slice(0, 2).trim(),
+							file: l.slice(3).trim(),
 						}
-						const status = l.slice(0, 2).trim()
-						const file = l.slice(2).trim()
-						return { status, file }
 					})
 					const logs = (logStdout || '').trim().split('\n').filter(Boolean)
 					sendJson(res, 200, {
