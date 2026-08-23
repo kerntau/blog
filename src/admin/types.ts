@@ -143,6 +143,12 @@ export interface WidgetConfigData {
 	tech?: WidgetTechConfig
 	commGroup?: WidgetCommGroupConfig
 	log?: WidgetLogConfig
+	weather?: {
+		title?: string
+		apiKey?: string
+		defaultCity?: string
+		unit?: string
+	}
 }
 
 export interface SiteInfoData {
@@ -161,6 +167,9 @@ export interface SiteInfoData {
 	copyrightAbbr: string
 	emojiTail: string[]
 	logo: string
+	githubUrl?: string
+	bilibiliUrl?: string
+	twitterUrl?: string
 }
 
 export interface AppearanceConfigData {
@@ -289,4 +298,12 @@ export interface ValidationResult {
 	error?: string
 	line?: number
 	column?: number
+}
+
+export interface BackupSnapshotItem {
+	fileName: string
+	size: number
+	createdAt: string
+	postCount: number
+	note?: string
 }

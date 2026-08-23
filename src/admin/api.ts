@@ -2,6 +2,7 @@ import type {
 	AssetFile,
 	AssetReferenceData,
 	AuditLogItem,
+	BackupSnapshotItem,
 	CategoryItem,
 	FeedCheckResult,
 	FeedGroup,
@@ -247,9 +248,25 @@ export const adminApi = {
 			body: JSON.stringify({ path: assetPath }),
 		}),
 
-	// 系统与备份与审计
+	// 系统与备份与快照管理
 	getAuditLogs: () => request<AuditLogItem[]>('/system/audit-logs'),
 	getBackup: () => request<any>('/system/backup'),
+	getBackups: () => request<BackupSnapshotItem[]>('/system/backups'),
+	createSnapshot: (note?: string) =>
+		request<{ message: string, data: { fileName: string } }>('/system/backups/create', {
+			method: 'POST',
+			body: JSON.stringify({ note }),
+		}),
+	restoreSnapshot: (fileName: string) =>
+		request<{ message: string }>('/system/backups/restore-snapshot', {
+			method: 'POST',
+			body: JSON.stringify({ fileName }),
+		}),
+	deleteSnapshot: (fileName: string) =>
+		request<{ message: string }>('/system/backups/delete', {
+			method: 'POST',
+			body: JSON.stringify({ fileName }),
+		}),
 	restoreBackup: (backup: any) =>
 		request<{ message: string }>('/system/restore', {
 			method: 'POST',

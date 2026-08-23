@@ -14,6 +14,7 @@ import { visit } from 'unist-util-visit'
 
 import { calculatePostStats, normalizeFrontmatter, parseArrayField } from '../src/utils/post-meta'
 import { preprocessMdc } from '../src/utils/mdc'
+import { buildStaticData } from './build-static'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const rootDir = path.resolve(__dirname, '..')
@@ -28,6 +29,32 @@ const snapshotsDir = path.join(dataDir, 'post-snapshots')
 
 const PORT = Number(process.env.ADMIN_PORT) || 3001
 const startTime = Date.now()
+
+// ==================== 静态数据自动同步触发器 ====================
+
+let staticBuildTimer: NodeJS.Timeout | null = null
+let isBuildingStatic = false
+
+function triggerStaticBuild(delayMs = 300) {
+	if (staticBuildTimer) {
+		clearTimeout(staticBuildTimer)
+	}
+	staticBuildTimer = setTimeout(async () => {
+		if (isBuildingStatic) return
+		isBuildingStatic = true
+		try {
+			console.log('🔄 后台管理数据变更，正在自动同步静态索引与预编译数据...')
+			await buildStaticData()
+			console.log('✅ 静态索引与预编译数据已自动同步完成')
+		}
+		catch (err) {
+			console.error('❌ 自动同步静态数据失败:', err)
+		}
+		finally {
+			isBuildingStatic = false
+		}
+	}, delayMs)
+}
 
 // ==================== 工具函数 ====================
 
@@ -101,6 +128,15 @@ function walkDir(dir: string, fileList: string[] = []): string[] {
 	return fileList
 }
 
+// 全局配置写入串行互斥队列，彻底消除并发写文件的覆盖竞争
+let configWriteMutex = Promise.resolve()
+
+function runExclusiveConfigTask<T>(task: () => Promise<T>): Promise<T> {
+	const next = configWriteMutex.then(task, task)
+	configWriteMutex = next.then(() => {}, () => {})
+	return next
+}
+
 function generateAppConfigCode(cfg: any): string {
 	const component = cfg.component || {}
 	const alert = component.alert || { defaultStyle: 'card' }
@@ -110,25 +146,49 @@ function generateAppConfigCode(cfg: any): string {
 	const stats = component.stats || { birthYear: 2006, wordCount: '约12万' }
 
 	const footer = cfg.footer || {}
-	const copyright = footer.copyright || `© \${Temporal.Now.plainDateISO().year.toString()} \${blogConfig.author.name}`
+	const copyright = footer.copyright || `© 2026 ${cfg.author?.name || 'kerntau'}`
 	const iconNav = footer.iconNav || [
-		{ icon: 'tabler:home', text: '个人主页', url: blogConfigPath },
 		{ icon: 'tabler:brand-github', text: 'GitHub: kerntau', url: 'https://github.com/kerntau' },
 		{ icon: 'ri:bilibili-line', text: 'Bilibili', url: 'https://space.bilibili.com/9655855' },
 		{ icon: 'tabler:rss', text: 'Atom订阅', url: '/atom.xml' },
+		{ icon: 'tabler:brand-twitter', text: 'X (Twitter)', url: 'https://x.com/Kerntao' },
 	]
 	const footerNav = footer.nav || []
 
 	const header = cfg.header || {}
-	const _headerLogo = header.logo || '/og-image.jpg'
+	const headerLogo = header.logo || '/avatar.webp'
 	const showTitle = header.showTitle !== undefined ? header.showTitle : true
-	const _subtitle = header.subtitle || '心中有景,花香满径'
-	const emojiTail = header.emojiTail || ['💻', '⚡', '☕', '🚀']
+	const subtitle = header.subtitle || '心中有景,花香满径'
+	const emojiTail = header.emojiTail || ['🌈', '☕', '💡', '🦄', '🎯']
 
 	const link = cfg.link || { remindNoFeed: true, randomInGroup: true }
-	const nav = cfg.nav || []
-	const pagination = cfg.pagination || { perPage: 10, sortOrder: 'date', allowAscending: false }
+	const nav = cfg.nav || [
+		{
+			title: '',
+			items: [
+				{ icon: 'tabler:files', text: '文章', url: '/' },
+				{ icon: 'tabler:category', text: '分类', url: '/categories' },
+				{ icon: 'tabler:archive', text: '归档', url: '/archive' },
+				{ icon: 'tabler:link', text: '友链', url: '/link' },
+			],
+		},
+	]
+	const pagination = cfg.pagination || { perPage: 12, sortOrder: 'date', allowAscending: false }
 	const widgets = cfg.widgets || {}
+	const themes = cfg.themes || {
+		light: {
+			icon: 'tabler:sun',
+			tip: '浅色模式',
+		},
+		system: {
+			icon: 'tabler:device-desktop',
+			tip: '跟随系统',
+		},
+		dark: {
+			icon: 'tabler:moon',
+			tip: '深色模式',
+		},
+	}
 
 	let code = `import type { Nav, NavItem } from '@/types/nav'
 import blogConfig from '../blog.config'
@@ -149,15 +209,15 @@ const appConfig = {
 
 		codeblock: {
 			/** 代码块触发折叠的行数 */
-			triggerRows: ${codeblock.triggerRows || 32},
+			triggerRows: ${Number(codeblock.triggerRows) || 32},
 			/** 代码块折叠后的行数 */
-			collapsedRows: ${codeblock.collapsedRows || 16},
+			collapsedRows: ${Number(codeblock.collapsedRows) || 16},
 			/** 启用代码块缩进导航会关闭空格渲染 */
 			enableIndentGuide: ${Boolean(codeblock.enableIndentGuide)},
 			/** 代码块缩进导航(Indent Guige)竖线匹配空格数 */
-			indent: ${codeblock.indent || 4},
+			indent: ${Number(codeblock.indent) || 4},
 			/** tab渲染宽度 */
-			tabSize: ${codeblock.tabSize || 3},
+			tabSize: ${Number(codeblock.tabSize) || 3},
 		},
 
 		/** 文章开头摘要 */
@@ -174,7 +234,7 @@ const appConfig = {
 
 		stats: {
 			/** 归档页面每年标题对应的年龄 */
-			birthYear: ${stats.birthYear || 2006},
+			birthYear: ${Number(stats.birthYear) || 2006},
 			/** blog-stats widget 的预置文本 */
 			wordCount: '${(stats.wordCount || '约12万').replace(/'/g, '\\\'')}',
 		},
@@ -188,7 +248,7 @@ const appConfig = {
 		iconNav: [\n`
 
 	for (const item of iconNav) {
-		const urlVal = item.url === 'blogConfig.author.homepage' || item.url === 'https://blog.cot.wiki/'
+		const urlVal = item.url === 'blogConfig.author.homepage'
 			? 'blogConfig.author.homepage'
 			: `'${(item.url || '').replace(/'/g, '\\\'')}'`
 		code += `\t\t\t{ icon: '${(item.icon || '').replace(/'/g, '\\\'')}', text: '${(item.text || '').replace(/'/g, '\\\'')}', url: ${urlVal} },\n`
@@ -210,10 +270,10 @@ const appConfig = {
 
 	/** 左侧栏顶部 Logo (与博主头像保持同一权威数据源) */
 	header: {
-		logo: blogConfig.author.avatar,
+		logo: ${headerLogo === 'blogConfig.author.avatar' ? 'blogConfig.author.avatar' : `'${headerLogo.replace(/'/g, '\\\'')}'`},
 		/** 展示标题文本，否则展示纯 Logo */
 		showTitle: ${Boolean(showTitle)},
-		subtitle: blogConfig.subtitle,
+		subtitle: ${subtitle === 'blogConfig.subtitle' ? 'blogConfig.subtitle' : `'${subtitle.replace(/'/g, '\\\'')}'`},
 		emojiTail: [${(emojiTail || []).map((e: string) => `'${e.replace(/'/g, '\\\'')}'`).join(', ')}],
 	},
 
@@ -239,12 +299,21 @@ const appConfig = {
 	code += `\t] satisfies Nav,
 
 	pagination: {
-		perPage: ${pagination.perPage || 10},
+		perPage: ${Number(pagination.perPage) || 12},
 		/** 默认排序方式，需要是 this.article.order 中的键名 */
 		sortOrder: '${pagination.sortOrder || 'date'}' as keyof typeof blogConfig.article.order,
 		/** 允许（普通/预览/归档）文章列表正序，开启后排序方式左侧图标可切换顺序 */
 		allowAscending: ${Boolean(pagination.allowAscending)},
 	},
+
+	themes: {\n`
+
+	for (const [themeName, themeData] of Object.entries(themes)) {
+		const t = themeData as any
+		code += `\t\t${themeName}: {\n\t\t\ticon: '${(t.icon || '').replace(/'/g, '\\\'')}',\n\t\t\ttip: '${(t.tip || '').replace(/'/g, '\\\'')}',\n\t\t},\n`
+	}
+
+	code += `\t},
 
 	widgets: {
 		tech: {
@@ -252,7 +321,9 @@ const appConfig = {
 			services: [\n`
 
 	for (const s of (widgets.tech?.services || [])) {
-		const valExpr = s.value === 'CC BY-NC-SA 4.0' ? 'blogConfig.copyright.abbr' : `'${(s.value || '').replace(/'/g, '\\\'')}'`
+		const valExpr = s.value === 'CC BY-NC-SA 4.0' || s.value === 'blogConfig.copyright.abbr'
+			? 'blogConfig.copyright.abbr'
+			: `'${(s.value || '').replace(/'/g, '\\\'')}'`
 		code += `\t\t\t\t{ label: '${(s.label || '').replace(/'/g, '\\\'')}', value: ${valExpr}, icon: '${(s.icon || '').replace(/'/g, '\\\'')}', iconColor: '${(s.iconColor || '').replace(/'/g, '\\\'')}' },\n`
 	}
 	code += `\t\t\t],\n\t\t\ttechstack: [\n`
@@ -263,8 +334,8 @@ const appConfig = {
 
 	code += `\t\tcommGroup: {
 			title: '${(widgets.commGroup?.title || '博客/技术社区').replace(/'/g, '\\\'')}',
-			groupName: '${(widgets.commGroup?.groupName || '纸网接入点').replace(/'/g, '\\\'')}',
-			account: '${(widgets.commGroup?.account || '169994096').replace(/'/g, '\\\'')}',
+			groupName: '${(widgets.commGroup?.groupName || '序栈接入点').replace(/'/g, '\\\'')}',
+			account: '${(widgets.commGroup?.account || '1722288011').replace(/'/g, '\\\'')}',
 			icon: '${(widgets.commGroup?.icon || 'ri:qq-fill').replace(/'/g, '\\\'')}',
 			bgImg: '${(widgets.commGroup?.bgImg || '').replace(/'/g, '\\\'')}',
 		},\n`
@@ -273,7 +344,9 @@ const appConfig = {
 			title: '${(widgets.log?.title || '更新日志').replace(/'/g, '\\\'')}',
 			items: [\n`
 	for (const item of (widgets.log?.items || [])) {
-		const dateExpr = item.date === '2025-11-10' ? 'blogConfig.timeEstablished' : `'${(item.date || '').replace(/'/g, '\\\'')}'`
+		const dateExpr = item.date === '2025-11-10' || item.date === 'blogConfig.timeEstablished'
+			? 'blogConfig.timeEstablished'
+			: `'${(item.date || '').replace(/'/g, '\\\'')}'`
 		code += `\t\t\t\t{ date: ${dateExpr}, content: '${(item.content || '').replace(/'/g, '\\\'')}' },\n`
 	}
 	code += `\t\t\t],\n\t\t},\n`
@@ -284,21 +357,6 @@ const appConfig = {
 		code += `\t\t\t${pageKey}: [${(widgetIds as string[]).map(id => `'${id}'`).join(', ')}],\n`
 	}
 	code += `\t\t},\n\t},
-
-	themes: {
-		light: {
-			icon: 'tabler:sun',
-			tip: '浅色模式',
-		},
-		system: {
-			icon: 'tabler:device-desktop',
-			tip: '跟随系统',
-		},
-		dark: {
-			icon: 'tabler:moon',
-			tip: '深色模式',
-		},
-	},
 }
 
 export type AppConfig = typeof appConfig
@@ -309,11 +367,160 @@ export default appConfig
 }
 
 async function updateAppConfigFile(updater: (currentConfig: any) => any) {
-	const mod = await import(`../src/app.config.ts?t=${Date.now()}`)
-	const current = mod.default || {}
-	const updated = updater(current)
-	const newTsCode = generateAppConfigCode(updated)
-	safeWriteFileSync(appConfigPath, newTsCode)
+	return runExclusiveConfigTask(async () => {
+		const mod = await import(`../src/app.config.ts?t=${Date.now()}`)
+		const current = mod.default || {}
+		const updated = updater(current)
+		const newTsCode = generateAppConfigCode(updated)
+		safeWriteFileSync(appConfigPath, newTsCode)
+	})
+}
+
+function generateBlogConfigCode(cfg: any, myFeedData: any): string {
+	const basic = {
+		title: cfg.title || '序栈',
+		subtitle: cfg.subtitle || '心中有景,花香满径',
+		description: cfg.description || '在有序的世界里，寻一处生活的归栈。用理性梳理日常，用技术温柔时光，不慌不忙，自在生长。',
+		author: {
+			name: cfg.author?.name || 'kerntau',
+			avatar: cfg.author?.avatar || '/avatar.webp',
+			email: cfg.author?.email || '1722288011@qq.com',
+			homepage: cfg.author?.homepage || 'https://keru.in/',
+		},
+		copyright: {
+			abbr: cfg.copyright?.abbr || 'CC BY-NC-SA 4.0',
+			name: cfg.copyright?.name || '署名-非商业性使用-相同方式共享 4.0 国际',
+			url: cfg.copyright?.url || cfg.author?.homepage || 'https://keru.in/',
+		},
+		favicon: cfg.favicon || '/favicon.ico',
+		language: cfg.language || 'zh-CN',
+		timeEstablished: cfg.timeEstablished || '2025-11-10',
+		timeZone: cfg.timeZone || 'Asia/Shanghai',
+		url: cfg.url || 'https://keru.in/',
+		defaultCategory: cfg.defaultCategory || '前端开发',
+	}
+
+	const article = cfg.article || {}
+	const categories = { ...(article.categories || {}) }
+	if (!categories[basic.defaultCategory]) {
+		categories[basic.defaultCategory] = { icon: 'tabler:browser', color: '#33aaff' }
+	}
+
+	const types = article.types || { tech: {}, story: {} }
+	const order = article.order || { date: '创建日期', updated: '更新日期' }
+	const useRandomPremalink = Boolean(article.useRandomPremalink)
+	const hidePostPrefix = article.hidePostPrefix !== undefined ? Boolean(article.hidePostPrefix) : true
+	const robotsNotIndex = article.robotsNotIndex || ['/preview', '/previews/*']
+	const feed = cfg.feed || { limit: 50, enableStyle: true }
+	const scripts = cfg.scripts || []
+	const twikoo = cfg.twikoo || { envId: '', preload: '' }
+
+	let code = `import type { FeedEntry } from './src/types/feed'\n\n`
+	code += `const basicConfig = {\n`
+	code += `\ttitle: '${basic.title.replace(/'/g, '\\\'')}',\n`
+	code += `\tsubtitle: '${basic.subtitle.replace(/'/g, '\\\'')}',\n`
+	code += `\t// 长 description 利好于 SEO\n`
+	code += `\tdescription: '${basic.description.replace(/'/g, '\\\'')}',\n`
+	code += `\tauthor: {\n`
+	code += `\t\tname: '${basic.author.name.replace(/'/g, '\\\'')}',\n`
+	code += `\t\tavatar: '${basic.author.avatar.replace(/'/g, '\\\'')}',\n`
+	code += `\t\temail: '${basic.author.email.replace(/'/g, '\\\'')}',\n`
+	code += `\t\thomepage: '${basic.author.homepage.replace(/'/g, '\\\'')}',\n`
+	code += `\t},\n`
+	code += `\tcopyright: {\n`
+	code += `\t\tabbr: '${basic.copyright.abbr.replace(/'/g, '\\\'')}',\n`
+	code += `\t\tname: '${basic.copyright.name.replace(/'/g, '\\\'')}',\n`
+	code += `\t\turl: '${basic.copyright.url.replace(/'/g, '\\\'')}',\n`
+	code += `\t},\n`
+	code += `\tfavicon: '${basic.favicon.replace(/'/g, '\\\'')}',\n`
+	code += `\tlanguage: '${basic.language.replace(/'/g, '\\\'')}',\n`
+	code += `\ttimeEstablished: '${basic.timeEstablished.replace(/'/g, '\\\'')}',\n`
+	code += `\ttimeZone: '${basic.timeZone.replace(/'/g, '\\\'')}',\n`
+	code += `\turl: '${basic.url.replace(/'/g, '\\\'')}',\n`
+	code += `\tdefaultCategory: '${basic.defaultCategory.replace(/'/g, '\\\'')}',\n`
+	code += `}\n\n`
+
+	code += `// 存储 next.config 和 app.config 共用的配置\n`
+	code += `// 此处为启动时需要的配置，启动后可变配置位于 src/app.config.ts\n`
+	code += `// @keep-sorted\n`
+	code += `const blogConfig = {\n`
+	code += `\t...basicConfig,\n\n`
+	code += `\tarticle: {\n`
+	code += `\t\tcategories: {\n`
+	code += `\t\t\t[basicConfig.defaultCategory]: { icon: '${categories[basic.defaultCategory]?.icon || 'tabler:browser'}', color: '${categories[basic.defaultCategory]?.color || '#33aaff'}' },\n`
+	for (const [catName, catMeta] of Object.entries(categories)) {
+		if (catName === basic.defaultCategory) continue
+		code += `\t\t\t'${catName.replace(/'/g, '\\\'')}': { icon: '${(catMeta as any)?.icon || 'tabler:folder'}', color: '${(catMeta as any)?.color || '#33aaff'}' },\n`
+	}
+	code += `\t\t},\n`
+	code += `\t\t/** 文章版式，首个为默认版式 */\n`
+	code += `\t\ttypes: {\n`
+	for (const t of Object.keys(types)) {
+		code += `\t\t\t${t}: {},\n`
+	}
+	code += `\t\t},\n`
+	code += `\t\t/** 分类排序方式，键为排序字段，值为显示名称 */\n`
+	code += `\t\torder: {\n`
+	for (const [k, v] of Object.entries(order)) {
+		code += `\t\t\t${k}: '${String(v).replace(/'/g, '\\\'')}',\n`
+	}
+	code += `\t\t},\n`
+	code += `\t\t/** 使用 pnpm new 新建文章时自动生成自定义链接（permalink/abbrlink） */\n`
+	code += `\t\tuseRandomPremalink: ${useRandomPremalink},\n`
+	code += `\t\t/** 隐藏基于文件路由（不是自定义链接）的 URL /post 路径前缀 */\n`
+	code += `\t\thidePostPrefix: ${hidePostPrefix},\n`
+	code += `\t\t/** 禁止搜索引擎收录的路径 */\n`
+	code += `\t\trobotsNotIndex: [${robotsNotIndex.map((r: string) => `'${r.replace(/'/g, '\\\'')}'`).join(', ')}],\n`
+	code += `\t},\n\n`
+
+	code += `\t/** 博客 Atom 订阅源 */\n`
+	code += `\tfeed: {\n`
+	code += `\t\t/** 订阅源最大文章数量 */\n`
+	code += `\t\tlimit: ${feed.limit || 50},\n`
+	code += `\t\t/** 订阅源是否启用XSLT样式 */\n`
+	code += `\t\tenableStyle: ${Boolean(feed.enableStyle)},\n`
+	code += `\t},\n\n`
+
+	code += `\t/** 向 <head> 中添加脚本 */\n`
+	code += `\tscripts: [${scripts.map((s: string) => `'${s.replace(/'/g, '\\\'')}'`).join(', ')}],\n\n`
+
+	code += `\t/** 自己部署的 Twikoo 服务 */\n`
+	code += `\ttwikoo: {\n`
+	code += `\t\tenvId: '${(twikoo.envId || '').replace(/'/g, '\\\'')}',\n`
+	code += `\t\tpreload: '${(twikoo.preload || '').replace(/'/g, '\\\'')}',\n`
+	code += `\t},\n`
+	code += `}\n\n`
+
+	const mf = myFeedData || {}
+	code += `/** 用于生成 OPML 和友链页面配置 */\n`
+	code += `export const myFeed: FeedEntry = {\n`
+	code += `\tauthor: blogConfig.author.name,\n`
+	code += `\tsitenick: '${(mf.sitenick || '').replace(/'/g, '\\\'')}',\n`
+	code += `\ttitle: blogConfig.title,\n`
+	code += `\tdesc: blogConfig.subtitle || blogConfig.description,\n`
+	code += `\tlink: blogConfig.url,\n`
+	code += `\tfeed: new URL('/atom.xml', blogConfig.url).toString(),\n`
+	code += `\ticon: blogConfig.favicon,\n`
+	code += `\tavatar: blogConfig.author.avatar,\n`
+	const archs = Array.isArray(mf.archs) && mf.archs.length > 0 ? mf.archs : ['React', 'Rsbuild']
+	code += `\tarchs: [${archs.map((a: string) => `'${a.replace(/'/g, '\\\'')}'`).join(', ')}],\n`
+	code += `\tdate: blogConfig.timeEstablished,\n`
+	code += `\tcomment: '${(mf.comment || '这是我自己').replace(/'/g, '\\\'')}',\n`
+	code += `}\n\n`
+	code += `export default blogConfig\n`
+
+	return code
+}
+
+async function updateBlogConfigFile(updater: (currentBlog: any, currentMyFeed: any) => { blogConfig: any, myFeed: any }) {
+	return runExclusiveConfigTask(async () => {
+		const blogMod = await import(`../blog.config.ts?t=${Date.now()}`)
+		const currentBlog = blogMod.default || {}
+		const currentMyFeed = blogMod.myFeed || {}
+		const { blogConfig: updatedBlog, myFeed: updatedMyFeed } = updater(currentBlog, currentMyFeed)
+		const newTsCode = generateBlogConfigCode(updatedBlog, updatedMyFeed)
+		safeWriteFileSync(blogConfigPath, newTsCode)
+	})
 }
 
 // ==================== 审计日志与版本快照 ====================
@@ -894,6 +1101,7 @@ const server = http.createServer(async (req, res) => {
 			safeWriteFileSync(targetPath, fileContent)
 
 			recordAuditLog('修改文章', fm.title || slug, `保存并更新了文章《${fm.title || slug}》`)
+			triggerStaticBuild()
 
 			sendJson(res, 200, {
 				code: 0,
@@ -963,6 +1171,7 @@ const server = http.createServer(async (req, res) => {
 
 			savePostSnapshot(slug, targetPath, initialContent, fm, '新建初始版本')
 			recordAuditLog('创建文章', body.title, `创建新文章《${body.title}》`)
+			triggerStaticBuild()
 
 			sendJson(res, 200, {
 				code: 0,
@@ -995,6 +1204,7 @@ const server = http.createServer(async (req, res) => {
 
 			fs.unlinkSync(targetPath)
 			recordAuditLog('删除文章', path.basename(targetPath), `删除了文章 ${path.basename(targetPath)}`)
+			triggerStaticBuild()
 			sendJson(res, 200, { code: 0, message: '文章已安全删除' })
 			return
 		}
@@ -1079,6 +1289,7 @@ const server = http.createServer(async (req, res) => {
 			safeWriteFileSync(targetPath, fileContent)
 
 			recordAuditLog('恢复历史版本', body.slug, `恢复文章《${body.slug}》到快照 ${snapshotData.timestamp}`)
+			triggerStaticBuild()
 
 			sendJson(res, 200, {
 				code: 0,
@@ -1132,6 +1343,7 @@ const server = http.createServer(async (req, res) => {
 			}
 
 			recordAuditLog('批量操作', `${body.action}`, `对 ${modifiedCount} 篇文章执行了批量 ${body.action} 操作`)
+			triggerStaticBuild()
 
 			sendJson(res, 200, {
 				code: 0,
@@ -1205,17 +1417,24 @@ const server = http.createServer(async (req, res) => {
 				return
 			}
 
-			const raw = fs.readFileSync(blogConfigPath, 'utf-8')
-			let categoriesBlock = 'categories: {\n'
-			for (const c of body.categories) {
-				categoriesBlock += `\t\t\t'${c.name.replace(/'/g, '\\\'')}': { icon: '${c.icon}', color: '${c.color}' },\n`
-			}
-			categoriesBlock += '\t\t},'
-
-			const updated = raw.replace(/categories:\s*\{[\s\S]*?\},/, categoriesBlock)
-			safeWriteFileSync(blogConfigPath, updated)
+			await updateBlogConfigFile((currentBlog, currentMyFeed) => {
+				const article = { ...currentBlog.article }
+				const newCategories: Record<string, { icon: string, color: string }> = {}
+				for (const c of body.categories) {
+					newCategories[c.name] = { icon: c.icon, color: c.color }
+				}
+				article.categories = newCategories
+				return {
+					blogConfig: {
+						...currentBlog,
+						article,
+					},
+					myFeed: currentMyFeed,
+				}
+			})
 
 			recordAuditLog('修改分类', 'blog.config.ts', `更新了 ${body.categories.length} 个分类定义`)
+			triggerStaticBuild()
 
 			sendJson(res, 200, { code: 0, message: '分类配置已保存生效' })
 			return
@@ -1270,6 +1489,7 @@ const server = http.createServer(async (req, res) => {
 			}
 
 			recordAuditLog('重命名标签', `${body.oldName} -> ${body.newName}`, `更新了 ${affectedCount} 篇文章的标签`)
+			triggerStaticBuild()
 
 			sendJson(res, 200, { code: 0, message: `已重命名标签，影响 ${affectedCount} 篇文章` })
 			return
@@ -1298,56 +1518,27 @@ const server = http.createServer(async (req, res) => {
 		// 18. POST /api/nav/save - 保存全量导航与页脚配置
 		if (method === 'POST' && pathname === '/api/nav/save') {
 			const body = await parseJsonBody<{ nav?: any[], footerNav?: any[], iconNav?: any[], copyright?: string }>(req)
-			let appRaw = fs.readFileSync(appConfigPath, 'utf-8')
 
-			// 1. 更新主侧栏导航 (nav)
-			if (body.nav && Array.isArray(body.nav)) {
-				let navStr = 'nav: [\n'
-				for (const group of body.nav) {
-					navStr += `\t\t{\n\t\t\ttitle: '${(group.title || '').replace(/'/g, '\\\'')}',\n\t\t\titems: [\n`
-					for (const item of group.items || []) {
-						navStr += `\t\t\t\t{ icon: '${(item.icon || '').replace(/'/g, '\\\'')}', text: '${(item.text || '').replace(/'/g, '\\\'')}', url: '${(item.url || '').replace(/'/g, '\\\'')}' },\n`
-					}
-					navStr += `\t\t\t],\n\t\t},\n`
+			await updateAppConfigFile((current) => {
+				const footer = { ...current.footer }
+
+				if (body.iconNav && Array.isArray(body.iconNav)) {
+					footer.iconNav = body.iconNav
 				}
-				navStr += '\t] satisfies Nav,'
-				appRaw = appRaw.replace(/nav:\s*\[[\s\S]*?\]\s*satisfies\s*Nav,/, navStr)
-			}
-
-			// 2. 更新侧栏底部图标导航 (iconNav)
-			if (body.iconNav && Array.isArray(body.iconNav)) {
-				let iconNavStr = 'iconNav: [\n'
-				for (const item of body.iconNav) {
-					iconNavStr += `\t\t\t{ icon: '${(item.icon || '').replace(/'/g, '\\\'')}', text: '${(item.text || '').replace(/'/g, '\\\'')}', url: '${(item.url || '').replace(/'/g, '\\\'')}' },\n`
+				if (body.footerNav && Array.isArray(body.footerNav)) {
+					footer.nav = body.footerNav
 				}
-				iconNavStr += '\t\t] satisfies NavItem[],'
-				appRaw = appRaw.replace(/iconNav:\s*\[[\s\S]*?\]\s*satisfies\s*NavItem\[\],/, iconNavStr)
-			}
-
-			// 3. 更新页脚站点地图 (footer.nav)
-			if (body.footerNav && Array.isArray(body.footerNav)) {
-				let footerNavStr = 'nav: [\n'
-				for (const group of body.footerNav) {
-					footerNavStr += `\t\t\t{\n\t\t\t\ttitle: '${(group.title || '').replace(/'/g, '\\\'')}',\n\t\t\t\titems: [\n`
-					for (const item of group.items || []) {
-						footerNavStr += `\t\t\t\t\t{ icon: '${(item.icon || '').replace(/'/g, '\\\'')}', text: '${(item.text || '').replace(/'/g, '\\\'')}', url: '${(item.url || '').replace(/'/g, '\\\'')}' },\n`
-					}
-					footerNavStr += `\t\t\t\t],\n\t\t\t},\n`
+				if (body.copyright !== undefined) {
+					footer.copyright = body.copyright
 				}
-				footerNavStr += '\t\t] satisfies Nav,'
-				appRaw = appRaw.replace(/footer:\s*\{[\s\S]*?nav:\s*\[[\s\S]*?\]\s*satisfies\s*Nav,/, (match) => {
-					return match.replace(/nav:\s*\[[\s\S]*?\]\s*satisfies\s*Nav,/, footerNavStr)
-				})
-			}
 
-			// 4. 更新版权文本 (copyright)
-			if (body.copyright !== undefined) {
-				if (body.copyright.startsWith('`') || body.copyright.startsWith('©')) {
-					appRaw = appRaw.replace(/copyright:\s*[`'"].*?[`'"]/, `copyright: \`${body.copyright.replace(/`/g, '\\`')}\``)
+				return {
+					...current,
+					nav: body.nav && Array.isArray(body.nav) ? body.nav : (current.nav || []),
+					footer,
 				}
-			}
+			})
 
-			safeWriteFileSync(appConfigPath, appRaw)
 			recordAuditLog('修改导航与页脚', 'app.config.ts', '保存更新了侧栏菜单、底部社交图标与页脚站点地图')
 
 			sendJson(res, 200, { code: 0, message: '全量导航、社交图标与页脚站点地图配置已更新保存！' })
@@ -1357,10 +1548,11 @@ const server = http.createServer(async (req, res) => {
 		// 19. GET /api/widgets - 侧边栏挂件管理器 (全量数据读取)
 		if (method === 'GET' && pathname === '/api/widgets') {
 			const appConfigModule = await import(`../src/app.config.ts?t=${Date.now()}`)
-			const statsConfig = appConfigModule.default?.component?.stats || { birthYear: 2006, wordCount: '约10万' }
+			const statsConfig = appConfigModule.default?.component?.stats || { birthYear: 2006, wordCount: '约12万' }
 			const rawWidgets = appConfigModule.default?.widgets || {}
 
 			const availableWidgets = [
+				{ id: 'blog-weather', name: '心知天气 (BlogWeather)', icon: 'tabler:cloud-sun', description: '展示实时天气现象、气温与未来3天逐日预报' },
 				{ id: 'blog-stats', name: '博客统计 (BlogStats)', icon: 'tabler:chart-bar', description: '展示博文篇数、字数及建站年份' },
 				{ id: 'blog-tech', name: '技术栈矩阵 (BlogTech)', icon: 'tabler:stack-2', description: '前台技术体系与架构徽标展示' },
 				{ id: 'comm-group', name: '社区交流群 (CommGroup)', icon: 'tabler:users', description: 'QQ/微信交流群与二维码' },
@@ -1369,10 +1561,17 @@ const server = http.createServer(async (req, res) => {
 			]
 
 			const pageAsideMappings = rawWidgets.pageAsideMappings || {
-				home: ['blog-stats', 'blog-tech', 'comm-group'],
+				home: ['blog-weather', 'blog-stats', 'blog-tech', 'comm-group'],
 				archive: ['blog-stats', 'blog-log'],
 				post: ['toc'],
 				link: ['blog-stats', 'comm-group'],
+			}
+
+			const weather = rawWidgets.weather || {
+				title: '实时天气',
+				apiKey: 'SvyX4Wvh0a',
+				defaultCity: 'beijing',
+				unit: 'c',
 			}
 
 			const tech = rawWidgets.tech || {
@@ -1381,25 +1580,25 @@ const server = http.createServer(async (req, res) => {
 					{ label: '部署平台', value: 'EdgeOne', icon: 'ri:tencent-cloud-fill', iconColor: '#0052D9' },
 					{ label: '图片存储', value: 'Cloudflare R2', icon: 'devicon:cloudflare', iconColor: '' },
 					{ label: '开源协议', value: 'MIT', icon: 'tabler:license', iconColor: '#F59E0B' },
-					{ label: '文章许可', value: 'CC BY-NC-SA 4.0', icon: '', iconColor: '' },
-					{ label: '规范域名', value: 'cot.wiki', icon: '', iconColor: '' },
+					{ label: '文章许可', value: 'CC BY-NC-SA 4.0', icon: 'tabler:creative-commons', iconColor: '#10B981' },
+					{ label: '规范域名', value: 'cot.wiki', icon: 'tabler:link', iconColor: '#6366F1' },
 				],
 				techstack: [
-					{ name: 'React', version: '^19.0.0', icon: 'logos:react', iconColor: '' },
+					{ name: 'React', version: '^19.1.0', icon: 'logos:react', iconColor: '' },
 					{ name: 'Rsbuild', version: '^2.1.13', icon: 'tabler:bolt', iconColor: '#F85D00' },
-					{ name: 'TS', version: '^5.8.0', icon: 'logos:typescript-icon', iconColor: '' },
-					{ name: 'MDX', version: '^3.1.0', icon: 'simple-icons:mdx', iconColor: '#FCB32C' },
-					{ name: 'Node', version: '^22.0.0', icon: 'logos:nodejs-icon', iconColor: '' },
+					{ name: 'TS', version: '^6.0.3', icon: 'logos:typescript-icon', iconColor: '' },
+					{ name: 'MDX', version: '^3.1.1', icon: 'simple-icons:mdx', iconColor: '#FCB32C' },
+					{ name: 'Node', version: '^22.17', icon: 'logos:nodejs-icon', iconColor: '' },
 					{ name: 'pnpm', version: '11.0.4', icon: 'logos:pnpm', iconColor: '' },
-					{ name: 'Motion', version: '^12.4.7', icon: 'simple-icons:framer', iconColor: '#0055FF' },
+					{ name: 'Motion', version: '^12.38.0', icon: 'simple-icons:framer', iconColor: '#0055FF' },
 					{ name: 'Sass', version: '^1.99.0', icon: 'logos:sass', iconColor: '' },
 				],
 			}
 
 			const commGroup = rawWidgets.commGroup || {
 				title: '博客/技术社区',
-				groupName: '纸网接入点',
-				account: '169994096',
+				groupName: '序栈接入点',
+				account: '1722288011',
 				icon: 'ri:qq-fill',
 				bgImg: '',
 			}
@@ -1420,6 +1619,7 @@ const server = http.createServer(async (req, res) => {
 					availableWidgets,
 					pageAsideMappings,
 					statsConfig,
+					weather,
 					tech,
 					commGroup,
 					log,
@@ -1432,6 +1632,7 @@ const server = http.createServer(async (req, res) => {
 		if (method === 'POST' && pathname === '/api/widgets/save') {
 			const body = await parseJsonBody<{
 				pageAsideMappings?: Record<string, string[]>
+				weather?: any
 				tech?: any
 				commGroup?: any
 				log?: any
@@ -1439,12 +1640,15 @@ const server = http.createServer(async (req, res) => {
 			}>(req)
 
 			await updateAppConfigFile((current) => {
-				const widgets = current.widgets || {}
-				const component = current.component || {}
-				const stats = component.stats || {}
+				const widgets = { ...current.widgets }
+				const component = { ...current.component }
+				const stats = { ...component.stats }
 
 				if (body.pageAsideMappings) {
 					widgets.pageAsideMappings = body.pageAsideMappings
+				}
+				if (body.weather) {
+					widgets.weather = body.weather
 				}
 				if (body.tech) {
 					widgets.tech = body.tech
@@ -1477,6 +1681,36 @@ const server = http.createServer(async (req, res) => {
 			return
 		}
 
+		// 19.12 GET /api/weather - 心知天气实况代理
+		if (method === 'GET' && pathname === '/api/weather') {
+			const loc = (parsedUrl.searchParams.get('location') || 'ip').trim()
+			const appConfigModule = await import(`../src/app.config.ts?t=${Date.now()}`)
+			const apiKey = appConfigModule.default?.widgets?.weather?.apiKey || 'SETN6ufSUnD0sxHTo'
+			try {
+				const resp = await fetch(`https://api.seniverse.com/v3/weather/now.json?key=${apiKey}&location=${encodeURIComponent(loc)}&language=zh-Hans&unit=c`)
+				const json = await resp.json()
+				sendJson(res, resp.status, json)
+			} catch (err: any) {
+				sendJson(res, 500, { code: 500, message: `心知天气请求异常: ${err.message}` })
+			}
+			return
+		}
+
+		// 19.13 GET /api/weather/daily - 心知天气逐日预报代理
+		if (method === 'GET' && pathname === '/api/weather/daily') {
+			const loc = (parsedUrl.searchParams.get('location') || 'ip').trim()
+			const appConfigModule = await import(`../src/app.config.ts?t=${Date.now()}`)
+			const apiKey = appConfigModule.default?.widgets?.weather?.apiKey || 'SETN6ufSUnD0sxHTo'
+			try {
+				const resp = await fetch(`https://api.seniverse.com/v3/weather/daily.json?key=${apiKey}&location=${encodeURIComponent(loc)}&language=zh-Hans&unit=c&start=0&days=3`)
+				const json = await resp.json()
+				sendJson(res, resp.status, json)
+			} catch (err: any) {
+				sendJson(res, 500, { code: 500, message: `心知天气逐日预报请求异常: ${err.message}` })
+			}
+			return
+		}
+
 		// 19.15 GET /api/appearance - 获取主题外观与排版配置
 		if (method === 'GET' && pathname === '/api/appearance') {
 			const appConfigModule = await import(`../src/app.config.ts?t=${Date.now()}`)
@@ -1506,11 +1740,13 @@ const server = http.createServer(async (req, res) => {
 				excerpt?: { animation: boolean, caret: string }
 				slide?: { showTitle: boolean }
 				pagination?: { perPage: number, sortOrder: string, allowAscending: boolean }
+				themes?: any
 			}>(req)
 
 			await updateAppConfigFile((current) => {
-				const component = current.component || {}
-				const pagination = current.pagination || {}
+				const component = { ...current.component }
+				const pagination = { ...current.pagination }
+				const themes = { ...current.themes }
 
 				if (body.alert) {
 					component.alert = { ...component.alert, ...body.alert }
@@ -1527,11 +1763,15 @@ const server = http.createServer(async (req, res) => {
 				if (body.pagination) {
 					Object.assign(pagination, body.pagination)
 				}
+				if (body.themes) {
+					Object.assign(themes, body.themes)
+				}
 
 				return {
 					...current,
 					component,
 					pagination,
+					themes,
 				}
 			})
 
@@ -1542,41 +1782,44 @@ const server = http.createServer(async (req, res) => {
 
 		// 19.2 GET /api/site-info - 获取全站信息与头像Emoji配置
 		if (method === 'GET' && pathname === '/api/site-info') {
-			const blogRaw = fs.readFileSync(blogConfigPath, 'utf-8')
-			const appRaw = fs.readFileSync(appConfigPath, 'utf-8')
+			const blogMod = await import(`../blog.config.ts?t=${Date.now()}`)
+			const appMod = await import(`../src/app.config.ts?t=${Date.now()}`)
+			const blog = blogMod.default || {}
+			const app = appMod.default || {}
 
-			const extractField = (str: string, key: string) => {
-				const m = str.match(new RegExp(`${key}:\\s*['"\`](.*?)['"\`]`))
-				return m ? m[1] : ''
-			}
+			// 从 iconNav 与 author 提取社交链接
+			let githubUrl = ''
+			let bilibiliUrl = ''
+			let twitterUrl = ''
 
-			let emojiTail: string[] = ['💻', '⚡', '☕', '🚀']
-			const emojiMatch = appRaw.match(/emojiTail:\s*\[([\s\S]*?)\]/)
-			if (emojiMatch) {
-				const items = emojiMatch[1].match(/['"`](.*?)['"`]/g)
-				if (items) {
-					emojiTail = items.map(s => s.replace(/['"`]/g, ''))
-				}
+			for (const item of (app.footer?.iconNav || [])) {
+				const u = item.url || ''
+				if (u.includes('github.com')) githubUrl = u
+				else if (u.includes('bilibili.com')) bilibiliUrl = u
+				else if (u.includes('x.com') || u.includes('twitter.com')) twitterUrl = u
 			}
 
 			sendJson(res, 200, {
 				code: 0,
 				data: {
-					title: extractField(blogRaw, 'title') || 'kerntau',
-					subtitle: extractField(blogRaw, 'subtitle') || '',
-					description: extractField(blogRaw, 'description') || '',
-					authorName: extractField(blogRaw, 'name') || 'kerntau',
-					authorAvatar: extractField(blogRaw, 'avatar') || '/avatar.webp',
-					authorEmail: extractField(blogRaw, 'email') || '',
-					authorHomepage: extractField(blogRaw, 'homepage') || '',
-					url: extractField(blogRaw, 'url') || 'https://blog.cot.wiki/',
-					favicon: extractField(blogRaw, 'favicon') || '/favicon.ico',
-					timeEstablished: extractField(blogRaw, 'timeEstablished') || '2025-11-10',
-					timeZone: extractField(blogRaw, 'timeZone') || 'Asia/Shanghai',
-					defaultCategory: extractField(blogRaw, 'defaultCategory') || '前端开发',
-					copyrightAbbr: extractField(blogRaw, 'abbr') || 'CC BY-NC-SA 4.0',
-					emojiTail,
-					logo: extractField(appRaw, 'logo') || '/og-image.jpg',
+					title: blog.title || '序栈',
+					subtitle: blog.subtitle || '',
+					description: blog.description || '',
+					authorName: blog.author?.name || 'kerntau',
+					authorAvatar: blog.author?.avatar || '/avatar.webp',
+					authorEmail: blog.author?.email || '',
+					authorHomepage: blog.author?.homepage || '',
+					url: blog.url || 'https://keru.in/',
+					favicon: blog.favicon || '/favicon.ico',
+					timeEstablished: blog.timeEstablished || '2025-11-10',
+					timeZone: blog.timeZone || 'Asia/Shanghai',
+					defaultCategory: blog.defaultCategory || '前端开发',
+					copyrightAbbr: blog.copyright?.abbr || 'CC BY-NC-SA 4.0',
+					emojiTail: app.header?.emojiTail || ['🌈', '☕', '💡', '🦄', '🎯'],
+					logo: app.header?.logo || blog.author?.avatar || '/avatar.webp',
+					githubUrl: githubUrl || 'https://github.com/kerntau',
+					bilibiliUrl: bilibiliUrl || 'https://space.bilibili.com/9655855',
+					twitterUrl: twitterUrl || 'https://x.com/Kerntao',
 				},
 			})
 			return
@@ -1600,48 +1843,96 @@ const server = http.createServer(async (req, res) => {
 				copyrightAbbr?: string
 				emojiTail?: string[]
 				logo?: string
+				githubUrl?: string
+				bilibiliUrl?: string
+				twitterUrl?: string
 			}>(req)
 
-			let blogRaw = fs.readFileSync(blogConfigPath, 'utf-8')
-			let appRaw = fs.readFileSync(appConfigPath, 'utf-8')
+			await updateBlogConfigFile((currentBlog, currentMyFeed) => {
+				const author = { ...currentBlog.author }
+				const copyright = { ...currentBlog.copyright }
 
-			const replaceField = (str: string, key: string, val: string) => {
-				const reg = new RegExp(`(${key}:\\s*)['"\`].*?['"\`]`)
-				if (reg.test(str)) {
-					return str.replace(reg, `$1'${val.replace(/'/g, '\\\'')}'`)
+				if (body.authorName !== undefined) author.name = body.authorName
+				if (body.authorAvatar !== undefined) author.avatar = body.authorAvatar
+				if (body.authorEmail !== undefined) author.email = body.authorEmail
+				if (body.authorHomepage !== undefined) author.homepage = body.authorHomepage
+
+				if (body.copyrightAbbr !== undefined) copyright.abbr = body.copyrightAbbr
+				if (body.authorHomepage !== undefined) copyright.url = body.authorHomepage
+				if (body.url !== undefined) copyright.url = body.url
+
+				const updatedBlog = {
+					...currentBlog,
+					author,
+					copyright,
 				}
-				return str
-			}
 
-			if (body.title !== undefined) blogRaw = replaceField(blogRaw, 'title', body.title)
-			if (body.subtitle !== undefined) blogRaw = replaceField(blogRaw, 'subtitle', body.subtitle)
-			if (body.description !== undefined) blogRaw = replaceField(blogRaw, 'description', body.description)
-			if (body.authorName !== undefined) blogRaw = replaceField(blogRaw, 'name', body.authorName)
-			if (body.authorAvatar !== undefined) blogRaw = replaceField(blogRaw, 'avatar', body.authorAvatar)
-			if (body.authorEmail !== undefined) blogRaw = replaceField(blogRaw, 'email', body.authorEmail)
-			if (body.authorHomepage !== undefined) blogRaw = replaceField(blogRaw, 'homepage', body.authorHomepage)
-			if (body.url !== undefined) blogRaw = replaceField(blogRaw, 'url', body.url)
-			if (body.favicon !== undefined) blogRaw = replaceField(blogRaw, 'favicon', body.favicon)
-			if (body.timeEstablished !== undefined) blogRaw = replaceField(blogRaw, 'timeEstablished', body.timeEstablished)
-			if (body.timeZone !== undefined) blogRaw = replaceField(blogRaw, 'timeZone', body.timeZone)
-			if (body.defaultCategory !== undefined) blogRaw = replaceField(blogRaw, 'defaultCategory', body.defaultCategory)
-			if (body.copyrightAbbr !== undefined) blogRaw = replaceField(blogRaw, 'abbr', body.copyrightAbbr)
+				if (body.title !== undefined) updatedBlog.title = body.title
+				if (body.subtitle !== undefined) updatedBlog.subtitle = body.subtitle
+				if (body.description !== undefined) updatedBlog.description = body.description
+				if (body.url !== undefined) updatedBlog.url = body.url
+				if (body.favicon !== undefined) updatedBlog.favicon = body.favicon
+				if (body.timeEstablished !== undefined) updatedBlog.timeEstablished = body.timeEstablished
+				if (body.timeZone !== undefined) updatedBlog.timeZone = body.timeZone
+				if (body.defaultCategory !== undefined) updatedBlog.defaultCategory = body.defaultCategory
 
-			if (body.emojiTail && Array.isArray(body.emojiTail)) {
-				const emojisFormatted = body.emojiTail.map(e => `'${e.replace(/'/g, '\\\'')}'`).join(', ')
-				appRaw = appRaw.replace(/emojiTail:\s*\[[\s\S]*?\],/, `emojiTail: [${emojisFormatted}],`)
-			}
+				return { blogConfig: updatedBlog, myFeed: currentMyFeed }
+			})
 
-			if (body.logo !== undefined) {
-				appRaw = replaceField(appRaw, 'logo', body.logo)
-			}
+			await updateAppConfigFile((currentApp) => {
+				const header = { ...currentApp.header }
+				const footer = { ...currentApp.footer }
+				const iconNav = [...(footer.iconNav || [])]
 
-			safeWriteFileSync(blogConfigPath, blogRaw)
-			safeWriteFileSync(appConfigPath, appRaw)
+				if (body.emojiTail && Array.isArray(body.emojiTail)) {
+					header.emojiTail = body.emojiTail
+				}
+				if (body.logo !== undefined) {
+					header.logo = body.logo
+				}
+				if (body.subtitle !== undefined) {
+					header.subtitle = body.subtitle
+				}
 
-			recordAuditLog('修改站点与身份配置', 'blog.config.ts / app.config.ts', '更新了全站基础配置、博主头像与 Emoji 动效')
+				// 同步社交链接到 footer.iconNav
+				if (body.githubUrl !== undefined) {
+					const idx = iconNav.findIndex(i => i.icon.includes('github') || (Boolean(i.text) && i.text.toLowerCase().includes('github')))
+					if (idx >= 0) {
+						iconNav[idx] = { ...iconNav[idx], url: body.githubUrl, text: `GitHub: ${body.authorName || currentApp.author?.name || 'kerntau'}` }
+					} else {
+						iconNav.push({ icon: 'tabler:brand-github', text: 'GitHub', url: body.githubUrl })
+					}
+				}
+				if (body.bilibiliUrl !== undefined) {
+					const idx = iconNav.findIndex(i => i.icon.includes('bilibili') || (Boolean(i.text) && i.text.toLowerCase().includes('bilibili')))
+					if (idx >= 0) {
+						iconNav[idx] = { ...iconNav[idx], url: body.bilibiliUrl }
+					} else {
+						iconNav.push({ icon: 'ri:bilibili-line', text: 'Bilibili', url: body.bilibiliUrl })
+					}
+				}
+				if (body.twitterUrl !== undefined) {
+					const idx = iconNav.findIndex(i => i.icon.includes('twitter') || i.icon.includes('brand-x') || (Boolean(i.text) && (i.text.toLowerCase().includes('twitter') || i.text.toLowerCase().includes('x'))))
+					if (idx >= 0) {
+						iconNav[idx] = { ...iconNav[idx], url: body.twitterUrl }
+					} else {
+						iconNav.push({ icon: 'tabler:brand-twitter', text: 'X (Twitter)', url: body.twitterUrl })
+					}
+				}
 
-			sendJson(res, 200, { code: 0, message: '全站信息与头像 Emoji 配置已成功更新保存！' })
+				footer.iconNav = iconNav
+
+				return {
+					...currentApp,
+					header,
+					footer,
+				}
+			})
+
+			recordAuditLog('修改站点与身份配置', 'blog.config.ts / app.config.ts', '更新了全站基础配置、博主头像、社交链接与 Emoji 动效')
+			triggerStaticBuild()
+
+			sendJson(res, 200, { code: 0, message: '全站信息、社交链接与头像 Emoji 配置已成功更新保存！' })
 			return
 		}
 
@@ -1661,6 +1952,7 @@ const server = http.createServer(async (req, res) => {
 			}
 			serializeFeedsToFile(body.groups)
 			recordAuditLog('修改友链', 'src/feeds.ts', `保存更新了 ${body.groups.length} 个友链分组`)
+			triggerStaticBuild()
 			sendJson(res, 200, { code: 0, message: '友链数据已保存' })
 			return
 		}
@@ -1753,48 +2045,22 @@ const server = http.createServer(async (req, res) => {
 
 		// 24.1 GET /api/feeds/my-feed - 获取本站友链展示信息 (myFeed)
 		if (method === 'GET' && pathname === '/api/feeds/my-feed') {
-			const blogRaw = fs.readFileSync(blogConfigPath, 'utf-8')
-			const extractField = (str: string, key: string) => {
-				const m = str.match(new RegExp(`${key}:\\s*['"\`](.*?)['"\`]`))
-				return m ? m[1] : ''
-			}
-
-			let sitenick = '序栈'
-			const sitenickMatch = blogRaw.match(/sitenick:\s*['"`](.*?)['"`]/)
-			if (sitenickMatch) sitenick = sitenickMatch[1] || '序栈'
-
-			let archs: string[] = ['React', 'Rsbuild']
-			const archsMatch = blogRaw.match(/archs:\s*\[([\s\S]*?)\]/)
-			if (archsMatch) {
-				const items = archsMatch[1].match(/['"`](.*?)['"`]/g)
-				if (items) archs = items.map(s => s.replace(/['"`]/g, ''))
-			}
-
-			let comment = '这是我自己'
-			const commentMatch = blogRaw.match(/comment:\s*['"`](.*?)['"`]/)
-			if (commentMatch) comment = commentMatch[1] || '这是我自己'
-
-			const author = extractField(blogRaw, 'name') || extractField(blogRaw, 'author') || 'kerntau'
-			const title = extractField(blogRaw, 'title') || 'kerntau'
-			const subtitle = extractField(blogRaw, 'subtitle')
-			const description = extractField(blogRaw, 'description')
-			const desc = subtitle || description || '心中有景,花香满径'
-			const link = extractField(blogRaw, 'url') || 'https://keru.in/'
-			const avatar = extractField(blogRaw, 'avatar') || '/avatar.webp'
-			const date = extractField(blogRaw, 'timeEstablished') || '2025-11-10'
+			const blogMod = await import(`../blog.config.ts?t=${Date.now()}`)
+			const blog = blogMod.default || {}
+			const mf = blogMod.myFeed || {}
 
 			sendJson(res, 200, {
 				code: 0,
 				data: {
-					author,
-					sitenick,
-					title,
-					desc,
-					link,
-					avatar,
-					archs,
-					date,
-					comment,
+					author: mf.author || blog.author?.name || 'kerntau',
+					sitenick: mf.sitenick || '序栈',
+					title: mf.title || blog.title || 'kerntau',
+					desc: mf.desc || blog.subtitle || blog.description || '心中有景,花香满径',
+					link: mf.link || blog.url || 'https://keru.in/',
+					avatar: mf.avatar || blog.author?.avatar || '/avatar.webp',
+					archs: mf.archs || ['React', 'Rsbuild'],
+					date: mf.date || blog.timeEstablished || '2025-11-10',
+					comment: mf.comment || '这是我自己',
 				},
 			})
 			return
@@ -1813,32 +2079,29 @@ const server = http.createServer(async (req, res) => {
 				comment?: string
 			}>(req)
 
-			let blogRaw = fs.readFileSync(blogConfigPath, 'utf-8')
-			const replaceField = (str: string, key: string, val: string) => {
-				const reg = new RegExp(`(${key}:\\s*)['"\`].*?['"\`]`)
-				if (reg.test(str)) {
-					return str.replace(reg, `$1'${val.replace(/'/g, '\\\'')}'`)
+			await updateBlogConfigFile((currentBlog, currentMyFeed) => {
+				const updatedMyFeed = { ...currentMyFeed }
+				if (body.sitenick !== undefined) updatedMyFeed.sitenick = body.sitenick
+				if (body.comment !== undefined) updatedMyFeed.comment = body.comment
+				if (body.archs && Array.isArray(body.archs)) updatedMyFeed.archs = body.archs
+
+				const updatedBlog = { ...currentBlog }
+				if (body.author !== undefined) {
+					updatedBlog.author = { ...(updatedBlog.author || {}), name: body.author }
 				}
-				return str
-			}
+				if (body.title !== undefined) updatedBlog.title = body.title
+				if (body.desc !== undefined) updatedBlog.subtitle = body.desc
+				if (body.link !== undefined) updatedBlog.url = body.link
+				if (body.avatar !== undefined) {
+					updatedBlog.author = { ...(updatedBlog.author || {}), avatar: body.avatar }
+				}
 
-			if (body.sitenick !== undefined) blogRaw = replaceField(blogRaw, 'sitenick', body.sitenick)
-			if (body.comment !== undefined) blogRaw = replaceField(blogRaw, 'comment', body.comment)
-			if (body.author !== undefined) blogRaw = replaceField(blogRaw, 'name', body.author)
-			if (body.title !== undefined) blogRaw = replaceField(blogRaw, 'title', body.title)
-			if (body.desc !== undefined) {
-				blogRaw = replaceField(blogRaw, 'subtitle', body.desc)
-			}
-			if (body.link !== undefined) blogRaw = replaceField(blogRaw, 'url', body.link)
-			if (body.avatar !== undefined) blogRaw = replaceField(blogRaw, 'avatar', body.avatar)
+				return { blogConfig: updatedBlog, myFeed: updatedMyFeed }
+			})
 
-			if (body.archs && Array.isArray(body.archs)) {
-				const archsFormatted = body.archs.map(a => `'${a.replace(/'/g, '\\\'')}'`).join(', ')
-				blogRaw = blogRaw.replace(/archs:\s*\[[\s\S]*?\],/, `archs: [${archsFormatted}],`)
-			}
-
-			safeWriteFileSync(blogConfigPath, blogRaw)
 			recordAuditLog('修改本站友链信息', 'blog.config.ts', '更新了友链页展示的本站信息 (myFeed)')
+			triggerStaticBuild()
+
 			sendJson(res, 200, { code: 0, message: '本站友链卡片展示信息已成功保存更新！' })
 			return
 		}
@@ -1857,6 +2120,7 @@ const server = http.createServer(async (req, res) => {
 			const linkMdPath = path.join(rootDir, 'content', 'link.md')
 			safeWriteFileSync(linkMdPath, body.content || '')
 			recordAuditLog('修改友链申请说明', 'content/link.md', '更新了友链页面的申请说明文档')
+			triggerStaticBuild()
 			sendJson(res, 200, { code: 0, message: '友链申请说明 (link.md) 已成功保存生效！' })
 			return
 		}
@@ -1885,6 +2149,7 @@ const server = http.createServer(async (req, res) => {
 				safeWriteFileSync(appConfigPath, body.appConfigRaw)
 			}
 			recordAuditLog('修改系统配置', 'blog.config.ts / app.config.ts', '更新了站点全局配置文件')
+			triggerStaticBuild()
 			sendJson(res, 200, { code: 0, message: '配置已更新保存' })
 			return
 		}
@@ -2018,6 +2283,7 @@ const server = http.createServer(async (req, res) => {
 			const backupPayload = {
 				version: '1.0',
 				timestamp: Temporal.Now.plainDateTimeISO().toLocaleString('sv'),
+				postCount: posts.length,
 				blogConfigRaw,
 				appConfigRaw,
 				feedsRaw,
@@ -2033,7 +2299,129 @@ const server = http.createServer(async (req, res) => {
 			return
 		}
 
-		// 33. POST /api/system/restore - 全量数据还原
+		// 32.1 GET /api/system/backups - 获取历史快照列表
+		if (method === 'GET' && pathname === '/api/system/backups') {
+			const backupsDir = path.resolve(rootDir, '.backups')
+			if (!fs.existsSync(backupsDir)) {
+				fs.mkdirSync(backupsDir, { recursive: true })
+			}
+			const files = fs.readdirSync(backupsDir).filter(f => f.endsWith('.json'))
+			const list = files.map((fileName) => {
+				const filePath = path.join(backupsDir, fileName)
+				const stat = fs.statSync(filePath)
+				let note = ''
+				let postCount = 0
+				let timestamp = stat.mtime.toISOString()
+				try {
+					const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+					note = content.note || ''
+					postCount = content.postCount || Object.keys(content.posts || {}).length || 0
+					timestamp = content.timestamp || timestamp
+				} catch {}
+				return {
+					fileName,
+					size: stat.size,
+					createdAt: timestamp,
+					postCount,
+					note,
+				}
+			}).sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+
+			sendJson(res, 200, { code: 0, data: list })
+			return
+		}
+
+		// 32.2 POST /api/system/backups/create - 一键创建本地快照
+		if (method === 'POST' && pathname === '/api/system/backups/create') {
+			const body = await parseJsonBody<{ note?: string }>(req)
+			const backupsDir = path.resolve(rootDir, '.backups')
+			if (!fs.existsSync(backupsDir)) {
+				fs.mkdirSync(backupsDir, { recursive: true })
+			}
+
+			const posts = getAllPostsMeta()
+			const postsContent: Record<string, string> = {}
+			for (const p of posts) {
+				postsContent[p.relativePath] = fs.readFileSync(p.path, 'utf-8')
+			}
+			const blogConfigRaw = fs.existsSync(blogConfigPath) ? fs.readFileSync(blogConfigPath, 'utf-8') : ''
+			const appConfigRaw = fs.existsSync(appConfigPath) ? fs.readFileSync(appConfigPath, 'utf-8') : ''
+			const feedsRaw = fs.existsSync(feedsFilePath) ? fs.readFileSync(feedsFilePath, 'utf-8') : ''
+
+			const nowStr = Temporal.Now.plainDateTimeISO().toString({ smallestUnit: 'second' }).replace(/[:]/g, '-')
+			const fileName = `snapshot-${nowStr}.json`
+			const filePath = path.join(backupsDir, fileName)
+
+			const backupPayload = {
+				version: '1.0',
+				timestamp: Temporal.Now.plainDateTimeISO().toLocaleString('sv'),
+				note: body.note?.trim() || '手动全量快照',
+				postCount: posts.length,
+				blogConfigRaw,
+				appConfigRaw,
+				feedsRaw,
+				posts: postsContent,
+			}
+
+			safeWriteFileSync(filePath, JSON.stringify(backupPayload, null, 2))
+			recordAuditLog('创建本地快照', fileName, `生成了包含 ${posts.length} 篇文章的本地安全快照`)
+
+			sendJson(res, 200, {
+				code: 0,
+				message: `快照已成功创建 (${fileName})`,
+				data: { fileName },
+			})
+			return
+		}
+
+		// 32.3 POST /api/system/backups/restore-snapshot - 从指定快照还原
+		if (method === 'POST' && pathname === '/api/system/backups/restore-snapshot') {
+			const body = await parseJsonBody<{ fileName: string }>(req)
+			const backupsDir = path.resolve(rootDir, '.backups')
+			const filePath = path.join(backupsDir, body.fileName)
+			if (!fs.existsSync(filePath)) {
+				sendJson(res, 404, { code: 404, message: '快照文件不存在' })
+				return
+			}
+
+			const backup = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+			if (backup.blogConfigRaw) safeWriteFileSync(blogConfigPath, backup.blogConfigRaw)
+			if (backup.appConfigRaw) safeWriteFileSync(appConfigPath, backup.appConfigRaw)
+			if (backup.feedsRaw) safeWriteFileSync(feedsFilePath, backup.feedsRaw)
+
+			let restoredCount = 0
+			if (backup.posts) {
+				for (const [relPath, contentStr] of Object.entries(backup.posts as Record<string, string>)) {
+					const full = path.join(contentPostsDir, relPath)
+					safeWriteFileSync(full, contentStr)
+					restoredCount++
+				}
+			}
+
+			recordAuditLog('从快照还原系统', body.fileName, `成功恢复了 ${restoredCount} 篇文章与全站配置`)
+			triggerStaticBuild()
+
+			sendJson(res, 200, {
+				code: 0,
+				message: `已成功从快照 ${body.fileName} 还原数据 (${restoredCount} 篇文章)`,
+			})
+			return
+		}
+
+		// 32.4 DELETE /api/system/backups/delete - 删除指定快照
+		if (method === 'POST' && pathname === '/api/system/backups/delete') {
+			const body = await parseJsonBody<{ fileName: string }>(req)
+			const backupsDir = path.resolve(rootDir, '.backups')
+			const filePath = path.join(backupsDir, body.fileName)
+			if (fs.existsSync(filePath)) {
+				fs.unlinkSync(filePath)
+				recordAuditLog('删除本地快照', body.fileName, '清除了旧历史快照')
+			}
+			sendJson(res, 200, { code: 0, message: '快照已删除' })
+			return
+		}
+
+		// 33. POST /api/system/restore - 全量数据直接还原
 		if (method === 'POST' && pathname === '/api/system/restore') {
 			const body = await parseJsonBody<{ backup: any }>(req)
 			const backup = body.backup
@@ -2053,7 +2441,8 @@ const server = http.createServer(async (req, res) => {
 				restoredPostsCount++
 			}
 
-			recordAuditLog('还原系统备份', `恢复了 ${restoredPostsCount} 篇文章`, `从历史备份包执行了全量还原操作`)
+			recordAuditLog('还原系统备份', `恢复了 ${restoredPostsCount} 篇文章`, `从上传的备份包执行了全量还原操作`)
+			triggerStaticBuild()
 
 			sendJson(res, 200, {
 				code: 0,
