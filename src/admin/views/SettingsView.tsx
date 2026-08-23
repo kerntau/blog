@@ -5,16 +5,6 @@ import { useToast } from '../components/Toast'
 import { getGithubAvatar, getOicqAvatar } from '../../utils/img'
 import type { SiteInfoData, AppearanceConfigData } from '../types'
 
-// OG 卡片微光背景预设
-const OG_GRADIENT_PRESETS = [
-	{ name: '暮光极光', bg: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%)', textColor: '#ffffff' },
-	{ name: '科技深海', bg: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0284c7 100%)', textColor: '#ffffff' },
-	{ name: '翡翠极光', bg: 'linear-gradient(135deg, #064e3b 0%, #059669 50%, #10b981 100%)', textColor: '#ffffff' },
-	{ name: '日落余晖', bg: 'linear-gradient(135deg, #831843 0%, #db2777 50%, #f97316 100%)', textColor: '#ffffff' },
-	{ name: '深邃暗夜', bg: 'linear-gradient(135deg, #18181b 0%, #27272a 50%, #3f3f46 100%)', textColor: '#ffffff' },
-	{ name: '清新晨曦', bg: 'linear-gradient(135deg, #e0e7ff 0%, #fae8ff 50%, #fce7f3 100%)', textColor: '#1e1b4b' },
-]
-
 const QUICK_EMOJIS = [
 	'🌈',
 	'☕',
@@ -71,6 +61,9 @@ export const SettingsView: React.FC = () => {
 		copyrightAbbr: 'CC BY-NC-SA 4.0',
 		emojiTail: ['🌈', '☕', '💡', '🦄', '🎯'],
 		logo: '/avatar.webp',
+		githubUrl: 'https://github.com/kerntau',
+		bilibiliUrl: 'https://space.bilibili.com/9655855',
+		twitterUrl: 'https://x.com/Kerntao',
 	})
 
 	// 外观与渲染数据 (对应 src/app.config.ts)
@@ -79,11 +72,10 @@ export const SettingsView: React.FC = () => {
 		codeblock: { triggerRows: 32, collapsedRows: 16, enableIndentGuide: true, indent: 4, tabSize: 3 },
 		excerpt: { animation: true, caret: '_' },
 		slide: { showTitle: true },
-		pagination: { perPage: 10, sortOrder: 'date', allowAscending: false },
+		pagination: { perPage: 12, sortOrder: 'date', allowAscending: false },
 	})
 
-	// 社交卡片与快捷抓取状态
-	const [selectedOgPreset, setSelectedOgPreset] = useState(0)
+	// 社交与快捷抓取状态
 	const [avatarInputType, setAvatarInputType] = useState<'url' | 'github' | 'qq'>('url')
 	const [githubUsername, setGithubUsername] = useState('')
 	const [qqNumber, setQqNumber] = useState('')
@@ -104,6 +96,9 @@ export const SettingsView: React.FC = () => {
 				...prev,
 				...siteData,
 				emojiTail: siteData.emojiTail && siteData.emojiTail.length > 0 ? siteData.emojiTail : prev.emojiTail,
+				githubUrl: siteData.githubUrl || prev.githubUrl,
+				bilibiliUrl: siteData.bilibiliUrl || prev.bilibiliUrl,
+				twitterUrl: siteData.twitterUrl || prev.twitterUrl,
 			}))
 
 			if (appData) {
@@ -136,10 +131,9 @@ export const SettingsView: React.FC = () => {
 	const handleSave = async () => {
 		setSaving(true)
 		try {
-			await Promise.all([
-				adminApi.saveSiteInfo(siteInfo),
-				adminApi.saveAppearance(appearance),
-			])
+			// 顺序保存，防止写配置冲突
+			await adminApi.saveSiteInfo(siteInfo)
+			await adminApi.saveAppearance(appearance)
 
 			window.dispatchEvent(new CustomEvent('site-info-updated', { detail: siteInfo }))
 			setIsDirty(false)
@@ -712,11 +706,16 @@ export const SettingsView: React.FC = () => {
 						<div className="admin-card" style={{ padding: '18px', display: 'flex', flexDirection: 'column', gap: 14 }}>
 							<div className="admin-section-title">
 								<Icon icon="tabler:sparkles" />
-								<span>搜索引擎与社交分享卡片 (SEO & OpenGraph)</span>
+								<Icon icon="tabler:world-search" />
+								<span>搜索引擎收录与站点地图 (SEO & Sitemap)</span>
 							</div>
 
+							{/* 1. SEO 核心元数据 */}
 							<div className="admin-form-group">
-								<label className="admin-form-label">SEO 标题模版</label>
+								<label className="admin-form-label">
+									<span>SEO 网站主标题</span>
+									<span style={{ fontSize: 11, fontWeight: 400, color: 'var(--admin-text-3)' }}>(建议在 20-50 字符之间)</span>
+								</label>
 								<input
 									type="text"
 									className="admin-input"
@@ -729,9 +728,14 @@ export const SettingsView: React.FC = () => {
 							</div>
 
 							<div className="admin-form-group">
-								<label className="admin-form-label">SEO 描述 (长描述利好收录)</label>
+								<label className="admin-form-label">
+									<span>SEO 网站描述 (Meta Description)</span>
+									<span style={{ fontSize: 11, fontWeight: 400, color: siteInfo.description.length < 50 || siteInfo.description.length > 180 ? 'var(--admin-warning)' : 'var(--admin-success)' }}>
+										(当前 {siteInfo.description.length} 字 · 建议 80-160 字利于百度与谷歌收录)
+									</span>
+								</label>
 								<textarea
-									className="admin-input"
+									className="admin-textarea"
 									rows={3}
 									value={siteInfo.description}
 									onChange={e => {
@@ -739,45 +743,89 @@ export const SettingsView: React.FC = () => {
 										setIsDirty(true)
 									}}
 								/>
-								<div style={{ fontSize: 11, color: 'var(--admin-text-3)', marginTop: 4 }}>
-									当前字符数: {siteInfo.description.length} 字符 (建议在 80-160 字之间)
-								</div>
 							</div>
 
-							<div className="admin-form-group">
-								<label className="admin-form-label">社交卡片 (OpenGraph) 微光主题选择</label>
-								<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 8 }}>
-									{OG_GRADIENT_PRESETS.map((preset, idx) => (
-										<div
-											key={preset.name}
-											onClick={() => setSelectedOgPreset(idx)}
-											style={{
-												padding: '8px 10px',
-												borderRadius: 6,
-												background: preset.bg,
-												color: preset.textColor,
-												fontSize: 11,
-												fontWeight: 600,
-												textAlign: 'center',
-												cursor: 'pointer',
-												border: selectedOgPreset === idx ? '2px solid var(--admin-accent)' : '1px solid rgba(255,255,255,0.2)',
-												boxShadow: selectedOgPreset === idx ? '0 0 10px rgba(0,0,0,0.3)' : 'none',
+							{/* 2. 站点地图 (Sitemap.xml) 实况 */}
+							<div style={{ background: 'var(--admin-bg-subtle)', padding: '16px', borderRadius: 'var(--admin-radius-md)', border: '1px solid var(--admin-border)' }}>
+								<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+									<div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 650, color: 'var(--admin-text-1)', fontSize: 13 }}>
+										<Icon icon="tabler:sitemap" style={{ color: 'var(--admin-accent)', fontSize: 16 }} />
+										<span>站点地图资源 (Sitemap & Feeds)</span>
+									</div>
+
+									<div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+										<button
+											type="button"
+											className="admin-btn btn-ghost btn-sm"
+											onClick={() => {
+												navigator.clipboard.writeText(`${siteInfo.url.replace(/\/$/, '')}/sitemap.xml`)
+												showToast('已复制 Sitemap URL', 'success')
 											}}
 										>
-											{preset.name}
-										</div>
-									))}
+											<Icon icon="tabler:copy" />
+											<span>复制 Sitemap 地址</span>
+										</button>
+										<a
+											href="/sitemap.xml"
+											target="_blank"
+											rel="noreferrer"
+											className="admin-btn btn-secondary btn-sm"
+										>
+											<Icon icon="tabler:external-link" />
+											<span>在线查看 sitemap.xml</span>
+										</a>
+									</div>
 								</div>
-							</div>
 
-							<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 6 }}>
-								<div style={{ padding: '10px 12px', background: 'var(--admin-surface-hover)', borderRadius: 6, fontSize: 12 }}>
-									<div style={{ fontWeight: 600, color: 'var(--admin-text-1)', marginBottom: 2 }}>Sitemap 地图</div>
-									<div style={{ color: 'var(--admin-text-3)' }}>{siteInfo.url.replace(/\/$/, '')}/sitemap.xml</div>
+								<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
+									<div style={{ padding: '10px 12px', background: 'var(--admin-surface)', borderRadius: 'var(--admin-radius-sm)', border: '1px solid var(--admin-border)' }}>
+										<div style={{ fontSize: 11, color: 'var(--admin-text-3)' }}>站点地图 (XML Sitemap)</div>
+										<code style={{ fontSize: 12, fontWeight: 600, color: 'var(--admin-accent)', fontFamily: 'var(--admin-font-mono)' }}>
+											/sitemap.xml
+										</code>
+										<div style={{ fontSize: 11, color: 'var(--admin-text-3)', marginTop: 4 }}>
+											包含全站首页、分类、归档及所有文章 URL
+										</div>
+									</div>
+
+									<div style={{ padding: '10px 12px', background: 'var(--admin-surface)', borderRadius: 'var(--admin-radius-sm)', border: '1px solid var(--admin-border)' }}>
+										<div style={{ fontSize: 11, color: 'var(--admin-text-3)' }}>爬虫协议 (Robots Protocol)</div>
+										<code style={{ fontSize: 12, fontWeight: 600, color: 'var(--admin-success)', fontFamily: 'var(--admin-font-mono)' }}>
+											/robots.txt
+										</code>
+										<div style={{ fontSize: 11, color: 'var(--admin-text-3)', marginTop: 4 }}>
+											声明全站抓取权限与自动引导至 Sitemap
+										</div>
+									</div>
+
+									<div style={{ padding: '10px 12px', background: 'var(--admin-surface)', borderRadius: 'var(--admin-radius-sm)', border: '1px solid var(--admin-border)' }}>
+										<div style={{ fontSize: 11, color: 'var(--admin-text-3)' }}>RSS 订阅源 (Atom Feed)</div>
+										<code style={{ fontSize: 12, fontWeight: 600, color: 'var(--admin-warning)', fontFamily: 'var(--admin-font-mono)' }}>
+											/atom.xml
+										</code>
+										<div style={{ fontSize: 11, color: 'var(--admin-text-3)', marginTop: 4 }}>
+											标准 Atom 1.0 协议全量文章订阅源
+										</div>
+									</div>
 								</div>
-								<div style={{ padding: '10px 12px', background: 'var(--admin-surface-hover)', borderRadius: 6, fontSize: 12 }}>
-									<div style={{ fontWeight: 600, color: 'var(--admin-text-1)', marginBottom: 2 }}>Atom 订阅源</div>
-									<div style={{ color: 'var(--admin-text-3)' }}>{siteInfo.url.replace(/\/$/, '')}/atom.xml</div>
+
+								{/* 3. 搜索引擎主动提交指引 */}
+								<div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px dashed var(--admin-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11.5, color: 'var(--admin-text-3)' }}>
+									<span>💡 站长收录提交入口：</span>
+									<div style={{ display: 'flex', gap: 12 }}>
+										<a href="https://search.google.com/search-console" target="_blank" rel="noreferrer" style={{ color: 'var(--admin-accent)', display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+											<span>Google Search Console</span>
+											<Icon icon="tabler:external-link" style={{ fontSize: 11 }} />
+										</a>
+										<a href="https://ziyuan.baidu.com/site" target="_blank" rel="noreferrer" style={{ color: 'var(--admin-accent)', display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+											<span>百度搜索资源平台</span>
+											<Icon icon="tabler:external-link" style={{ fontSize: 11 }} />
+										</a>
+										<a href="https://www.bing.com/webmasters" target="_blank" rel="noreferrer" style={{ color: 'var(--admin-accent)', display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+											<span>必应 Webmaster</span>
+											<Icon icon="tabler:external-link" style={{ fontSize: 11 }} />
+										</a>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -798,8 +846,12 @@ export const SettingsView: React.FC = () => {
 									<input
 										type="text"
 										className="admin-input"
-										value="https://github.com/kerntau"
-										readOnly
+										value={siteInfo.githubUrl || ''}
+										onChange={e => {
+											setSiteInfo({ ...siteInfo, githubUrl: e.target.value })
+											setIsDirty(true)
+										}}
+										placeholder="https://github.com/用户名"
 									/>
 								</div>
 							</div>
@@ -811,8 +863,12 @@ export const SettingsView: React.FC = () => {
 									<input
 										type="text"
 										className="admin-input"
-										value="https://space.bilibili.com/9655855"
-										readOnly
+										value={siteInfo.bilibiliUrl || ''}
+										onChange={e => {
+											setSiteInfo({ ...siteInfo, bilibiliUrl: e.target.value })
+											setIsDirty(true)
+										}}
+										placeholder="https://space.bilibili.com/用户ID"
 									/>
 								</div>
 							</div>
@@ -824,8 +880,12 @@ export const SettingsView: React.FC = () => {
 									<input
 										type="text"
 										className="admin-input"
-										value="https://x.com/Kerntao"
-										readOnly
+										value={siteInfo.twitterUrl || ''}
+										onChange={e => {
+											setSiteInfo({ ...siteInfo, twitterUrl: e.target.value })
+											setIsDirty(true)
+										}}
+										placeholder="https://x.com/用户名"
 									/>
 								</div>
 							</div>
@@ -1226,48 +1286,52 @@ export const SettingsView: React.FC = () => {
 						)}
 
 						{activeTab === 'seo' && (
-							<div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-								<div style={{ fontSize: 11, color: 'var(--admin-text-3)' }}>社交分享卡片 (OpenGraph) 模拟:</div>
+							<div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+								<div style={{ fontSize: 11.5, color: 'var(--admin-text-3)', fontWeight: 600 }}>搜索引擎收录展现预览 (SERP Snippet Live Preview):</div>
+
+								{/* Google / 百度搜索结果真实模拟卡片 */}
 								<div
 									style={{
 										width: '100%',
-										aspectRatio: '1200 / 630',
-										borderRadius: 8,
-										background: OG_GRADIENT_PRESETS[selectedOgPreset]?.bg,
-										color: OG_GRADIENT_PRESETS[selectedOgPreset]?.textColor,
-										padding: '24px',
+										borderRadius: 'var(--admin-radius-md)',
+										background: 'var(--admin-surface)',
+										border: '1px solid var(--admin-border)',
+										padding: '16px 18px',
+										boxShadow: 'var(--admin-shadow-sm)',
 										display: 'flex',
 										flexDirection: 'column',
-										justifyContent: 'space-between',
-										boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-										overflow: 'hidden',
+										gap: 6,
 									}}
 								>
-									<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-										<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-											<img
-												src={siteInfo.authorAvatar}
-												alt=""
-												style={{ width: 36, height: 36, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.6)' }}
-												onError={e => (e.currentTarget.src = '/favicon.ico')}
-											/>
-											<span style={{ fontSize: 16, fontWeight: 700 }}>{siteInfo.title}</span>
-										</div>
-										<span style={{ fontSize: 12, opacity: 0.85 }}>{siteInfo.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
-									</div>
-
-									<div>
-										<div style={{ fontSize: 20, fontWeight: 800, lineHeight: 1.3, textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
-											{siteInfo.subtitle || siteInfo.title}
-										</div>
-										<div style={{ fontSize: 12, opacity: 0.85, marginTop: 6, lineHeight: 1.4 }}>
-											{siteInfo.description.slice(0, 75)}...
+									{/* 面包屑导航与Favicon */}
+									<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+										<img
+											src={siteInfo.authorAvatar}
+											alt=""
+											style={{ width: 18, height: 18, borderRadius: '50%', border: '1px solid var(--admin-border)' }}
+											onError={e => (e.currentTarget.src = '/favicon.ico')}
+										/>
+										<div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+											<span style={{ fontSize: 12, fontWeight: 550, color: 'var(--admin-text-1)' }}>{siteInfo.title}</span>
+											<span style={{ fontSize: 10.5, color: 'var(--admin-text-3)', fontFamily: 'var(--admin-font-mono)' }}>{siteInfo.url.replace(/\/$/, '')}</span>
 										</div>
 									</div>
 
-									<div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, opacity: 0.8 }}>
-										<span>By @{siteInfo.authorName}</span>
-										<span>{new Date().toISOString().slice(0, 10)}</span>
+									{/* 蓝色搜索大标题 */}
+									<div style={{ fontSize: 16, fontWeight: 650, color: 'var(--admin-accent)', lineHeight: 1.3, cursor: 'pointer', marginTop: 2 }}>
+										{siteInfo.title} - {siteInfo.subtitle || '心中有景,花香满径'}
+									</div>
+
+									{/* 搜索描述摘要 */}
+									<div style={{ fontSize: 12, color: 'var(--admin-text-2)', lineHeight: 1.5, marginTop: 2 }}>
+										{siteInfo.description || '个人技术博客与知识库，记录前端开发、架构设计与工程实践心得...'}
+									</div>
+
+									{/* 结构化特性徽章 */}
+									<div style={{ display: 'flex', gap: 6, marginTop: 8, paddingTop: 8, borderTop: '1px dashed var(--admin-border)', fontSize: 10.5 }}>
+										<span className="admin-badge badge-success">✓ HTTPS 已启用</span>
+										<span className="admin-badge badge-primary">✓ Sitemap.xml 自动生成</span>
+										<span className="admin-badge badge-default">✓ Robots.txt 友好</span>
 									</div>
 								</div>
 							</div>

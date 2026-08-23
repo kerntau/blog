@@ -1,0 +1,7 @@
+# Robots.txt for 序栈
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin
+
+Sitemap: https://keru.in/sitemap.xml

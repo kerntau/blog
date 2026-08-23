@@ -567,12 +567,87 @@ function generateOpml() {
 	})
 }
 
+function generateSitemapXml(posts: any[]) {
+	const builder = new XmlBuilder({
+		attributeNamePrefix: '$',
+		format: true,
+		ignoreAttributes: false,
+		textNodeName: '_',
+	})
+
+	const baseUrl = blogConfig.url.replace(/\/$/, '')
+
+	const urlList: any[] = [
+		{
+			loc: `${baseUrl}/`,
+			lastmod: new Date().toISOString().slice(0, 10),
+			changefreq: 'daily',
+			priority: '1.0',
+		},
+		{
+			loc: `${baseUrl}/categories`,
+			lastmod: new Date().toISOString().slice(0, 10),
+			changefreq: 'weekly',
+			priority: '0.7',
+		},
+		{
+			loc: `${baseUrl}/archive`,
+			lastmod: new Date().toISOString().slice(0, 10),
+			changefreq: 'daily',
+			priority: '0.7',
+		},
+		{
+			loc: `${baseUrl}/link`,
+			lastmod: new Date().toISOString().slice(0, 10),
+			changefreq: 'monthly',
+			priority: '0.5',
+		},
+	]
+
+	// 注入所有公开发布的文章
+	const publicPosts = posts.filter(p => !p.draft && p._stem?.startsWith('posts/'))
+	for (const p of publicPosts) {
+		const postUrl = `${baseUrl}${p.path.startsWith('/') ? p.path : `/${p.path}`}`
+		const lastModDate = p.updated || p.date || new Date().toISOString().slice(0, 10)
+		urlList.push({
+			loc: postUrl,
+			lastmod: String(lastModDate).slice(0, 10),
+			changefreq: 'weekly',
+			priority: '0.8',
+		})
+	}
+
+	const urlset = {
+		$xmlns: 'http://www.sitemaps.org/schemas/sitemap/0.9',
+		url: urlList,
+	}
+
+	return builder.build({
+		'?xml': { $version: '1.0', $encoding: 'UTF-8' },
+		urlset,
+	})
+}
+
+function generateRobotsTxt() {
+	const baseUrl = blogConfig.url.replace(/\/$/, '')
+	return `# Robots.txt for ${blogConfig.title}
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin
+
+Sitemap: ${baseUrl}/sitemap.xml
+`
+}
+
 export async function buildStaticData() {
 	console.log('📦 正在提取文章数据并进行 MDX 预编译与静态文件生成...')
 	const posts = await getAllPostsData()
 	const stats = calculateStats(posts)
 	const searchIndex = generateSearchIndex(posts)
 	const atomXml = generateAtomXml(posts)
+	const sitemapXml = generateSitemapXml(posts)
+	const robotsTxt = generateRobotsTxt()
 	const opmlXml = generateOpml()
 
 	// 1. 生成 src/data/generated-posts.json
@@ -589,13 +664,15 @@ export async function buildStaticData() {
 	const publicApiDir = join(publicDir, 'api')
 	mkdirSync(publicApiDir, { recursive: true })
 
+	writeFileSync(join(publicDir, 'sitemap.xml'), sitemapXml, 'utf-8')
+	writeFileSync(join(publicDir, 'robots.txt'), robotsTxt, 'utf-8')
 	writeFileSync(join(publicDir, 'atom.xml'), atomXml, 'utf-8')
 	writeFileSync(join(publicDir, 'friends.opml'), opmlXml, 'utf-8')
 	writeFileSync(join(publicDir, 'cotovo.opml'), opmlXml, 'utf-8')
 	writeFileSync(join(publicApiDir, 'stats.json'), JSON.stringify(stats, null, 2), 'utf-8')
 	writeFileSync(join(publicApiDir, 'search.json'), JSON.stringify(searchIndex, null, 2), 'utf-8')
 
-	console.log(`静态数据生成完毕：共预编译 ${posts.length} 篇文章，已生成 atom.xml, friends.opml, stats.json, search.json`)
+	console.log(`静态数据生成完毕：共预编译 ${posts.length} 篇文章，已生成 sitemap.xml, robots.txt, atom.xml, friends.opml, stats.json, search.json`)
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
