@@ -507,7 +507,7 @@ function generateAtomXml(posts: any[]) {
 			{ $href: blogConfig.url, $rel: 'alternate' },
 		],
 		generator: {
-			$uri: 'https://blog.cot.wiki',
+			$uri: blogConfig.url,
 			$version: packageJson.version,
 			_: 'Blog Engine (Rsbuild)',
 		},

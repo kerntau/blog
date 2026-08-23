@@ -1,7 +1,3 @@
-export function getGithubIcon(name = '') {
-	return `https://wsrv.nl/?url=github.com/${encodeURIComponent(name)}.png?size=32&mask=circle`
-}
-
 // https://docs.webp.se/public-services/github-avatar/
 export function getGithubAvatar(name = '', options = { size: 120 }) {
 	return `https://avatars-githubusercontent-webp.webp.se/${encodeURIComponent(name)}?s=${options.size}`

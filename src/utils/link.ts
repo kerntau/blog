@@ -4,7 +4,7 @@ const domainTip: Record<string, string> = {
 	'github.io': 'GitHub Pages 域名',
 	'netlify.app': 'Netlify 域名',
 	'pages.dev': 'Cloudflare 域名',
-	'blog.cot.wiki': '当前站点域名',
+	'keru.in': '当前站点域名',
 	'vercel.app': 'Vercel 域名',
 	'zeabur.app': 'Zeabur 域名',
 }

@@ -122,6 +122,21 @@ const appConfig = {
 		allowAscending: false,
 	},
 
+	themes: {
+		light: {
+			icon: 'tabler:sun',
+			tip: '浅色模式',
+		},
+		system: {
+			icon: 'tabler:device-desktop',
+			tip: '跟随系统',
+		},
+		dark: {
+			icon: 'tabler:moon',
+			tip: '深色模式',
+		},
+	},
+
 	widgets: {
 		tech: {
 			title: '技术信息',
@@ -165,21 +180,6 @@ const appConfig = {
 			archive: ['blog-stats', 'blog-log'],
 			home: ['blog-stats', 'blog-tech', 'comm-group'],
 			post: ['toc'],
-		},
-	},
-
-	themes: {
-		light: {
-			icon: 'tabler:sun',
-			tip: '浅色模式',
-		},
-		system: {
-			icon: 'tabler:device-desktop',
-			tip: '跟随系统',
-		},
-		dark: {
-			icon: 'tabler:moon',
-			tip: '深色模式',
 		},
 	},
 }
