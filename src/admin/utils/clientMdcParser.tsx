@@ -34,15 +34,21 @@ export function parseClientInlineProps(propsStr: string): Record<string, any> {
 	const props: Record<string, any> = {}
 	if (!propsStr) return props
 
-	const regex = /(?::?)([\w-]+)=(?:(['"])(.*?)\2|(\{.*?\})|(\S+))/g
-	let match: RegExpExecArray | null
+	const regex = /:?([\w-]+)=(?:(['"])(.*?)\2|(\{.*?\})|(\S+))/g
+	let match = regex.exec(propsStr)
 
-	while ((match = regex.exec(propsStr)) !== null) {
+	while (match !== null) {
 		const key = match[1]!
 		let val: any = match[3] ?? match[4] ?? match[5]
-		if (val === 'true') val = true
-		else if (val === 'false') val = false
-		else if (!Number.isNaN(Number(val)) && val !== '') val = Number(val)
+		if (val === 'true') {
+			val = true
+		}
+		else if (val === 'false') {
+			val = false
+		}
+		else if (!Number.isNaN(Number(val)) && val !== '') {
+			val = Number(val)
+		}
 		else if (typeof val === 'string' && val.startsWith('{') && val.endsWith('}')) {
 			try {
 				val = JSON.parse(val.slice(1, -1))
@@ -52,6 +58,7 @@ export function parseClientInlineProps(propsStr: string): Record<string, any> {
 			}
 		}
 		props[key] = val
+		match = regex.exec(propsStr)
 	}
 	return props
 }
@@ -84,8 +91,8 @@ export function renderInlineMarkdown(text: string, keyPrefix = 'inline'): ReactN
 	// 8. 行内代码 `code`
 	const inlineRegex = /(:([a-z][\w-]*)\[(.*?)\](?:\{((?:[^{}]|"[^"]*"|'[^']*')*)\})?)|(:([a-z][\w-]*)(\{[^}\n]*\}))|(!\[(.*?)\]\((.*?)\))|(\[(.*?)\]\((.*?)\))|(\*\*(.*?)\*\*|__(.*?)__)|(\*(.*?)\*|_(.*?)_)|(~~(.*?)~~)|(`([^`]+)`)/g
 
-	let match: RegExpExecArray | null
-	while ((match = inlineRegex.exec(text)) !== null) {
+	let match = inlineRegex.exec(text)
+	while (match !== null) {
 		const matchStart = match.index
 		const matchEnd = matchStart + match[0].length
 
@@ -166,6 +173,7 @@ export function renderInlineMarkdown(text: string, keyPrefix = 'inline'): ReactN
 		}
 
 		cursor = matchEnd
+		match = inlineRegex.exec(text)
 	}
 
 	if (cursor < text.length) {
@@ -250,22 +258,18 @@ export function parseAndRenderClientMdc(
 				const key = `code-${i}`
 				const ProsePre = defaultMdxComponents.pre
 				if (ProsePre) {
-					appendNode(
-						createElement(ProsePre, {
-							key,
-							className: codeBlockLang ? `language-${codeBlockLang}` : '',
-							'data-language': codeBlockLang,
-							'data-title': codeBlockTitle,
-						}, createElement('code', { className: codeBlockLang ? `language-${codeBlockLang}` : '' }, codeContent)),
-					)
+					appendNode(createElement(ProsePre, {
+						key,
+						className: codeBlockLang ? `language-${codeBlockLang}` : '',
+						'data-language': codeBlockLang,
+						'data-title': codeBlockTitle,
+					}, createElement('code', { className: codeBlockLang ? `language-${codeBlockLang}` : '' }, codeContent)))
 				}
 				else {
-					appendNode(
-						createElement('pre', { key, className: codeBlockLang ? `language-${codeBlockLang}` : '' },
-							codeBlockTitle ? createElement('div', { className: 'code-title' }, codeBlockTitle) : null,
-							createElement('code', null, codeContent),
-						),
-					)
+					appendNode(createElement('pre', {
+						key,
+						className: codeBlockLang ? `language-${codeBlockLang}` : '',
+					}, codeBlockTitle ? createElement('div', { className: 'code-title' }, codeBlockTitle) : null, createElement('code', null, codeContent)))
 				}
 				i++
 				continue
@@ -400,72 +404,52 @@ export function parseAndRenderClientMdc(
 			toc.push({ depth, text: headingText, id })
 			const key = `h-${depth}-${i}`
 			const tagName = `h${depth}`
-			appendNode(
-				createElement(tagName, { key, id, className: `heading-${depth}` },
-					renderInlineMarkdown(headingText, `${key}-inline`),
-				),
-			)
+			appendNode(createElement(tagName, { key, id, className: `heading-${depth}` }, renderInlineMarkdown(headingText, `${key}-inline`)))
 			i++
 			continue
 		}
 
 		// 6. 分割线 ---, ***, ___
-		if (/^\s*([*-_\s]){3,}\s*$/.test(line)) {
+		if (/^[*\-_\s]{3,}$/.test(line)) {
 			appendNode(createElement('hr', { key: `hr-${i}`, className: 'article-hr' }))
 			i++
 			continue
 		}
 
 		// 7. 引用块 > quote
-		if (/^\s*>\s*(.*)$/.test(line)) {
+		if (/^\s*>/.test(line)) {
 			const quoteLines: string[] = []
-			while (i < lines.length && /^\s*>\s*(.*)$/.test(lines[i]!)) {
+			while (i < lines.length && /^\s*>/.test(lines[i]!)) {
 				const m = lines[i]!.match(/^\s*>\s*(.*)$/)
 				quoteLines.push(m?.[1] || '')
 				i++
 			}
 			const quoteContent = quoteLines.join(' ')
-			appendNode(
-				createElement('blockquote', { key: `quote-${i}`, className: 'article-quote' },
-					renderInlineMarkdown(quoteContent, `quote-text-${i}`),
-				),
-			)
+			appendNode(createElement('blockquote', { key: `quote-${i}`, className: 'article-quote' }, renderInlineMarkdown(quoteContent, `quote-text-${i}`)))
 			continue
 		}
 
 		// 8. 无序列表 - / * / +
-		if (/^\s*[-*+]\s+(.*)$/.test(line)) {
+		if (/^\s*[-*+]\s+/.test(line)) {
 			const listItems: string[] = []
-			while (i < lines.length && /^\s*[-*+]\s+(.*)$/.test(lines[i]!)) {
+			while (i < lines.length && /^\s*[-*+]\s+/.test(lines[i]!)) {
 				const m = lines[i]!.match(/^\s*[-*+]\s+(.*)$/)
 				listItems.push(m?.[1] || '')
 				i++
 			}
-			appendNode(
-				createElement('ul', { key: `ul-${i}`, className: 'article-ul' },
-					listItems.map((item, lIdx) =>
-						createElement('li', { key: `li-${lIdx}` }, renderInlineMarkdown(item, `li-${lIdx}-inline`)),
-					),
-				),
-			)
+			appendNode(createElement('ul', { key: `ul-${i}`, className: 'article-ul' }, listItems.map((item, lIdx) => createElement('li', { key: `li-${lIdx}` }, renderInlineMarkdown(item, `li-${lIdx}-inline`)))))
 			continue
 		}
 
 		// 9. 有序列表 1. 2. 3.
-		if (/^\s*\d+\.\s+(.*)$/.test(line)) {
+		if (/^\s*\d+\.\s+/.test(line)) {
 			const listItems: string[] = []
-			while (i < lines.length && /^\s*\d+\.\s+(.*)$/.test(lines[i]!)) {
+			while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i]!)) {
 				const m = lines[i]!.match(/^\s*\d+\.\s+(.*)$/)
 				listItems.push(m?.[1] || '')
 				i++
 			}
-			appendNode(
-				createElement('ol', { key: `ol-${i}`, className: 'article-ol' },
-					listItems.map((item, lIdx) =>
-						createElement('li', { key: `ol-li-${lIdx}` }, renderInlineMarkdown(item, `ol-li-${lIdx}-inline`)),
-					),
-				),
-			)
+			appendNode(createElement('ol', { key: `ol-${i}`, className: 'article-ol' }, listItems.map((item, lIdx) => createElement('li', { key: `ol-li-${lIdx}` }, renderInlineMarkdown(item, `ol-li-${lIdx}-inline`)))))
 			continue
 		}
 
@@ -482,23 +466,10 @@ export function parseAndRenderClientMdc(
 				const bodyLines = hasDivider ? tableLines.slice(2) : tableLines.slice(1)
 
 				const ProseTable = defaultMdxComponents.table || 'table'
-				appendNode(
-					createElement(ProseTable, { key: `tbl-${i}`, className: 'article-table' },
-						createElement('thead', null,
-							createElement('tr', null,
-								headerCells.map((h, hIdx) => createElement('th', { key: `th-${hIdx}` }, renderInlineMarkdown(h, `th-${hIdx}-inline`))),
-							),
-						),
-						createElement('tbody', null,
-							bodyLines.map((rowStr, rIdx) => {
-								const cells = rowStr.split('|').slice(1, -1).map(c => c.trim())
-								return createElement('tr', { key: `tr-${rIdx}` },
-									cells.map((cell, cIdx) => createElement('td', { key: `td-${cIdx}` }, renderInlineMarkdown(cell, `td-${rIdx}-${cIdx}`))),
-								)
-							}),
-						),
-					),
-				)
+				appendNode(createElement(ProseTable, { key: `tbl-${i}`, className: 'article-table' }, createElement('thead', null, createElement('tr', null, headerCells.map((h, hIdx) => createElement('th', { key: `th-${hIdx}` }, renderInlineMarkdown(h, `th-${hIdx}-inline`))))), createElement('tbody', null, bodyLines.map((rowStr, rIdx) => {
+					const cells = rowStr.split('|').slice(1, -1).map(c => c.trim())
+					return createElement('tr', { key: `tr-${rIdx}` }, cells.map((cell, cIdx) => createElement('td', { key: `td-${cIdx}` }, renderInlineMarkdown(cell, `td-${rIdx}-${cIdx}`))))
+				}))))
 				continue
 			}
 		}
@@ -510,11 +481,7 @@ export function parseAndRenderClientMdc(
 		}
 
 		// 12. 普通段落
-		appendNode(
-			createElement('p', { key: `p-${i}`, className: 'article-paragraph' },
-				renderInlineMarkdown(line, `p-${i}-inline`),
-			),
-		)
+		appendNode(createElement('p', { key: `p-${i}`, className: 'article-paragraph' }, renderInlineMarkdown(line, `p-${i}-inline`)))
 		i++
 	}
 

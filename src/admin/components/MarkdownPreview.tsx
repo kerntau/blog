@@ -31,15 +31,17 @@ class PreviewErrorBoundary extends React.Component<{ children: React.ReactNode }
 	render() {
 		if (this.state.hasError) {
 			return (
-				<div style={{
-					padding: '16px 20px',
-					margin: '16px 0',
-					borderRadius: '8px',
-					background: 'var(--admin-warning-soft)',
-					border: '1px solid var(--admin-warning)',
-					color: 'var(--admin-warning)',
-					fontSize: '13px',
-				}}>
+				<div
+					style={{
+						padding: '16px 20px',
+						margin: '16px 0',
+						borderRadius: '8px',
+						background: 'var(--admin-warning-soft)',
+						border: '1px solid var(--admin-warning)',
+						color: 'var(--admin-warning)',
+						fontSize: '13px',
+					}}
+				>
 					<div style={{ fontWeight: 600, marginBottom: 4 }}>渲染容错中</div>
 					<div style={{ opacity: 0.85 }}>正在编辑的内容结构暂未闭合，已自动启用弹性容错回退模式。</div>
 				</div>
@@ -60,12 +62,14 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
 		if (!content || !content.trim()) {
 			return {
 				renderedElements: (
-					<div style={{
-						padding: '48px 0',
-						textAlign: 'center',
-						color: 'var(--admin-text-3)',
-						fontSize: '14px',
-					}}>
+					<div
+						style={{
+							padding: '48px 0',
+							textAlign: 'center',
+							color: 'var(--admin-text-3)',
+							fontSize: '14px',
+						}}
+					>
 						在此输入文章内容，右侧将 0 延迟同源实时呈现...
 					</div>
 				),

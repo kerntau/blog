@@ -45,7 +45,6 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 
 	// 表单状态
 	const [title, setTitle] = useState('')
-	const [slug, setSlug] = useState('')
 	const [description, setDescription] = useState('')
 	const [category, setCategory] = useState('前端开发')
 	const [categoriesList, setCategoriesList] = useState<string[]>([])
@@ -75,7 +74,7 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 	const isSyncingLeftRef = useRef(false)
 	const isSyncingRightRef = useRef(false)
 
-	const currentSlug = postPath ? postPath.replace(/^.*[\\/]/, '').replace(/\.(md|mdx)$/i, '') : slug || 'new-post'
+	const currentSlug = postPath ? postPath.replace(/^.*[\\/]/, '').replace(/\.(md|mdx)$/i, '') : 'new-post'
 	const draftStorageKey = `blog_draft_${currentSlug}`
 
 	// 加载系统分类列表
@@ -167,7 +166,6 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 			if (isNew) {
 				await adminApi.createPost({
 					title: title.trim(),
-					slug: slug.trim() || undefined,
 					category: category.trim(),
 					tags,
 					type,
@@ -212,7 +210,7 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 		finally {
 			setSaving(false)
 		}
-	}, [title, isNew, slug, category, tags, type, permalink, description, content, draftStorageKey, postPath, date, draft, image, onSaved, onBack, showToast])
+	}, [title, isNew, category, tags, type, permalink, description, content, draftStorageKey, postPath, date, draft, image, onSaved, onBack, showToast])
 
 	// 分栏比例拖拽把手
 	const handleResizerMouseDown = (e: React.MouseEvent) => {
@@ -384,7 +382,8 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 
 			if (e.shiftKey) {
 				const lineStart = val.lastIndexOf('\n', start - 1) + 1
-				const lineEnd = val.indexOf('\n', end) === -1 ? val.length : val.indexOf('\n', end)
+				const nextNewline = val.indexOf('\n', end)
+				const lineEnd = nextNewline === -1 ? val.length : nextNewline
 				const block = val.slice(lineStart, lineEnd)
 				const unindented = block.split('\n').map(l => l.startsWith('  ') ? l.slice(2) : l.startsWith('\t') ? l.slice(1) : l).join('\n')
 				const nextVal = val.slice(0, lineStart) + unindented + val.slice(lineEnd)
@@ -400,7 +399,8 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 				}
 				else {
 					const lineStart = val.lastIndexOf('\n', start - 1) + 1
-					const lineEnd = val.indexOf('\n', end) === -1 ? val.length : val.indexOf('\n', end)
+					const nextNewline = val.indexOf('\n', end)
+					const lineEnd = nextNewline === -1 ? val.length : nextNewline
 					const block = val.slice(lineStart, lineEnd)
 					const indented = block.split('\n').map(l => '  ' + l).join('\n')
 					const nextVal = val.slice(0, lineStart) + indented + val.slice(lineEnd)

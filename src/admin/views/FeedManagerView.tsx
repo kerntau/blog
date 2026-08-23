@@ -12,9 +12,23 @@ import { getDomain } from '../../utils/link'
 
 // 常用技术栈预设
 const COMMON_ARCHS = [
-	'React', 'Vue', 'Next.js', 'Nuxt', 'Astro', 'Svelte',
-	'Hexo', 'Hugo', 'VitePress', 'Docusaurus', 'WordPress',
-	'Tailwind', 'Rsbuild', 'TypeScript', 'Node.js', 'Rust', 'Go'
+	'React',
+	'Vue',
+	'Next.js',
+	'Nuxt',
+	'Astro',
+	'Svelte',
+	'Hexo',
+	'Hugo',
+	'VitePress',
+	'Docusaurus',
+	'WordPress',
+	'Tailwind',
+	'Rsbuild',
+	'TypeScript',
+	'Node.js',
+	'Rust',
+	'Go',
 ]
 
 export const FeedManagerView: React.FC = () => {
@@ -361,10 +375,6 @@ export const FeedManagerView: React.FC = () => {
 	// 统计数据
 	const totalFriendsCount = useMemo(() => {
 		return groups.reduce((acc, g) => acc + (g.entries?.length || 0), 0)
-	}, [groups])
-
-	const withFeedCount = useMemo(() => {
-		return groups.reduce((acc, g) => acc + (g.entries?.filter(e => Boolean(e.feed))?.length || 0), 0)
 	}, [groups])
 
 	const currentGroup = groups[selectedGroupIdx]
