@@ -29,9 +29,16 @@ export default function BlogTech({ customData }: BlogTechProps = {}) {
 		{ label: '部署平台', value: 'EdgeOne', icon: 'ri:tencent-cloud-fill', iconColor: '#0052D9' },
 		{ label: '图片存储', value: 'Cloudflare R2', icon: 'devicon:cloudflare' },
 		{ label: '开源协议', value: 'MIT', icon: 'tabler:license', iconColor: '#F59E0B' },
-		{ label: '文章许可', value: appConfig.copyright.abbr },
-		{ label: '规范域名', value: getDomain(appConfig.url) || 'cot.wiki' },
+		{ label: '文章许可', value: appConfig.copyright.abbr, icon: 'tabler:creative-commons', iconColor: '#10B981' },
+		{ label: '规范域名', value: getDomain(appConfig.url) || 'cot.wiki', icon: 'tabler:link', iconColor: '#6366F1' },
 	]
+
+	const renderIcon = (iconStr: string, iconColor?: string, altText = '') => {
+		if (iconStr.startsWith('/') || iconStr.endsWith('.svg')) {
+			return <img src={iconStr} alt={altText} className={styles.customSvgIcon} />
+		}
+		return <Icon icon={iconStr} style={iconColor ? { color: iconColor } : undefined} />
+	}
 
 	const service = rawServices.map((s: any) => ({
 		label: s.label,
@@ -39,7 +46,9 @@ export default function BlogTech({ customData }: BlogTechProps = {}) {
 			if (s.icon) {
 				return (
 					<span className={styles.valWithIcon}>
-						<Icon icon={s.icon} style={s.iconColor ? { color: s.iconColor } : undefined} />
+						<span className={styles.valIcon}>
+							{renderIcon(s.icon, s.iconColor, s.label)}
+						</span>
 						<span>{s.value}</span>
 					</span>
 				)
@@ -50,13 +59,13 @@ export default function BlogTech({ customData }: BlogTechProps = {}) {
 
 	const techstack = techConfig?.techstack || [
 		{ icon: 'logos:react', name: 'React', version: packageJson.dependencies.react },
-		{ icon: 'tabler:bolt', iconColor: '#F85D00', name: 'Rsbuild', version: (packageJson.devDependencies as any)['@rsbuild/core'] || '^2.1.13' },
-		{ icon: 'devicon:typescript', name: 'TS', version: packageJson.devDependencies.typescript },
+		{ icon: '/icons/rsbuild.svg', name: 'Rsbuild', version: (packageJson.devDependencies as any)['@rsbuild/core'] || '^2.1.13' },
+		{ icon: 'logos:typescript-icon', name: 'TS', version: packageJson.devDependencies.typescript },
+		{ icon: 'simple-icons:sass', iconColor: '#CC6699', name: 'Sass', version: packageJson.devDependencies['sass-embedded'] || '^1.99.0' },
 		{ icon: 'simple-icons:mdx', iconColor: '#FCB32C', name: 'MDX', version: packageJson.dependencies['@mdx-js/mdx'] },
 		{ icon: 'logos:nodejs-icon', name: 'Node', version: packageJson.engines.node },
-		{ icon: 'logos:pnpm', name: 'pnpm', version: packageJson.packageManager?.split('@')[1] || '11.0.4' },
+		{ icon: 'simple-icons:pnpm', iconColor: '#F69220', name: 'pnpm', version: packageJson.packageManager?.split('@')[1] || '11.0.4' },
 		{ icon: 'simple-icons:framer', iconColor: '#0055FF', name: 'Motion', version: packageJson.dependencies['framer-motion'] },
-		{ icon: 'logos:sass', name: 'Sass', version: packageJson.devDependencies['sass-embedded'] || '^1.99.0' },
 	]
 
 	return (
@@ -68,7 +77,7 @@ export default function BlogTech({ customData }: BlogTechProps = {}) {
 						<div key={i} className={styles.techItem}>
 							<div className={styles.techLabel}>
 								<span className={styles.techIcon}>
-									<Icon icon={tech.icon} style={tech.iconColor ? { color: tech.iconColor } : undefined} />
+									{renderIcon(tech.icon, tech.iconColor, tech.name)}
 								</span>
 								<span className={styles.techName}>{tech.name}</span>
 							</div>

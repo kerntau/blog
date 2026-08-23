@@ -26,6 +26,7 @@
 	grid-template-columns: auto auto;
 	gap: 0.4em 8%;
 	padding: 0.2em 0;
+	align-items: center;
 
 	.item {
 		display: contents;
@@ -33,6 +34,14 @@
 		.dt {
 			font-size: inherit;
 			text-align: end;
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+		}
+
+		.dd {
+			display: flex;
+			align-items: center;
 		}
 	}
 }
