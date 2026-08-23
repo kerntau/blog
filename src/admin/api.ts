@@ -172,6 +172,38 @@ export const adminApi = {
 			method: 'POST',
 			body: JSON.stringify({ groups }),
 		}),
+	getMyFeed: () =>
+		request<{
+			author: string
+			sitenick: string
+			title: string
+			desc: string
+			link: string
+			avatar: string
+			archs: string[]
+			date: string
+			comment: string
+		}>('/feeds/my-feed'),
+	saveMyFeed: (data: {
+		author?: string
+		sitenick?: string
+		title?: string
+		desc?: string
+		link?: string
+		avatar?: string
+		archs?: string[]
+		comment?: string
+	}) =>
+		request<{ message: string }>('/feeds/my-feed/save', {
+			method: 'POST',
+			body: JSON.stringify(data),
+		}),
+	getLinkMd: () => request<{ content: string }>('/feeds/link-md'),
+	saveLinkMd: (content: string) =>
+		request<{ message: string }>('/feeds/link-md/save', {
+			method: 'POST',
+			body: JSON.stringify({ content }),
+		}),
 	sniffWebsite: (url: string) =>
 		request<SniffResult>('/feeds/sniff', {
 			method: 'POST',

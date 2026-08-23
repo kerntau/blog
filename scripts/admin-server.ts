@@ -1751,6 +1751,116 @@ const server = http.createServer(async (req, res) => {
 			return
 		}
 
+		// 24.1 GET /api/feeds/my-feed - 获取本站友链展示信息 (myFeed)
+		if (method === 'GET' && pathname === '/api/feeds/my-feed') {
+			const blogRaw = fs.readFileSync(blogConfigPath, 'utf-8')
+			const extractField = (str: string, key: string) => {
+				const m = str.match(new RegExp(`${key}:\\s*['"\`](.*?)['"\`]`))
+				return m ? m[1] : ''
+			}
+
+			let sitenick = '序栈'
+			const sitenickMatch = blogRaw.match(/sitenick:\s*['"`](.*?)['"`]/)
+			if (sitenickMatch) sitenick = sitenickMatch[1] || '序栈'
+
+			let archs: string[] = ['React', 'Rsbuild']
+			const archsMatch = blogRaw.match(/archs:\s*\[([\s\S]*?)\]/)
+			if (archsMatch) {
+				const items = archsMatch[1].match(/['"`](.*?)['"`]/g)
+				if (items) archs = items.map(s => s.replace(/['"`]/g, ''))
+			}
+
+			let comment = '这是我自己'
+			const commentMatch = blogRaw.match(/comment:\s*['"`](.*?)['"`]/)
+			if (commentMatch) comment = commentMatch[1] || '这是我自己'
+
+			const author = extractField(blogRaw, 'name') || extractField(blogRaw, 'author') || 'kerntau'
+			const title = extractField(blogRaw, 'title') || 'kerntau'
+			const subtitle = extractField(blogRaw, 'subtitle')
+			const description = extractField(blogRaw, 'description')
+			const desc = subtitle || description || '心中有景,花香满径'
+			const link = extractField(blogRaw, 'url') || 'https://keru.in/'
+			const avatar = extractField(blogRaw, 'avatar') || '/avatar.webp'
+			const date = extractField(blogRaw, 'timeEstablished') || '2025-11-10'
+
+			sendJson(res, 200, {
+				code: 0,
+				data: {
+					author,
+					sitenick,
+					title,
+					desc,
+					link,
+					avatar,
+					archs,
+					date,
+					comment,
+				},
+			})
+			return
+		}
+
+		// 24.2 POST /api/feeds/my-feed/save - 保存本站友链展示信息 (myFeed)
+		if (method === 'POST' && pathname === '/api/feeds/my-feed/save') {
+			const body = await parseJsonBody<{
+				author?: string
+				sitenick?: string
+				title?: string
+				desc?: string
+				link?: string
+				avatar?: string
+				archs?: string[]
+				comment?: string
+			}>(req)
+
+			let blogRaw = fs.readFileSync(blogConfigPath, 'utf-8')
+			const replaceField = (str: string, key: string, val: string) => {
+				const reg = new RegExp(`(${key}:\\s*)['"\`].*?['"\`]`)
+				if (reg.test(str)) {
+					return str.replace(reg, `$1'${val.replace(/'/g, '\\\'')}'`)
+				}
+				return str
+			}
+
+			if (body.sitenick !== undefined) blogRaw = replaceField(blogRaw, 'sitenick', body.sitenick)
+			if (body.comment !== undefined) blogRaw = replaceField(blogRaw, 'comment', body.comment)
+			if (body.author !== undefined) blogRaw = replaceField(blogRaw, 'name', body.author)
+			if (body.title !== undefined) blogRaw = replaceField(blogRaw, 'title', body.title)
+			if (body.desc !== undefined) {
+				blogRaw = replaceField(blogRaw, 'subtitle', body.desc)
+			}
+			if (body.link !== undefined) blogRaw = replaceField(blogRaw, 'url', body.link)
+			if (body.avatar !== undefined) blogRaw = replaceField(blogRaw, 'avatar', body.avatar)
+
+			if (body.archs && Array.isArray(body.archs)) {
+				const archsFormatted = body.archs.map(a => `'${a.replace(/'/g, '\\\'')}'`).join(', ')
+				blogRaw = blogRaw.replace(/archs:\s*\[[\s\S]*?\],/, `archs: [${archsFormatted}],`)
+			}
+
+			safeWriteFileSync(blogConfigPath, blogRaw)
+			recordAuditLog('修改本站友链信息', 'blog.config.ts', '更新了友链页展示的本站信息 (myFeed)')
+			sendJson(res, 200, { code: 0, message: '本站友链卡片展示信息已成功保存更新！' })
+			return
+		}
+
+		// 24.3 GET /api/feeds/link-md - 读取友链申请说明 (link.md)
+		if (method === 'GET' && pathname === '/api/feeds/link-md') {
+			const linkMdPath = path.join(rootDir, 'content', 'link.md')
+			const content = fs.existsSync(linkMdPath) ? fs.readFileSync(linkMdPath, 'utf-8') : ''
+			sendJson(res, 200, { code: 0, data: { content } })
+			return
+		}
+
+		// 24.4 POST /api/feeds/link-md/save - 保存友链申请说明 (link.md)
+		if (method === 'POST' && pathname === '/api/feeds/link-md/save') {
+			const body = await parseJsonBody<{ content: string }>(req)
+			const linkMdPath = path.join(rootDir, 'content', 'link.md')
+			safeWriteFileSync(linkMdPath, body.content || '')
+			recordAuditLog('修改友链申请说明', 'content/link.md', '更新了友链页面的申请说明文档')
+			sendJson(res, 200, { code: 0, message: '友链申请说明 (link.md) 已成功保存生效！' })
+			return
+		}
+
 		// 25. GET /api/config - 获取配置
 		if (method === 'GET' && pathname === '/api/config') {
 			const blogConfigRaw = fs.existsSync(blogConfigPath) ? fs.readFileSync(blogConfigPath, 'utf-8') : ''
