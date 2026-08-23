@@ -43,6 +43,8 @@ const appConfig = {
 		stats: {
 			/** 归档页面每年标题对应的年龄 */
 			birthYear: 2006,
+			/** blog-stats widget 的预置文本 */
+			wordCount: '约12万',
 		},
 	},
 
@@ -113,26 +115,11 @@ const appConfig = {
 	] satisfies Nav,
 
 	pagination: {
-		perPage: 10,
+		perPage: 12,
 		/** 默认排序方式，需要是 this.article.order 中的键名 */
 		sortOrder: 'date' as keyof typeof blogConfig.article.order,
 		/** 允许（普通/预览/归档）文章列表正序，开启后排序方式左侧图标可切换顺序 */
 		allowAscending: false,
-	},
-
-	themes: {
-		light: {
-			icon: 'tabler:sun',
-			tip: '浅色模式',
-		},
-		system: {
-			icon: 'tabler:device-desktop',
-			tip: '跟随系统',
-		},
-		dark: {
-			icon: 'tabler:moon',
-			tip: '深色模式',
-		},
 	},
 
 	widgets: {
@@ -178,6 +165,21 @@ const appConfig = {
 			archive: ['blog-stats', 'blog-log'],
 			home: ['blog-stats', 'blog-tech', 'comm-group'],
 			post: ['toc'],
+		},
+	},
+
+	themes: {
+		light: {
+			icon: 'tabler:sun',
+			tip: '浅色模式',
+		},
+		system: {
+			icon: 'tabler:device-desktop',
+			tip: '跟随系统',
+		},
+		dark: {
+			icon: 'tabler:moon',
+			tip: '深色模式',
 		},
 	},
 }

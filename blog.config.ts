@@ -1,7 +1,7 @@
 import type { FeedEntry } from './src/types/feed'
 
 const basicConfig = {
-	title: 'kerntau',
+	title: '序栈',
 	subtitle: '心中有景,花香满径',
 	// 长 description 利好于 SEO
 	description: '在有序的世界里，寻一处生活的归栈。用理性梳理日常，用技术温柔时光，不慌不忙，自在生长。',
@@ -85,7 +85,7 @@ const blogConfig = {
 /** 用于生成 OPML 和友链页面配置 */
 export const myFeed: FeedEntry = {
 	author: blogConfig.author.name,
-	sitenick: '序栈',
+	sitenick: '',
 	title: blogConfig.title,
 	desc: blogConfig.subtitle || blogConfig.description,
 	link: blogConfig.url,
