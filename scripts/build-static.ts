@@ -199,7 +199,7 @@ async function compileMdxSource(rawSource: string, frontmatterTitle?: string, fi
 								node.properties['data-line'] = String(line)
 							},
 							pre(node: any) {
-								const rawMeta = this.options?.meta?.__raw || ''
+								const rawMeta = (this as any).options?.meta?.__raw || ''
 								node.properties = node.properties || {}
 								if (rawMeta) {
 									node.properties['data-meta'] = rawMeta
@@ -208,8 +208,8 @@ async function compileMdxSource(rawSource: string, frontmatterTitle?: string, fi
 										node.properties['data-filename'] = filenameMatch[1]
 									}
 								}
-								if (this.options?.lang) {
-									node.properties['data-language'] = this.options.lang
+								if ((this as any).options?.lang) {
+									node.properties['data-language'] = (this as any).options.lang
 								}
 								if (node.children?.[0]?.children) {
 									node.children[0].children = node.children[0].children.filter(
