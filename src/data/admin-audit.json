@@ -1,5 +1,157 @@
 [
   {
+    "id": "audit-1787449397996-p50i",
+    "timestamp": "2026-08-23 09:43:17",
+    "action": "删除媒体资源",
+    "target": "/covers/sec026-og.webp",
+    "details": "删除了静态资源文件 /covers/sec026-og.webp",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787449262962-zzng",
+    "timestamp": "2026-08-23 09:41:02",
+    "action": "修改主题与外观",
+    "target": "src/app.config.ts",
+    "details": "更新了提示框风格、代码块参数与摘要动画配置",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787449262948-4u1q",
+    "timestamp": "2026-08-23 09:41:02",
+    "action": "修改站点与身份配置",
+    "target": "blog.config.ts / app.config.ts",
+    "details": "更新了全站基础配置、博主头像与 Emoji 动效",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787449249598-0pg5",
+    "timestamp": "2026-08-23 09:40:49",
+    "action": "修改友链申请说明",
+    "target": "content/link.md",
+    "details": "更新了友链页面的申请说明文档",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787449249239-gkav",
+    "timestamp": "2026-08-23 09:40:49",
+    "action": "修改友链申请说明",
+    "target": "content/link.md",
+    "details": "更新了友链页面的申请说明文档",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787449248493-rxi1",
+    "timestamp": "2026-08-23 09:40:48",
+    "action": "修改友链申请说明",
+    "target": "content/link.md",
+    "details": "更新了友链页面的申请说明文档",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787448823170-krju",
+    "timestamp": "2026-08-23 09:33:43",
+    "action": "修改主题与外观",
+    "target": "src/app.config.ts",
+    "details": "更新了提示框风格、代码块参数与摘要动画配置",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787448823152-ad0p",
+    "timestamp": "2026-08-23 09:33:43",
+    "action": "修改站点与身份配置",
+    "target": "blog.config.ts / app.config.ts",
+    "details": "更新了全站基础配置、博主头像与 Emoji 动效",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787448363235-az2s",
+    "timestamp": "2026-08-23 09:26:03",
+    "action": "修改主题与外观",
+    "target": "src/app.config.ts",
+    "details": "更新了提示框风格、代码块参数与摘要动画配置",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787448363192-vm0h",
+    "timestamp": "2026-08-23 09:26:03",
+    "action": "修改站点与身份配置",
+    "target": "blog.config.ts / app.config.ts",
+    "details": "更新了全站基础配置、博主头像与 Emoji 动效",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787447456996-u989",
+    "timestamp": "2026-08-23 09:10:56",
+    "action": "修改友链申请说明",
+    "target": "content/link.md",
+    "details": "更新了友链页面的申请说明文档",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787447456823-9ytm",
+    "timestamp": "2026-08-23 09:10:56",
+    "action": "修改友链申请说明",
+    "target": "content/link.md",
+    "details": "更新了友链页面的申请说明文档",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787447456630-n56g",
+    "timestamp": "2026-08-23 09:10:56",
+    "action": "修改友链申请说明",
+    "target": "content/link.md",
+    "details": "更新了友链页面的申请说明文档",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787447455999-66wn",
+    "timestamp": "2026-08-23 09:10:55",
+    "action": "修改友链申请说明",
+    "target": "content/link.md",
+    "details": "更新了友链页面的申请说明文档",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787447447447-4p9l",
+    "timestamp": "2026-08-23 09:10:47",
+    "action": "修改友链申请说明",
+    "target": "content/link.md",
+    "details": "更新了友链页面的申请说明文档",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787447446842-3w68",
+    "timestamp": "2026-08-23 09:10:46",
+    "action": "修改友链申请说明",
+    "target": "content/link.md",
+    "details": "更新了友链页面的申请说明文档",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787447430902-jboq",
+    "timestamp": "2026-08-23 09:10:30",
+    "action": "修改本站友链信息",
+    "target": "blog.config.ts",
+    "details": "更新了友链页展示的本站信息 (myFeed)",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787447425836-vhf0",
+    "timestamp": "2026-08-23 09:10:25",
+    "action": "修改本站友链信息",
+    "target": "blog.config.ts",
+    "details": "更新了友链页展示的本站信息 (myFeed)",
+    "operator": "Admin"
+  },
+  {
+    "id": "audit-1787447423807-i9tu",
+    "timestamp": "2026-08-23 09:10:23",
+    "action": "修改本站友链信息",
+    "target": "blog.config.ts",
+    "details": "更新了友链页展示的本站信息 (myFeed)",
+    "operator": "Admin"
+  },
+  {
     "id": "audit-1787407012821-rynf",
     "timestamp": "2026-08-22 21:56:52",
     "action": "修改站点与身份配置",
