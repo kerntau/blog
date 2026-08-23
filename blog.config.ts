@@ -4,10 +4,10 @@ const basicConfig = {
 	title: '序栈',
 	subtitle: '心中有景,花香满径',
 	// 长 description 利好于 SEO
-	description: '在有序的世界里，寻一处生活的归栈。用理性梳理日常，用技术温柔时光，不慌不忙，自在生长。',
+	description: '在有序的世界里，寻一处生活的归栈。用理性梳理日常，用技术温柔时光。',
 	author: {
 		name: 'kerntau',
-		avatar: '/avatar.webp',
+		avatar: 'https://keru.in/avatar.webp',
 		email: '1722288011@qq.com',
 		homepage: 'https://keru.in/',
 	},
@@ -32,8 +32,7 @@ const blogConfig = {
 
 	article: {
 		categories: {
-			[basicConfig.defaultCategory]: { icon: 'tabler:code', color: '#7777ff' },
-			'前端开发': { icon: 'tabler:browser', color: '#33aaff' },
+			[basicConfig.defaultCategory]: { icon: 'tabler:browser', color: '#33aaff' },
 			'后端开发': { icon: 'tabler:server', color: '#7777ff' },
 			'数据库系统': { icon: 'tabler:database', color: '#ffaa33' },
 			'云原生与运维': { icon: 'tabler:cloud', color: '#33bbaa' },
@@ -85,7 +84,7 @@ const blogConfig = {
 /** 用于生成 OPML 和友链页面配置 */
 export const myFeed: FeedEntry = {
 	author: blogConfig.author.name,
-	sitenick: '',
+	sitenick: '序栈',
 	title: blogConfig.title,
 	desc: blogConfig.subtitle || blogConfig.description,
 	link: blogConfig.url,

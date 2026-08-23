@@ -136,6 +136,43 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 		return () => clearTimeout(timer)
 	}, [content, originalRawContent, draftStorageKey])
 
+	// 网页刷新与离开未保存防丢失保护
+	useEffect(() => {
+		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+			if (isDirty) {
+				e.preventDefault()
+				e.returnValue = '您有尚未保存的修改，确定要离开吗？'
+				return e.returnValue
+			}
+		}
+		window.addEventListener('beforeunload', handleBeforeUnload)
+		return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+	}, [isDirty])
+
+	// 格式化与智能排版 (Prettify)
+	const handleFormatArticle = () => {
+		if (!content) return
+		const formatted = `${content
+			// 1. 规范化超过2个的连续空行
+			.replace(/\n{3,}/g, '\n\n')
+			// 2. 规范化中英文之间的空格
+			.replace(/([\u4E00-\u9FA5])([a-zA-Z0-9`])/g, '$1 $2')
+			.replace(/([a-zA-Z0-9`])([\u4E00-\u9FA5])/g, '$1 $2')
+			// 3. 规范化标题与列表标记后的空格
+			.replace(/^(#{1,6})([^\s#])/gm, '$1 $2')
+			.replace(/^([*+-])(\S)/gm, '$1 $2')
+			.trim()}\n`
+
+		if (formatted !== content) {
+			setContent(formatted)
+			setIsDirty(true)
+			showToast('已完成文章智能格式化与空行修剪', 'success')
+		}
+		else {
+			showToast('当前文章排版已十分规范，无需调整', 'info')
+		}
+	}
+
 	// 恢复暂存草稿
 	const handleRestoreDraft = () => {
 		const savedDraft = localStorage.getItem(draftStorageKey)
@@ -266,21 +303,85 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 		}, 40)
 	}
 
+	// 光标位置精确记忆与 Notion 风格悬浮气泡工具条状态
+	const lastSelectionRef = useRef<{ start: number, end: number }>({ start: 0, end: 0 })
+	const [bubbleState, setBubbleState] = useState<{
+		visible: boolean
+		x: number
+		y: number
+		selectedText: string
+	}>({ visible: false, x: 0, y: 0, selectedText: '' })
+
+	const updateLastSelection = () => {
+		if (textareaRef.current) {
+			const el = textareaRef.current
+			const start = el.selectionStart
+			const end = el.selectionEnd
+			lastSelectionRef.current = { start, end }
+
+			if (start !== end && end - start > 0) {
+				const text = el.value.substring(start, end)
+				const lines = el.value.substring(0, start).split('\n')
+				const currentLine = lines.length
+				const currentCol = lines[lines.length - 1].length
+				const lineHeight = 22.2 // 13.5px font-size * 1.65 line-height ≈ 22.2px
+				const charWidth = 8.1 // monospace char width ≈ 8.1px
+				
+				const top = currentLine * lineHeight - el.scrollTop + 14
+				const left = Math.min(Math.max(currentCol * charWidth + 24, 110), el.clientWidth - 130)
+
+				setBubbleState({
+					visible: true,
+					x: left,
+					y: Math.max(top, 36),
+					selectedText: text,
+				})
+			}
+			else {
+				setBubbleState(prev => prev.visible ? { ...prev, visible: false } : prev)
+			}
+		}
+	}
+
 	// 插入 Markdown / MDC 文本片段
 	const handleInsertSnippet = (snippet: string) => {
 		const el = textareaRef.current
 		if (!el) {
 			setContent(prev => prev + snippet)
+			setIsDirty(true)
 			return
 		}
-		const start = el.selectionStart
-		const end = el.selectionEnd
-		const val = el.value
-		const nextVal = val.substring(0, start) + snippet + val.substring(end)
+
+		const val = content
+		const selStart = Math.min(el.selectionStart ?? lastSelectionRef.current.start, val.length)
+		const selEnd = Math.min(el.selectionEnd ?? lastSelectionRef.current.end, val.length)
+
+		let insertText = snippet
+		// 块级组件智能补齐首尾换行符
+		if (snippet.startsWith('::') || snippet.startsWith('```') || snippet.startsWith('#') || snippet.startsWith('|')) {
+			const beforeChar = selStart > 0 ? val[selStart - 1] : '\n'
+			const afterChar = selEnd < val.length ? val[selEnd] : '\n'
+
+			if (beforeChar !== '\n' && beforeChar !== undefined) {
+				insertText = `\n\n${insertText}`
+			}
+			if (afterChar !== '\n' && afterChar !== undefined && !insertText.endsWith('\n')) {
+				insertText = `${insertText}\n`
+			}
+		}
+
+		const nextVal = val.substring(0, selStart) + insertText + val.substring(selEnd)
 		setContent(nextVal)
+		setIsDirty(true)
+
+		const newCursorPos = selStart + insertText.length
+		lastSelectionRef.current = { start: newCursorPos, end: newCursorPos }
+
 		setTimeout(() => {
-			el.focus()
-			el.setSelectionRange(start + snippet.length, start + snippet.length)
+			if (textareaRef.current) {
+				textareaRef.current.focus()
+				textareaRef.current.setSelectionRange(newCursorPos, newCursorPos)
+			}
 		}, 50)
 	}
 
@@ -288,15 +389,23 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 	const handleInsertFormat = (prefix: string, suffix = '') => {
 		const el = textareaRef.current
 		if (!el) return
-		const start = el.selectionStart
-		const end = el.selectionEnd
-		const selected = content.substring(start, end)
+		const selStart = el.selectionStart ?? lastSelectionRef.current.start
+		const selEnd = el.selectionEnd ?? lastSelectionRef.current.end
+		const selected = content.substring(selStart, selEnd)
 		const replacement = `${prefix}${selected || '文本'}${suffix}`
-		const nextVal = content.substring(0, start) + replacement + content.substring(end)
+		const nextVal = content.substring(0, selStart) + replacement + content.substring(selEnd)
 		setContent(nextVal)
+		setIsDirty(true)
+
+		const selectTargetStart = selStart + prefix.length
+		const selectTargetEnd = selectTargetStart + (selected ? selected.length : 2)
+		lastSelectionRef.current = { start: selectTargetStart, end: selectTargetEnd }
+
 		setTimeout(() => {
-			el.focus()
-			el.setSelectionRange(start + prefix.length, start + prefix.length + (selected ? selected.length : 2))
+			if (textareaRef.current) {
+				textareaRef.current.focus()
+				textareaRef.current.setSelectionRange(selectTargetStart, selectTargetEnd)
+			}
 		}, 50)
 	}
 
@@ -551,7 +660,18 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 			>
 				{/* 左侧：返回与标题编辑 */}
 				<div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 280 }}>
-					<button type="button" className="admin-btn btn-ghost btn-sm" onClick={onBack} title="返回文章列表">
+					<button
+						type="button"
+						className="admin-btn btn-ghost btn-sm"
+						onClick={() => {
+							// eslint-disable-next-line no-alert
+							if (isDirty && typeof window !== 'undefined' && !window.confirm('您有尚未保存的文章修改，确定要放弃并返回吗？')) {
+								return
+							}
+							onBack()
+						}}
+						title="返回文章列表"
+					>
 						<Icon icon="tabler:arrow-left" />
 						<span>返回</span>
 					</button>
@@ -689,6 +809,17 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 					{/* 更多工具 */}
 					{postPath && (
 						<>
+							<a
+								href={permalink ? (permalink.startsWith('/') ? permalink : `/${permalink}`) : `/${currentSlug}`}
+								target="_blank"
+								rel="noreferrer"
+								className="admin-btn btn-ghost btn-sm"
+								title="在前台新标签页预览本文章"
+								style={{ textDecoration: 'none' }}
+							>
+								<Icon icon="tabler:external-link" />
+								<span>前台预览</span>
+							</a>
 							<button
 								type="button"
 								className="admin-btn btn-ghost btn-sm"
@@ -868,6 +999,99 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 						</div>
 					</div>
 
+					{/* 自定义 URL / 永久链接 (Permalink) */}
+					<div style={{ gridColumn: '1 / -1', background: 'var(--admin-bg-subtle)', padding: '10px 12px', borderRadius: 6, border: '1px solid var(--admin-border)' }}>
+						<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+							<label style={{ color: 'var(--admin-text-2)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
+								<Icon icon="tabler:link" style={{ color: 'var(--admin-accent)', fontSize: 15 }} />
+								<span>自定义文章链接 / 永久短链 (Permalink / Custom URL)</span>
+							</label>
+
+							<div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+								<button
+									type="button"
+									className="admin-btn btn-ghost btn-sm"
+									onClick={() => {
+										if (!title.trim()) {
+											showToast('请先输入文章标题', 'warning')
+											return
+										}
+										const generated = title.trim()
+											.toLowerCase()
+											.replace(/[\s/\\?%*:|"<>]+/g, '-')
+											.replace(/^-+|-+$/g, '')
+										setPermalink(generated)
+										setIsDirty(true)
+										showToast('已根据标题生成 URL Slug', 'success')
+									}}
+									style={{ fontSize: 11, padding: '2px 6px' }}
+									title="根据当前文章标题智能生成 URL Slug"
+								>
+									<Icon icon="tabler:wand" />
+									<span>按标题生成 Slug</span>
+								</button>
+
+								{permalink && (
+									<button
+										type="button"
+										className="admin-btn btn-ghost btn-sm"
+										onClick={() => {
+											setPermalink('')
+											setIsDirty(true)
+											showToast('已恢复默认文件名路径', 'info')
+										}}
+										style={{ fontSize: 11, padding: '2px 6px', color: 'var(--admin-text-3)' }}
+										title="清除自定义 URL 并使用默认文件名路径"
+									>
+										<Icon icon="tabler:rotate" />
+										<span>恢复默认</span>
+									</button>
+								)}
+							</div>
+						</div>
+
+						<div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+							<span style={{ fontSize: 12, color: 'var(--admin-text-3)', fontFamily: 'var(--admin-font-mono)', flexShrink: 0 }}>
+								/
+							</span>
+							<input
+								type="text"
+								className="admin-input"
+								placeholder={`例如: ${currentSlug || 'custom-post-url'} 或 posts/my-article`}
+								value={permalink}
+								onChange={e => {
+									setPermalink(e.target.value)
+									setIsDirty(true)
+								}}
+								style={{ flex: 1, padding: '5px 10px', fontSize: 12, fontFamily: 'var(--admin-font-mono)' }}
+							/>
+						</div>
+
+						{/* 最终访问链接与复制 */}
+						<div style={{ marginTop: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11, color: 'var(--admin-text-3)' }}>
+							<div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+								<span>前台访问路径:</span>
+								<code style={{ color: 'var(--admin-accent)', background: 'var(--admin-accent-soft)', padding: '1px 5px', borderRadius: 3, fontFamily: 'var(--admin-font-mono)' }}>
+									{permalink ? (permalink.startsWith('/') ? permalink : `/${permalink}`) : `/${currentSlug || 'posts/...'}`}
+								</code>
+							</div>
+							<button
+								type="button"
+								className="admin-btn btn-ghost btn-sm"
+								onClick={() => {
+									const finalUrl = permalink ? (permalink.startsWith('/') ? permalink : `/${permalink}`) : `/${currentSlug}`
+									navigator.clipboard.writeText(finalUrl)
+									showToast('已复制前台访问相对路径', 'success')
+								}}
+								style={{ fontSize: 11, padding: '1px 6px', height: 22 }}
+								title="复制前台相对路径"
+							>
+								<Icon icon="tabler:copy" />
+								<span>复制路径</span>
+							</button>
+						</div>
+					</div>
+
 					<div style={{ gridColumn: '1 / -1' }}>
 						<label style={{ display: 'block', color: 'var(--admin-text-3)', marginBottom: 4, fontWeight: 500 }}>
 							文章摘要简介 (Description)
@@ -952,10 +1176,26 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 						<Icon icon="tabler:icons" />
 						<span>图标</span>
 					</button>
+
+					<div style={{ width: 1, height: 16, background: 'var(--admin-border)', margin: '0 2px' }} />
+
+					{/* 一键排版与格式整理 */}
+					<button
+						type="button"
+						className="admin-btn btn-ghost btn-sm"
+						onClick={handleFormatArticle}
+						title="智能格式化排版 (修剪多余空行与规范标点空格)"
+					>
+						<Icon icon="tabler:wand" />
+						<span>一键排版</span>
+					</button>
 				</div>
 
 				{/* 右侧统计与同步滚动 */}
 				<div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 11, color: 'var(--admin-text-3)', whiteSpace: 'nowrap' }}>
+					<span title="文章总行数">
+						<strong style={{ color: 'var(--admin-text-1)' }}>{content.split('\n').length}</strong> 行
+					</span>
 					<span title="实时总字数">
 						<strong style={{ color: 'var(--admin-text-1)' }}>{stats.totalWords}</strong> 字
 					</span>
@@ -1005,8 +1245,17 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 							ref={textareaRef}
 							className="admin-textarea"
 							value={content}
-							onChange={e => setContent(e.target.value)}
-							onScroll={handleTextareaScroll}
+							onChange={e => {
+								setContent(e.target.value)
+								updateLastSelection()
+							}}
+							onSelect={updateLastSelection}
+							onKeyUp={updateLastSelection}
+							onClick={updateLastSelection}
+							onScroll={() => {
+								handleTextareaScroll()
+								updateLastSelection()
+							}}
 							onPaste={handlePaste}
 							onDrop={handleDrop}
 							onKeyDown={handleTextareaKeyDown}
@@ -1018,7 +1267,7 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 								height: '100%',
 								border: 'none',
 								borderRadius: 0,
-								padding: '16px 20px',
+								padding: '20px 24px',
 								fontFamily: 'var(--admin-font-mono)',
 								fontSize: 13.5,
 								lineHeight: 1.65,
@@ -1028,6 +1277,83 @@ export const PostEditorView: React.FC<PostEditorViewProps> = ({ postPath, onBack
 								color: 'var(--admin-text-1)',
 							}}
 						/>
+
+						{/* Notion 风格选中文本悬浮气泡条 (Floating Bubble Toolbar) */}
+						{bubbleState.visible && (
+							<div
+								className="editor-bubble-toolbar"
+								style={{
+									left: bubbleState.x,
+									top: bubbleState.y,
+								}}
+							>
+								<button
+									type="button"
+									className="bubble-btn"
+									onClick={() => handleInsertFormat('**', '**')}
+									title="加粗 (Ctrl+B)"
+								>
+									<Icon icon="tabler:bold" />
+								</button>
+								<button
+									type="button"
+									className="bubble-btn"
+									onClick={() => handleInsertFormat('*', '*')}
+									title="斜体 (Ctrl+I)"
+								>
+									<Icon icon="tabler:italic" />
+								</button>
+								<button
+									type="button"
+									className="bubble-btn"
+									onClick={() => handleInsertFormat('~~', '~~')}
+									title="删除线"
+								>
+									<Icon icon="tabler:strikethrough" />
+								</button>
+								<button
+									type="button"
+									className="bubble-btn"
+									onClick={() => handleInsertFormat('`', '`')}
+									title="行内代码"
+								>
+									<Icon icon="tabler:code" />
+								</button>
+								<div className="bubble-divider" />
+								<button
+									type="button"
+									className="bubble-btn"
+									onClick={() => handleInsertFormat('[', '](https://)')}
+									title="超链接 (Ctrl+K)"
+								>
+									<Icon icon="tabler:link" />
+								</button>
+								<button
+									type="button"
+									className="bubble-btn"
+									onClick={() => handleInsertSnippet(`\n::tip\n${bubbleState.selectedText || '提示内容'}\n::\n`)}
+									title="MDC 提示卡片 (Tip)"
+								>
+									<Icon icon="tabler:bulb" style={{ color: 'var(--admin-warning)' }} />
+								</button>
+								<button
+									type="button"
+									className="bubble-btn"
+									onClick={() => handleInsertSnippet(`\n::warning\n${bubbleState.selectedText || '注意内容'}\n::\n`)}
+									title="MDC 警告卡片 (Warning)"
+								>
+									<Icon icon="tabler:alert-triangle" style={{ color: 'var(--admin-danger)' }} />
+								</button>
+								<button
+									type="button"
+									className="bubble-btn"
+									onClick={() => handleInsertFormat('> ')}
+									title="引用块"
+								>
+									<Icon icon="tabler:quote" />
+								</button>
+							</div>
+						)}
 					</div>
 				)}
 

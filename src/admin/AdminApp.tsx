@@ -13,7 +13,6 @@ import { WidgetManagerView } from './views/WidgetManagerView'
 import { SettingsView } from './views/SettingsView'
 import { BackupManagerView } from './views/BackupManagerView'
 import { AssetManagerView } from './views/AssetManagerView'
-import { ConsoleView } from './views/ConsoleView'
 import { CommandPalette } from './components/CommandPalette'
 import { ShortcutHelpModal } from './components/ShortcutHelpModal'
 import { ToastProvider } from './components/Toast'
@@ -66,7 +65,7 @@ export const AdminAppContent: React.FC = () => {
 		}
 		window.addEventListener('site-info-updated', handleSiteInfoUpdated)
 		return () => window.removeEventListener('site-info-updated', handleSiteInfoUpdated)
-	}, [activeTab])
+	}, [])
 
 	const handleNavigate = (tab: string, params?: any) => {
 		setMobileSidebarOpen(false)
@@ -87,8 +86,14 @@ export const AdminAppContent: React.FC = () => {
 		}
 	}
 
+	const [mounted, setMounted] = useState(false)
+	useEffect(() => {
+		setMounted(true)
+	}, [])
+
 	const toggleTheme = () => {
-		setTheme(theme === 'dark' ? 'light' : 'dark')
+		const isCurrentDark = theme === 'dark' || (theme === 'system' && window.matchMedia?.('(prefers-color-scheme: dark)').matches)
+		setTheme(isCurrentDark ? 'light' : 'dark')
 	}
 
 	// 快捷键监听 (Ctrl+K 命令面板, ? 帮助)
@@ -215,16 +220,8 @@ export const AdminAppContent: React.FC = () => {
 						className={`nav-item ${activeTab === 'backup' ? 'active' : ''}`}
 						onClick={() => handleNavigate('backup')}
 					>
-						<Icon icon="tabler:database" className="nav-icon" />
-						<span>数据备份与体检</span>
-					</div>
-
-					<div
-						className={`nav-item ${activeTab === 'console' ? 'active' : ''}`}
-						onClick={() => handleNavigate('console')}
-					>
-						<Icon icon="tabler:terminal-2" className="nav-icon" />
-						<span>构建与运行</span>
+						<Icon icon="tabler:database-export" className="nav-icon" />
+						<span>数据备份</span>
 					</div>
 				</nav>
 
@@ -264,8 +261,7 @@ export const AdminAppContent: React.FC = () => {
 							{activeTab === 'navigation' && '导航管理'}
 							{activeTab === 'widgets' && '侧栏挂件'}
 							{activeTab === 'settings' && '站点设置'}
-							{activeTab === 'backup' && '数据备份与体检'}
-							{activeTab === 'console' && '构建与运行'}
+							{activeTab === 'backup' && '数据备份与快照'}
 						</div>
 					</div>
 
@@ -337,6 +333,17 @@ export const AdminAppContent: React.FC = () => {
 							style={{ padding: '0 8px' }}
 						>
 							<Icon icon="tabler:help" style={{ fontSize: 15 }} />
+						</button>
+
+						{/* 明暗模式切换 */}
+						<button
+							type="button"
+							className="admin-btn btn-secondary btn-sm"
+							onClick={toggleTheme}
+							title="切换明暗主题 (深色 / 浅色)"
+							style={{ padding: '0 8px' }}
+						>
+							<Icon icon={mounted && (theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches)) ? 'tabler:sun' : 'tabler:moon'} style={{ fontSize: 15 }} />
 						</button>
 
 						<a
@@ -415,8 +422,6 @@ export const AdminAppContent: React.FC = () => {
 					{activeTab === 'settings' && <SettingsView />}
 
 					{activeTab === 'backup' && <BackupManagerView />}
-
-					{activeTab === 'console' && <ConsoleView />}
 				</div>
 			</main>
 

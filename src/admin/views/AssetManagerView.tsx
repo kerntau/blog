@@ -302,6 +302,18 @@ export const AssetManagerView: React.FC<AssetManagerViewProps> = ({ onNavigatePo
 									<Icon icon="tabler:markdown" />
 									<span>MD</span>
 								</button>
+								{isImage(asset.name) && (
+									<button
+										type="button"
+										className="admin-btn btn-ghost btn-sm"
+										style={{ flex: 1, padding: '2px 4px', fontSize: 11 }}
+										onClick={() => handleCopy(`::pic{src="${asset.path}" caption="${asset.name}"}\n`, 'MDC 画廊组件')}
+										title="复制 MDC 高级画廊组件语法"
+									>
+										<Icon icon="tabler:components" />
+										<span>MDC</span>
+									</button>
+								)}
 								<button
 									type="button"
 									className="admin-btn btn-ghost btn-sm"

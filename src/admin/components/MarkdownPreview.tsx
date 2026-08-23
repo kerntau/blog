@@ -109,51 +109,51 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
 		>
 			{/* 前台真实文章容器 (100% 像素级复用) */}
 			<div style={{ padding: '24px 24px 48px', maxWidth: 860, margin: '0 auto', width: '100%' }}>
-				{showChrome && (
-					<>
-						{/* 真实 PostHeader */}
-						<PostHeader
-							path={frontmatter.path || ''}
-							title={frontmatter.title || '文章标题'}
-							date={frontmatter.date}
-							updated={frontmatter.updated}
-							categories={frontmatter.categories}
-							tags={frontmatter.tags}
-							readingTime={{
-								text: `${Math.max(1, Math.ceil(content.length / 400))} min read`,
-								minutes: Math.max(1, Math.ceil(content.length / 400)),
-								time: Math.max(1, Math.ceil(content.length / 400)) * 60000,
-								words: content.length,
-							}}
-							image={frontmatter.image}
-						/>
+				<PreviewErrorBoundary>
+					{showChrome && (
+						<>
+							{/* 真实 PostHeader */}
+							<PostHeader
+								path={frontmatter.path || ''}
+								title={frontmatter.title || '文章标题'}
+								date={frontmatter.date}
+								updated={frontmatter.updated}
+								categories={frontmatter.categories}
+								tags={frontmatter.tags}
+								readingTime={{
+									text: `${Math.max(1, Math.ceil(content.length / 400))} min read`,
+									minutes: Math.max(1, Math.ceil(content.length / 400)),
+									time: Math.max(1, Math.ceil(content.length / 400)) * 60000,
+									words: content.length,
+								}}
+								image={frontmatter.image}
+							/>
 
-						{/* 真实 PostExcerpt */}
-						{frontmatter.description && (
-							<PostExcerpt excerpt={frontmatter.description} />
-						)}
-					</>
-				)}
+							{/* 真实 PostExcerpt */}
+							{frontmatter.description && (
+								<PostExcerpt excerpt={frontmatter.description} />
+							)}
+						</>
+					)}
 
-				{/* 真实 PostArticle 样式上下文与 ErrorBoundary 保护 */}
-				<article className={`article ${postTypeClass}`} style={{ marginTop: showChrome ? 20 : 0 }}>
-					<PreviewErrorBoundary>
+					{/* 真实 PostArticle 样式上下文 */}
+					<article className={`article ${postTypeClass}`} style={{ marginTop: showChrome ? 20 : 0 }}>
 						{renderedElements}
-					</PreviewErrorBoundary>
-				</article>
+					</article>
 
-				{showChrome && frontmatter.title && (
-					<div style={{ marginTop: 36 }}>
-						<PostFooter
-							path={frontmatter.path || ''}
-							title={frontmatter.title}
-							date={frontmatter.date}
-							updated={frontmatter.updated}
-							categories={frontmatter.categories}
-							tags={frontmatter.tags}
-						/>
-					</div>
-				)}
+					{showChrome && frontmatter.title && (
+						<div style={{ marginTop: 36 }}>
+							<PostFooter
+								path={frontmatter.path || ''}
+								title={frontmatter.title}
+								date={frontmatter.date}
+								updated={frontmatter.updated}
+								categories={frontmatter.categories}
+								tags={frontmatter.tags}
+							/>
+						</div>
+					)}
+				</PreviewErrorBoundary>
 			</div>
 		</div>
 	)

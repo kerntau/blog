@@ -6,11 +6,13 @@ import { useToast } from '../components/Toast'
 import { IconPickerModal } from '../components/IconPickerModal'
 import BlogStats from '../../components/widget/BlogStats'
 import BlogTech from '../../components/widget/BlogTech'
+import BlogWeather from '../../components/widget/BlogWeather'
 import CommGroup from '../../components/widget/CommGroup'
 import BlogLog from '../../components/widget/BlogLog'
 
 const DEFAULT_WIDGET_CONFIG: WidgetConfigData = {
 	availableWidgets: [
+		{ id: 'blog-weather', name: '心知天气 (BlogWeather)', icon: 'tabler:cloud-sun', description: '展示实时天气现象、气温与未来3天逐日预报' },
 		{ id: 'blog-stats', name: '博客统计 (BlogStats)', icon: 'tabler:chart-bar', description: '展示博文篇数、字数及建站年份' },
 		{ id: 'blog-tech', name: '技术信息 (BlogTech)', icon: 'tabler:stack-2', description: '前台技术体系与架构徽标展示' },
 		{ id: 'comm-group', name: '社区交流 (CommGroup)', icon: 'tabler:users', description: 'QQ/微信交流群与社区入口' },
@@ -18,7 +20,7 @@ const DEFAULT_WIDGET_CONFIG: WidgetConfigData = {
 		{ id: 'toc', name: '文章目录 (Toc)', icon: 'tabler:list-tree', description: '文章详情页 H1-H6 目录大纲' },
 	],
 	pageAsideMappings: {
-		home: ['blog-stats', 'blog-tech', 'comm-group'],
+		home: ['blog-weather', 'blog-stats', 'blog-tech', 'comm-group'],
 		archive: ['blog-stats', 'blog-log'],
 		post: ['toc'],
 		link: ['blog-stats', 'comm-group'],
@@ -70,9 +72,11 @@ export const WidgetManagerView: React.FC = () => {
 	const [loading, setLoading] = useState(true)
 	const [saving, setSaving] = useState(false)
 	const [isDirty, setIsDirty] = useState(false)
-	const [activeSection, setActiveSection] = useState<'layout' | 'tech' | 'commGroup' | 'log' | 'stats'>('layout')
+	const [activeSection, setActiveSection] = useState<'layout' | 'weather' | 'tech' | 'commGroup' | 'log' | 'stats'>('layout')
 	const [activePage, setActivePage] = useState<'home' | 'archive' | 'post' | 'link'>('home')
 	const [previewTheme, setPreviewTheme] = useState<'light' | 'dark'>('light')
+	const [testingWeather, setTestingWeather] = useState(false)
+	const [showApiKey, setShowApiKey] = useState(false)
 
 	const [iconPickerOpen, setIconPickerOpen] = useState(false)
 	const [iconPickerTarget, setIconPickerTarget] = useState<{
@@ -91,6 +95,12 @@ export const WidgetManagerView: React.FC = () => {
 				availableWidgets: data.availableWidgets || prev.availableWidgets,
 				pageAsideMappings: data.pageAsideMappings || prev.pageAsideMappings,
 				statsConfig: data.statsConfig || prev.statsConfig,
+				weather: data.weather || prev.weather || {
+					title: '实时天气',
+					apiKey: 'SvyX4Wvh0a',
+					defaultCity: 'beijing',
+					unit: 'c',
+				},
 				tech: data.tech || prev.tech,
 				commGroup: data.commGroup || prev.commGroup,
 				log: data.log || prev.log,
@@ -245,6 +255,43 @@ export const WidgetManagerView: React.FC = () => {
 		setIsDirty(true)
 	}
 
+	// 心知天气配置修改
+	const handleUpdateWeatherField = (field: string, val: string) => {
+		setWidgetData(prev => ({
+			...prev,
+			weather: {
+				...prev.weather,
+				[field]: val,
+			},
+		}))
+		setIsDirty(true)
+	}
+
+	// 心知天气联通测试
+	const handleTestWeatherApi = async () => {
+		const targetCity = widgetData.weather?.defaultCity || 'beijing'
+		const key = widgetData.weather?.apiKey || 'SvyX4Wvh0a'
+		setTestingWeather(true)
+		try {
+			const res = await fetch(`https://api.seniverse.com/v3/weather/now.json?key=${key}&location=${encodeURIComponent(targetCity)}&language=zh-Hans&unit=c`)
+			const json = await res.json()
+			if (res.ok && json.results?.[0]?.now) {
+				const now = json.results[0].now
+				const loc = json.results[0].location
+				showToast(`心知天气连接成功！${loc.name}: ${now.text}，气温 ${now.temperature}°C`, 'success')
+			}
+			else {
+				showToast(`心知天气测试失败: ${json.status || '密钥或城市错误'}`, 'error')
+			}
+		}
+		catch (err: any) {
+			showToast(`心知天气连接超时或网络异常: ${err.message}`, 'error')
+		}
+		finally {
+			setTestingWeather(false)
+		}
+	}
+
 	// 图标选择回调
 	const handleIconSelected = (iconName: string) => {
 		if (!iconPickerTarget) return
@@ -357,10 +404,11 @@ export const WidgetManagerView: React.FC = () => {
 				<div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
 					{[
 						{ id: 'layout', name: '1. 页面挂载与排序', icon: 'tabler:layout-grid' },
-						{ id: 'tech', name: '2. 技术信息卡片 (BlogTech)', icon: 'tabler:stack-2' },
-						{ id: 'commGroup', name: '3. 社区群卡片 (CommGroup)', icon: 'tabler:users' },
-						{ id: 'log', name: '4. 更新日志卡片 (BlogLog)', icon: 'tabler:notes' },
-						{ id: 'stats', name: '5. 博客统计卡片 (BlogStats)', icon: 'tabler:chart-bar' },
+						{ id: 'weather', name: '2. 心知天气 (BlogWeather)', icon: 'tabler:cloud-sun' },
+						{ id: 'tech', name: '3. 技术信息 (BlogTech)', icon: 'tabler:stack-2' },
+						{ id: 'commGroup', name: '4. 社区群卡片 (CommGroup)', icon: 'tabler:users' },
+						{ id: 'log', name: '5. 更新日志 (BlogLog)', icon: 'tabler:notes' },
+						{ id: 'stats', name: '6. 博客统计 (BlogStats)', icon: 'tabler:chart-bar' },
 					].map(tab => (
 						<button
 							key={tab.id}
@@ -388,9 +436,10 @@ export const WidgetManagerView: React.FC = () => {
 							</div>
 
 							{/* 目标页面选择 */}
-							<div style={{ display: 'flex', gap: 8, borderBottom: '1px solid var(--admin-border)', paddingBottom: 10 }}>
+							<div style={{ display: 'flex', gap: 8, borderBottom: '1px solid var(--admin-border)', paddingBottom: 10, flexWrap: 'wrap' }}>
 								{[
 									{ id: 'home', name: '首页 (Home)', desc: '首页右侧' },
+									{ id: 'categories', name: '分类 (Categories)', desc: '分类矩阵页' },
 									{ id: 'archive', name: '归档 (Archive)', desc: '归档年份页' },
 									{ id: 'post', name: '文章详情 (Post)', desc: '文章目录TOC' },
 									{ id: 'link', name: '友链 (Link)', desc: '博友圈页' },
@@ -480,7 +529,133 @@ export const WidgetManagerView: React.FC = () => {
 						</div>
 					)}
 
-					{/* 2. 技术信息配置 (BlogTech) */}
+					{/* 2. 心知天气配置 (BlogWeather) */}
+					{activeSection === 'weather' && (
+						<div className="admin-card" style={{ padding: '18px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+								<div className="admin-section-title">
+									<Icon icon="tabler:cloud-sun" style={{ color: '#f59e0b' }} />
+									<span>心知天气 (Seniverse) 挂件参数配置</span>
+								</div>
+
+								<button
+									type="button"
+									className="admin-btn btn-secondary btn-sm"
+									onClick={handleTestWeatherApi}
+									disabled={testingWeather}
+									title="使用当前配置测试请求心知天气 API"
+								>
+									<Icon icon={testingWeather ? 'tabler:loader-2' : 'tabler:broadcast'} style={{ animation: testingWeather ? 'spin 1s linear infinite' : 'none' }} />
+									<span>{testingWeather ? '正在探测中...' : '测试心知 API 连通性'}</span>
+								</button>
+							</div>
+
+							{/* 提示信息 */}
+							<div style={{ padding: '10px 14px', background: 'var(--admin-bg-subtle)', borderRadius: 8, border: '1px solid var(--admin-border)', fontSize: 12, lineHeight: 1.6, color: 'var(--admin-text-2)' }}>
+								<div style={{ fontWeight: 600, color: 'var(--admin-text-1)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+									<Icon icon="tabler:info-circle" style={{ color: 'var(--admin-accent)' }} />
+									<span>关于心知天气 V3 接口集成：</span>
+								</div>
+								<div>
+									本博客已完整接入心知天气实况接口与 3 天逐日气象预报，支持城市中文、拼音或 <code>ip</code> 自动探测。
+									若无自定义 Key 可使用默认公共演示 Key，也可前往 <a href="https://www.seniverse.com" target="_blank" rel="noreferrer" style={{ color: 'var(--admin-accent)', textDecoration: 'underline' }}>心知天气官网</a> 免费申请私有 API Key。
+								</div>
+							</div>
+
+							{/* 卡片标题 */}
+							<div className="admin-form-group">
+								<label className="admin-form-label">挂件标题 (Widget Title)</label>
+								<input
+									type="text"
+									className="admin-input"
+									value={widgetData.weather?.title || '实时天气'}
+									onChange={e => handleUpdateWeatherField('title', e.target.value)}
+									placeholder="如：实时天气 / 今日气象"
+								/>
+							</div>
+
+							{/* 默认城市与快捷填入 */}
+							<div className="admin-form-group">
+								<label className="admin-form-label">定位策略 (City / Location)</label>
+								<input
+									type="text"
+									className="admin-input"
+									value={widgetData.weather?.defaultCity || 'ip'}
+									onChange={e => handleUpdateWeatherField('defaultCity', e.target.value)}
+									placeholder="留空或输入 ip 为访问者自动定位，也可指定城市如：beijing / 上海"
+								/>
+								<div style={{ fontSize: 11, color: 'var(--admin-text-3)', marginTop: 6, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+									<span>快捷选项：</span>
+									{['ip', 'beijing', 'shanghai', 'guangzhou', 'shenzhen', 'hangzhou', 'chengdu', 'wuhan', 'nanjing'].map(city => (
+										<button
+											key={city}
+											type="button"
+											className={`admin-btn ${widgetData.weather?.defaultCity === city ? 'btn-primary' : 'btn-ghost'} btn-sm`}
+											style={{ padding: '1px 8px', fontSize: 11, height: 22 }}
+											onClick={() => handleUpdateWeatherField('defaultCity', city)}
+										>
+											{city === 'ip' ? '🌐 访客自动IP定位 (推荐)' : city}
+										</button>
+									))}
+								</div>
+							</div>
+
+							{/* API Key */}
+							<div className="admin-form-group">
+								<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+									<label className="admin-form-label" style={{ marginBottom: 0 }}>心知天气 API Key (私钥 / 公钥)</label>
+									<button
+										type="button"
+										className="admin-btn btn-ghost btn-sm"
+										style={{ padding: '0 6px', fontSize: 11, height: 20 }}
+										onClick={() => setShowApiKey(!showApiKey)}
+									>
+										<Icon icon={showApiKey ? 'tabler:eye-off' : 'tabler:eye'} />
+										<span>{showApiKey ? '隐藏' : '查看'}</span>
+									</button>
+								</div>
+								<input
+									type={showApiKey ? 'text' : 'password'}
+									className="admin-input"
+									value={widgetData.weather?.apiKey || ''}
+									onChange={e => handleUpdateWeatherField('apiKey', e.target.value)}
+									placeholder="请输入心知天气 API Key (如 SvyX4Wvh0a)"
+								/>
+								<div style={{ fontSize: 11, color: 'var(--admin-text-3)', marginTop: 4 }}>
+									留空时将自动使用本站内置的免鉴权实况代理通道
+								</div>
+							</div>
+
+							{/* 温度单位 */}
+							<div className="admin-form-group">
+								<label className="admin-form-label">气温单位 (Temperature Unit)</label>
+								<div style={{ display: 'flex', gap: 12 }}>
+									<label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 13 }}>
+										<input
+											type="radio"
+											name="weatherUnit"
+											value="c"
+											checked={(widgetData.weather?.unit || 'c') === 'c'}
+											onChange={() => handleUpdateWeatherField('unit', 'c')}
+										/>
+										<span>摄氏度 (°C)</span>
+									</label>
+									<label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 13 }}>
+										<input
+											type="radio"
+											name="weatherUnit"
+											value="f"
+											checked={widgetData.weather?.unit === 'f'}
+											onChange={() => handleUpdateWeatherField('unit', 'f')}
+										/>
+										<span>华氏度 (°F)</span>
+									</label>
+								</div>
+							</div>
+						</div>
+					)}
+
+					{/* 3. 技术信息配置 (BlogTech) */}
 					{activeSection === 'tech' && (
 						<div className="admin-card" style={{ padding: '18px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 							<div className="admin-section-title">
@@ -913,6 +1088,17 @@ export const WidgetManagerView: React.FC = () => {
 							}}
 						>
 							<div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 340, margin: '0 auto' }}>
+								{activeSection === 'weather' && (
+									<BlogWeather
+										customData={{
+											title: widgetData.weather?.title,
+											apiKey: widgetData.weather?.apiKey,
+											defaultCity: widgetData.weather?.defaultCity,
+											unit: widgetData.weather?.unit,
+										}}
+									/>
+								)}
+
 								{activeSection === 'tech' && (
 									<BlogTech
 										customData={{
@@ -959,6 +1145,19 @@ export const WidgetManagerView: React.FC = () => {
 											</div>
 										) : (
 											currentAsideList.map((wid) => {
+												if (wid === 'blog-weather' || wid === 'weather') {
+													return (
+														<BlogWeather
+															key={wid}
+															customData={{
+																title: widgetData.weather?.title,
+																apiKey: widgetData.weather?.apiKey,
+																defaultCity: widgetData.weather?.defaultCity,
+																unit: widgetData.weather?.unit,
+															}}
+														/>
+													)
+												}
 												if (wid === 'blog-stats') return <BlogStats key={wid} />
 												if (wid === 'blog-tech') {
 													return (

@@ -1,82 +1,96 @@
 // ========================================================
-// Cotovo / blog-v3 Local Admin 3.0 Industrial Design System
-// Modern · High-Density · Textured Glassmorphism · Refined
+// Cotovo / blog-v3 Local Admin 3.5 Clean Linen & Notion Design System
+// Notion & Craft Inspired · Clean Linen · Warm Paper & Ink · Breathable
 // ========================================================
 
 :root {
 	--admin-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 	--admin-font-mono: 'Fira Code', 'JetBrains Mono', Consolas, Monaco, monospace;
 
-	// 亮色模式色彩
-	--admin-bg: #f8fafc;
-	--admin-bg-subtle: #f1f5f9;
+	// 【现代清透木棉白】亮色模式色彩
+	--admin-bg: #fafaf9;
+	--admin-bg-subtle: #f5f5f4;
 	--admin-surface: #ffffff;
 	--admin-surface-card: #ffffff;
-	--admin-surface-hover: #f1f5f9;
-	--admin-border: #e2e8f0;
-	--admin-border-subtle: #cbd5e1;
-	--admin-border-focus: #94a3b8;
+	--admin-surface-hover: #f5f5f4;
+	--admin-border: rgba(0, 0, 0, 0.06);
+	--admin-border-subtle: rgba(0, 0, 0, 0.12);
+	--admin-border-focus: #0ea5e9;
 
-	--admin-text-1: #0f172a;
-	--admin-text-2: #334155;
-	--admin-text-3: #64748b;
-	--admin-text-4: #94a3b8;
+	--admin-text-1: #1c1917;
+	--admin-text-2: #44403c;
+	--admin-text-3: #78716c;
+	--admin-text-4: #a8a29e;
 
-	--admin-accent: #2563eb;
-	--admin-accent-hover: #1d4ed8;
-	--admin-accent-soft: rgba(37, 99, 235, 0.08);
-	--admin-accent-subtle: rgba(37, 99, 235, 0.04);
-
-	--admin-success: #059669;
-	--admin-success-soft: rgba(5, 150, 105, 0.1);
-	--admin-warning: #d97706;
-	--admin-warning-soft: rgba(217, 119, 6, 0.1);
-	--admin-danger: #dc2626;
-	--admin-danger-soft: rgba(220, 38, 38, 0.1);
-
-	--admin-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-	--admin-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08);
-	--admin-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
-
-	--admin-grid-pattern: radial-gradient(#cbd5e1 1px, transparent 1px);
-}
-
-html.dark {
-	// 暗色模式色彩 (深邃质感，微光边框)
-	--admin-bg: #090a0f;
-	--admin-bg-subtle: #11131a;
-	--admin-surface: #12151f;
-	--admin-surface-card: rgba(22, 27, 39, 0.7);
-	--admin-surface-hover: rgba(255, 255, 255, 0.05);
-	--admin-border: rgba(255, 255, 255, 0.09);
-	--admin-border-subtle: rgba(255, 255, 255, 0.14);
-	--admin-border-focus: rgba(255, 255, 255, 0.25);
-
-	--admin-text-1: #f8fafc;
-	--admin-text-2: #cbd5e1;
-	--admin-text-3: #8492a6;
-	--admin-text-4: #475569;
-
-	--admin-accent: #3b82f6;
-	--admin-accent-hover: #60a5fa;
-	--admin-accent-soft: rgba(59, 130, 246, 0.14);
-	--admin-accent-subtle: rgba(59, 130, 246, 0.06);
+	--admin-accent: #0ea5e9;
+	--admin-accent-hover: #0284c7;
+	--admin-accent-soft: rgba(14, 165, 233, 0.08);
+	--admin-accent-subtle: rgba(14, 165, 233, 0.04);
 
 	--admin-success: #10b981;
-	--admin-success-soft: rgba(16, 185, 129, 0.14);
+	--admin-success-soft: rgba(16, 185, 129, 0.1);
 	--admin-warning: #f59e0b;
-	--admin-warning-soft: rgba(245, 158, 11, 0.14);
+	--admin-warning-soft: rgba(245, 158, 11, 0.1);
+	--admin-danger: #ef4444;
+	--admin-danger-soft: rgba(239, 68, 68, 0.1);
+
+	// 温润柔和阴影系统 (Soft Ambient Shadows)
+	--admin-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+	--admin-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+	--admin-shadow-md: 0 4px 14px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+	--admin-shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.03);
+
+	// 大圆角系统 (Notion & Craft Radius)
+	--admin-radius-sm: 6px;
+	--admin-radius-md: 10px;
+	--admin-radius-lg: 14px;
+	--admin-radius-xl: 18px;
+
+	--admin-grid-pattern: radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
+
+html.dark,
+html[data-theme='dark'],
+.dark,
+[data-theme='dark'] {
+	// 温润石墨炭黑暗色模式
+	--admin-bg: #18181b;
+	--admin-bg-subtle: #202024;
+	--admin-surface: #202024;
+	--admin-surface-card: #27272a;
+	--admin-surface-hover: rgba(255, 255, 255, 0.05);
+	--admin-border: rgba(255, 255, 255, 0.08);
+	--admin-border-subtle: rgba(255, 255, 255, 0.14);
+	--admin-border-focus: #38bdf8;
+
+	--admin-text-1: #fafafa;
+	--admin-text-2: #d4d4d8;
+	--admin-text-3: #a1a1aa;
+	--admin-text-4: #71717a;
+
+	--admin-accent: #38bdf8;
+	--admin-accent-hover: #7dd3fc;
+	--admin-accent-soft: rgba(56, 189, 248, 0.14);
+	--admin-accent-subtle: rgba(56, 189, 248, 0.06);
+
+	--admin-success: #34d399;
+	--admin-success-soft: rgba(52, 211, 153, 0.14);
+	--admin-warning: #fbbf24;
+	--admin-warning-soft: rgba(251, 191, 36, 0.14);
 	--admin-danger: #f87171;
 	--admin-danger-soft: rgba(248, 113, 113, 0.14);
 
-	--admin-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-	--admin-shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.45);
-	--admin-shadow-md: 0 6px 16px -2px rgba(0, 0, 0, 0.55);
+	--admin-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+	--admin-shadow-sm: 0 2px 5px 0 rgba(0, 0, 0, 0.45);
+	--admin-shadow-md: 0 6px 18px rgba(0, 0, 0, 0.55);
+	--admin-shadow-lg: 0 14px 32px rgba(0, 0, 0, 0.65);
 
-	--admin-grid-pattern: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+	--admin-grid-pattern: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+
+	color-scheme: dark;
 }
 
-// 整体布局与工程网格底纹
+// 整体布局与轻网格底纹
 .admin-layout {
 	display: flex;
 	min-height: 100vh;
@@ -98,7 +112,7 @@ html.dark {
 
 // 侧边栏 (Sidebar)
 .admin-sidebar {
-	width: 220px;
+	width: 230px;
 	flex-shrink: 0;
 	display: flex;
 	flex-direction: column;
@@ -112,8 +126,8 @@ html.dark {
 	z-index: 20;
 
 	.sidebar-brand {
-		height: 62px;
-		padding: 0 16px;
+		height: 64px;
+		padding: 0 18px;
 		display: flex;
 		align-items: center;
 		gap: 12px;
@@ -123,10 +137,10 @@ html.dark {
 		.brand-logo {
 			width: 36px;
 			height: 36px;
-			border-radius: 50%;
+			border-radius: var(--admin-radius-md);
 			overflow: hidden;
 			background: var(--admin-bg-subtle);
-			border: 2px solid var(--admin-accent);
+			border: 1.5px solid var(--admin-accent);
 			box-shadow: 0 2px 8px var(--admin-accent-soft);
 			display: flex;
 			align-items: center;
@@ -171,41 +185,43 @@ html.dark {
 				padding: 1px 6px;
 				border-radius: 4px;
 				line-height: 1.3;
-				border: 1px solid rgba(37, 99, 235, 0.2);
+				border: 1px solid rgba(14, 165, 233, 0.2);
 			}
 		}
 	}
 
 	.sidebar-nav {
 		flex: 1;
-		padding: 10px 8px;
+		padding: 12px 10px;
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: 3px;
 		overflow-y: auto;
 
 		.nav-group-title {
 			font-size: 11px;
 			font-weight: 600;
 			color: var(--admin-text-3);
-			padding: 8px 10px 4px;
+			padding: 10px 10px 4px;
 			letter-spacing: 0.02em;
 		}
 
 		.nav-item {
 			display: flex;
 			align-items: center;
-			gap: 9px;
-			padding: 7px 10px;
-			border-radius: 6px;
+			gap: 10px;
+			padding: 8px 12px;
+			border-radius: var(--admin-radius-md);
 			font-size: 13px;
 			font-weight: 500;
 			color: var(--admin-text-2);
 			cursor: pointer;
-			transition: all 0.15s ease;
+			border: 1px solid transparent;
+			box-sizing: border-box;
+			transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 
 			.nav-icon {
-				font-size: 16px;
+				font-size: 17px;
 				color: var(--admin-text-3);
 				transition: color 0.15s ease;
 			}
@@ -223,7 +239,7 @@ html.dark {
 				color: var(--admin-accent);
 				background: var(--admin-accent-soft);
 				font-weight: 600;
-				border: 1px solid rgba(37, 99, 235, 0.18);
+				border-color: rgba(14, 165, 233, 0.15);
 
 				.nav-icon {
 					color: var(--admin-accent);
@@ -233,7 +249,7 @@ html.dark {
 	}
 
 	.sidebar-footer {
-		padding: 8px 12px;
+		padding: 10px 14px;
 		border-top: 1px solid var(--admin-border);
 		display: flex;
 		align-items: center;
@@ -244,8 +260,8 @@ html.dark {
 			display: inline-flex;
 			align-items: center;
 			gap: 5px;
-			padding: 5px 8px;
-			border-radius: 5px;
+			padding: 6px 10px;
+			border-radius: var(--admin-radius-sm);
 			font-size: 12px;
 			color: var(--admin-text-2);
 			text-decoration: none;
@@ -273,8 +289,8 @@ html.dark {
 
 // 顶栏 (TopBar)
 .admin-topbar {
-	height: 52px;
-	padding: 0 20px;
+	height: 54px;
+	padding: 0 24px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -291,8 +307,8 @@ html.dark {
 		gap: 8px;
 
 		.page-title {
-			font-size: 14px;
-			font-weight: 600;
+			font-size: 14.5px;
+			font-weight: 650;
 			letter-spacing: -0.01em;
 			color: var(--admin-text-1);
 		}
@@ -301,37 +317,37 @@ html.dark {
 	.topbar-right {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: 10px;
 	}
 }
 
 // 内容视口
 .admin-content {
 	flex: 1;
-	padding: 16px 20px;
+	padding: 20px 24px;
 	overflow-y: auto;
 	overflow-x: hidden;
 }
 
-// 高质感卡片 (Card)
+// Notion / Craft 温润大圆角卡片 (Card)
 .admin-card {
 	background: var(--admin-surface-card);
 	backdrop-filter: blur(12px);
 	-webkit-backdrop-filter: blur(12px);
 	border: 1px solid var(--admin-border);
-	border-radius: 8px;
-	box-shadow: var(--admin-shadow-xs);
-	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	border-radius: var(--admin-radius-lg);
+	box-shadow: var(--admin-shadow-sm);
+	transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 
 	&.interactive:hover {
 		border-color: var(--admin-border-subtle);
-		box-shadow: var(--admin-shadow-sm);
+		box-shadow: var(--admin-shadow-md);
 	}
 }
 
 .glass-card {
 	@extend .admin-card;
-	padding: 16px 18px;
+	padding: 20px 22px;
 }
 
 // 按钮系统 (Buttons)
@@ -339,11 +355,11 @@ html.dark {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 5px;
-	height: 30px;
-	padding: 0 10px;
-	border-radius: 6px;
-	font-size: 12px;
+	gap: 6px;
+	height: 32px;
+	padding: 0 12px;
+	border-radius: var(--admin-radius-md);
+	font-size: 12.5px;
 	font-weight: 500;
 	border: 1px solid transparent;
 	cursor: pointer;
@@ -358,21 +374,22 @@ html.dark {
 	}
 
 	&.btn-sm {
-		height: 26px;
-		padding: 0 8px;
+		height: 28px;
+		padding: 0 9px;
 		font-size: 12px;
-		border-radius: 5px;
+		border-radius: var(--admin-radius-sm);
 	}
 
 	&.btn-primary {
 		background: var(--admin-accent);
 		color: #ffffff;
 		border-color: var(--admin-accent);
-		box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
+		box-shadow: 0 1px 3px rgba(14, 165, 233, 0.25);
 
 		&:hover:not(:disabled) {
 			background: var(--admin-accent-hover);
 			border-color: var(--admin-accent-hover);
+			box-shadow: 0 2px 6px rgba(14, 165, 233, 0.35);
 		}
 	}
 
@@ -402,7 +419,7 @@ html.dark {
 	&.btn-danger {
 		background: var(--admin-danger-soft);
 		color: var(--admin-danger);
-		border: 1px solid rgba(220, 38, 38, 0.2);
+		border: 1px solid rgba(239, 68, 68, 0.2);
 
 		&:hover:not(:disabled) {
 			background: var(--admin-danger);
@@ -411,18 +428,18 @@ html.dark {
 	}
 }
 
-// 输入控件
+// 输入与选择控件
 .admin-input,
 .admin-select,
 .admin-textarea {
 	width: 100%;
-	height: 30px;
-	padding: 0 8px;
+	height: 32px;
+	padding: 0 10px;
 	background: var(--admin-surface);
 	border: 1px solid var(--admin-border);
-	border-radius: 5px;
+	border-radius: var(--admin-radius-md);
 	color: var(--admin-text-1);
-	font-size: 12px;
+	font-size: 12.5px;
 	font-family: inherit;
 	outline: none;
 	transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -444,7 +461,7 @@ html.dark {
 
 .admin-textarea {
 	height: auto;
-	padding: 6px 8px;
+	padding: 8px 10px;
 	resize: vertical;
 	line-height: 1.5;
 }
@@ -452,10 +469,15 @@ html.dark {
 .admin-select {
 	cursor: pointer;
 	appearance: none;
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238492a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2378716c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 	background-repeat: no-repeat;
-	background-position: right 8px center;
-	padding-right: 24px;
+	background-position: right 10px center;
+	padding-right: 26px;
+
+	option {
+		background: var(--admin-surface);
+		color: var(--admin-text-1);
+	}
 }
 
 // 状态徽章
@@ -463,277 +485,213 @@ html.dark {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
-	padding: 2px 6px;
-	border-radius: 4px;
+	padding: 2px 8px;
+	border-radius: var(--admin-radius-sm);
 	font-size: 11px;
-	font-weight: 500;
+	font-weight: 550;
 	line-height: 1.3;
-	white-space: nowrap;
+
+	&.badge-default {
+		background: var(--admin-bg-subtle);
+		color: var(--admin-text-2);
+		border: 1px solid var(--admin-border);
+	}
 
 	&.badge-primary {
 		background: var(--admin-accent-soft);
 		color: var(--admin-accent);
-		border: 1px solid rgba(37, 99, 235, 0.15);
+		border: 1px solid rgba(14, 165, 233, 0.2);
 	}
 
 	&.badge-success {
 		background: var(--admin-success-soft);
 		color: var(--admin-success);
-		border: 1px solid rgba(16, 185, 129, 0.15);
+		border: 1px solid rgba(16, 185, 129, 0.2);
 	}
 
 	&.badge-warning {
 		background: var(--admin-warning-soft);
 		color: var(--admin-warning);
-		border: 1px solid rgba(245, 158, 11, 0.15);
+		border: 1px solid rgba(245, 158, 11, 0.2);
 	}
 
-	&.badge-danger,
-	&.badge-error {
+	&.badge-danger {
 		background: var(--admin-danger-soft);
 		color: var(--admin-danger);
-		border: 1px solid rgba(239, 68, 68, 0.15);
+		border: 1px solid rgba(239, 68, 68, 0.2);
+	}
+}
+
+// 表单组
+.admin-form-group {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin-bottom: 16px;
+
+	.admin-form-label {
+		font-size: 12.5px;
+		font-weight: 600;
+		color: var(--admin-text-2);
+		display: flex;
+		align-items: center;
+		gap: 6px;
+
+		.required {
+			color: var(--admin-danger);
+		}
 	}
 
-	&.badge-secondary {
-		background: var(--admin-bg-subtle);
+	.admin-form-help {
+		font-size: 11.5px;
 		color: var(--admin-text-3);
-		border: 1px solid var(--admin-border);
+		line-height: 1.4;
 	}
 }
 
-// 拖拽把手与 TOC 悬浮
-.admin-resizer-handle {
-	&:hover, &:active {
-		background: var(--admin-accent) !important;
-		box-shadow: 0 0 8px var(--admin-accent);
-	}
-}
-
-.admin-toc-item {
-	transition: background 0.15s ease, color 0.15s ease;
-	&:hover {
-		background: var(--admin-surface-hover);
-		color: var(--admin-accent);
-		font-weight: 500;
-	}
-}
-
-// 滑动开关 (Switch)
-.admin-switch {
-	position: relative;
-	display: inline-block;
-	width: 36px;
-	height: 20px;
-	flex-shrink: 0;
-
-	input {
-		opacity: 0;
-		width: 0;
-		height: 0;
-
-		&:checked + .switch-slider {
-			background-color: var(--admin-accent);
-
-			&:before {
-				transform: translateX(16px);
-			}
-		}
-	}
-
-	.switch-slider {
-		position: absolute;
-		cursor: pointer;
-		inset: 0;
-		background-color: var(--admin-border);
-		transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-		border-radius: 20px;
-
-		&:before {
-			position: absolute;
-			content: "";
-			height: 14px;
-			width: 14px;
-			left: 3px;
-			bottom: 3px;
-			background-color: white;
-			transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-			border-radius: 50%;
-			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-		}
-	}
-}
-
-// 状态呼吸灯
-.pulse-indicator {
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
-	display: inline-block;
-	position: relative;
-
-	&.online {
-		background: var(--admin-success);
-		box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-		animation: pulseGreen 2s infinite;
-	}
-
-	&.dirty {
-		background: var(--admin-warning);
-		box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
-		animation: pulseYellow 2s infinite;
-	}
-}
-
-@keyframes pulseGreen {
-	0% {
-		box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
-	}
-	70% {
-		box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
-	}
-	100% {
-		box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-	}
-}
-
-@keyframes pulseYellow {
-	0% {
-		box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6);
-	}
-	70% {
-		box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
-	}
-	100% {
-		box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
-	}
-}
-
-// 快捷键 KBD 样式
-kbd.admin-kbd {
-	font-family: var(--admin-font-mono);
-	font-size: 11px;
-	background: var(--admin-surface);
-	border: 1px solid var(--admin-border);
-	border-radius: 4px;
-	padding: 1px 5px;
-	color: var(--admin-text-2);
-	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-}
-
-// 模态弹窗 (Modal)
-.admin-modal-overlay {
-	position: fixed;
-	inset: 0;
-	background: rgba(0, 0, 0, 0.6);
-	backdrop-filter: blur(6px);
-	-webkit-backdrop-filter: blur(6px);
+// 标签页导航 (Tabs)
+.admin-tabs {
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	z-index: 100000;
-	padding: 16px;
-	animation: fadeIn 0.15s ease-out;
+	gap: 4px;
+	background: var(--admin-bg-subtle);
+	padding: 3px;
+	border-radius: var(--admin-radius-md);
+	width: fit-content;
+	border: 1px solid var(--admin-border);
 
-	.admin-modal-box {
-		width: 100%;
-		max-width: 520px;
-		background: var(--admin-surface);
-		border: 1px solid var(--admin-border);
-		border-radius: 8px;
-		box-shadow: var(--admin-shadow-md);
-		display: flex;
-		flex-direction: column;
-		overflow: hidden;
-		animation: scaleUp 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+	.admin-tab-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 5px 12px;
+		border-radius: var(--admin-radius-sm);
+		font-size: 12px;
+		font-weight: 500;
+		color: var(--admin-text-3);
+		cursor: pointer;
+		user-select: none;
+		transition: all 0.15s ease;
+		background: transparent;
+		border: none;
 
-		.modal-header {
-			padding: 12px 16px;
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			border-bottom: 1px solid var(--admin-border);
-
-			.modal-title {
-				font-size: 13px;
-				font-weight: 600;
-				color: var(--admin-text-1);
-			}
+		&:hover {
+			color: var(--admin-text-1);
 		}
 
-		.modal-body {
-			padding: 16px;
-			overflow-y: auto;
-			max-height: calc(85vh - 100px);
-			font-size: 13px;
-		}
-
-		.modal-footer {
-			padding: 10px 16px;
-			display: flex;
-			align-items: center;
-			justify-content: flex-end;
-			gap: 6px;
-			border-top: 1px solid var(--admin-border);
-			background: var(--admin-bg-subtle);
+		&.active {
+			color: var(--admin-text-1);
+			background: var(--admin-surface);
+			font-weight: 600;
+			box-shadow: var(--admin-shadow-xs);
 		}
 	}
 }
 
-// 终端窗口
-.admin-terminal {
-	background: #090d13;
-	color: #c9d1d9;
-	font-family: var(--admin-font-mono);
-	font-size: 12px;
-	line-height: 1.6;
-	padding: 12px 14px;
-	border-radius: 6px;
-	overflow-y: auto;
-	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+// 表格 (Table)
+.admin-table-container {
+	width: 100%;
+	overflow-x: auto;
+	border-radius: var(--admin-radius-lg);
+	border: 1px solid var(--admin-border);
+	background: var(--admin-surface-card);
+	box-shadow: var(--admin-shadow-sm);
+}
 
-	.log-line {
-		display: flex;
-		gap: 8px;
-		word-break: break-all;
-		white-space: pre-wrap;
+.admin-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 12.5px;
 
-		&.stdout {
-			color: #e6edf3;
-		}
+	th {
+		text-align: left;
+		padding: 10px 14px;
+		font-weight: 600;
+		color: var(--admin-text-3);
+		background: var(--admin-bg-subtle);
+		border-bottom: 1px solid var(--admin-border);
+		white-space: nowrap;
+	}
 
-		&.stderr,
-		&.error {
-			color: #ff7b72;
-		}
+	td {
+		padding: 12px 14px;
+		color: var(--admin-text-2);
+		border-bottom: 1px solid var(--admin-border);
+		vertical-align: middle;
+	}
 
-		&.start {
-			color: #79c0ff;
-			font-weight: 600;
-		}
+	tr:last-child td {
+		border-bottom: none;
+	}
 
-		&.done {
-			color: #7ee787;
-			font-weight: 600;
-		}
+	tr:hover td {
+		background: var(--admin-surface-hover);
 	}
 }
 
-// 动画与微交互
-@keyframes fadeIn {
-	from { opacity: 0; }
-	to { opacity: 1; }
+// 【Notion 风格悬浮气泡工具条】
+.editor-bubble-toolbar {
+	position: absolute;
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	padding: 4px 6px;
+	background: var(--admin-surface);
+	border: 1px solid var(--admin-border-subtle);
+	border-radius: var(--admin-radius-md);
+	box-shadow: var(--admin-shadow-lg);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+	transform: translate(-50%, -100%);
+	margin-top: -8px;
+	pointer-events: auto;
+	animation: bubblePop 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+
+	.bubble-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 26px;
+		height: 26px;
+		border-radius: 5px;
+		background: transparent;
+		border: none;
+		color: var(--admin-text-2);
+		font-size: 13px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.12s ease;
+
+		&:hover {
+			color: var(--admin-accent);
+			background: var(--admin-surface-hover);
+		}
+	}
+
+	.bubble-divider {
+		width: 1px;
+		height: 16px;
+		background: var(--admin-border);
+		margin: 0 3px;
+	}
 }
 
-@keyframes scaleUp {
-	from { opacity: 0; transform: scale(0.98); }
-	to { opacity: 1; transform: scale(1); }
+@keyframes bubblePop {
+	0% {
+		opacity: 0;
+		transform: translate(-50%, -90%) scale(0.95);
+	}
+	100% {
+		opacity: 1;
+		transform: translate(-50%, -100%) scale(1);
+	}
 }
 
-// 滚动条
+// 滚动条极简设计
 ::-webkit-scrollbar {
-	width: 5px;
-	height: 5px;
+	width: 6px;
+	height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -741,52 +699,95 @@ kbd.admin-kbd {
 }
 
 ::-webkit-scrollbar-thumb {
-	background: var(--admin-border);
+	background: var(--admin-border-subtle);
 	border-radius: 3px;
 
 	&:hover {
-		background: var(--admin-text-3);
+		background: var(--admin-text-4);
 	}
 }
 
-// 响应式移动端与平板适配
-.mobile-only {
-	display: none !important;
-}
+// ════════════════════════════════════════════════════════════════
+// 全局通用现代模态弹窗系统 (Modal System)
+// ════════════════════════════════════════════════════════════════
+.admin-modal-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 99999;
+	background: rgba(0, 0, 0, 0.45);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	animation: modalFadeIn 0.15s ease-out;
 
-@media (max-width: 768px) {
-	.mobile-only {
-		display: inline-flex !important;
-	}
+	.admin-modal-box {
+		width: 100%;
+		max-width: 480px;
+		background: var(--admin-surface);
+		border: 1px solid var(--admin-border);
+		border-radius: var(--admin-radius-lg);
+		box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.25), 0 4px 16px rgba(0, 0, 0, 0.08);
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		animation: modalZoomIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 
-	.admin-sidebar {
-		position: fixed;
-		left: -240px;
-		top: 0;
-		bottom: 0;
-		width: 230px;
-		transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-		z-index: 100;
-		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+		.modal-header {
+			padding: 16px 22px;
+			border-bottom: 1px solid var(--admin-border);
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			background: var(--admin-surface);
 
-		&.open {
-			left: 0;
+			.modal-title {
+				font-size: 15px;
+				font-weight: 700;
+				color: var(--admin-text-1);
+				letter-spacing: -0.01em;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+		}
+
+		.modal-body {
+			padding: 20px 22px;
+			display: flex;
+			flex-direction: column;
+			gap: 14px;
+			max-height: 70vh;
+			overflow-y: auto;
+		}
+
+		.modal-footer {
+			padding: 14px 22px;
+			border-top: 1px solid var(--admin-border);
+			background: var(--admin-bg-subtle);
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			gap: 10px;
 		}
 	}
+}
 
-	.admin-main {
-		width: 100vw;
+@keyframes modalFadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes modalZoomIn {
+	from {
+		opacity: 0;
+		transform: scale(0.96) translateY(8px);
 	}
-
-	.admin-topbar {
-		padding: 0 12px;
-
-		.page-title {
-			font-size: 13px;
-		}
-	}
-
-	.admin-content {
-		padding: 10px;
+	to {
+		opacity: 1;
+		transform: scale(1) translateY(0);
 	}
 }
+

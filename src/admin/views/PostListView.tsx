@@ -439,11 +439,11 @@ export const PostListView: React.FC<PostListViewProps> = ({ onEditPost, onNewPos
 
 							<div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
 								<a
-									href={`/${post.permalink || post.relativePath.replace(/\.(?:md|mdx)$/i, '')}`}
+									href={post.permalink ? (post.permalink.startsWith('/') ? post.permalink : `/${post.permalink}`) : `/${post.relativePath.replace(/\.(?:md|mdx)$/i, '')}`}
 									target="_blank"
 									rel="noreferrer"
 									className="admin-btn btn-ghost btn-sm"
-									title="在前台新标签页查看实际效果"
+									title="在前台新标签页预览文章实际效果"
 									style={{ textDecoration: 'none', color: 'inherit' }}
 								>
 									<Icon icon="tabler:external-link" style={{ fontSize: 14 }} />

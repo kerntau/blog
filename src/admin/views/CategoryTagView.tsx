@@ -266,9 +266,23 @@ export const CategoryTagView: React.FC = () => {
 
 								{/* 前台胶囊效果实时预览 */}
 								<div style={{ marginTop: 8, padding: '8px 10px', background: 'var(--admin-bg-subtle)', borderRadius: 6, border: '1px solid var(--admin-border)' }}>
-									<div style={{ fontSize: 10, color: 'var(--admin-text-3)', marginBottom: 6 }}>前台胶囊与导航预览:</div>
+									<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+										<span style={{ fontSize: 10, color: 'var(--admin-text-3)' }}>前台胶囊与导航预览:</span>
+										<a
+											href={`/categories?category=${encodeURIComponent(cat.name)}`}
+											target="_blank"
+											rel="noreferrer"
+											style={{ fontSize: 10, color: 'var(--admin-accent)', display: 'inline-flex', alignItems: 'center', gap: 2, textDecoration: 'none' }}
+										>
+											<span>前台查看</span>
+											<Icon icon="tabler:arrow-up-right" />
+										</a>
+									</div>
 									<div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-										<span
+										<a
+											href={`/categories?category=${encodeURIComponent(cat.name)}`}
+											target="_blank"
+											rel="noreferrer"
 											style={{
 												display: 'inline-flex',
 												alignItems: 'center',
@@ -280,11 +294,14 @@ export const CategoryTagView: React.FC = () => {
 												fontSize: 12,
 												fontWeight: 500,
 												border: `1px solid ${cat.color}40`,
+												textDecoration: 'none',
+												cursor: 'pointer',
 											}}
+											title={`点击前往前台《${cat.name}》分类聚合页`}
 										>
 											<Icon icon={cat.icon || 'tabler:folder'} />
 											<span>{cat.name}</span>
-										</span>
+										</a>
 									</div>
 								</div>
 							</div>
@@ -295,6 +312,16 @@ export const CategoryTagView: React.FC = () => {
 								</span>
 
 								<div style={{ display: 'flex', gap: 4 }}>
+									<a
+										href={`/categories?category=${encodeURIComponent(cat.name)}`}
+										target="_blank"
+										rel="noreferrer"
+										className="admin-btn btn-ghost btn-sm"
+										title="在新标签页预览此前台分类"
+										style={{ textDecoration: 'none', padding: '0 6px' }}
+									>
+										<Icon icon="tabler:external-link" />
+									</a>
 									<button
 										type="button"
 										className="admin-btn btn-secondary btn-sm"

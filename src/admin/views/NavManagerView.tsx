@@ -983,7 +983,7 @@ export const NavManagerView: React.FC = () => {
 							</button>
 						</div>
 
-						<div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+						<div className="modal-body">
 							{modalType === 'footerGroup' ? (
 								<div className="admin-form-group">
 									<label className="admin-form-label required">分组标题</label>
@@ -1026,9 +1026,9 @@ export const NavManagerView: React.FC = () => {
 										<div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
 											<div
 												style={{
-													width: 36,
-													height: 36,
-													borderRadius: 6,
+													width: 38,
+													height: 38,
+													borderRadius: 'var(--admin-radius-sm)',
 													background: 'var(--admin-surface-hover)',
 													border: '1px solid var(--admin-border)',
 													display: 'flex',
@@ -1037,6 +1037,7 @@ export const NavManagerView: React.FC = () => {
 													fontSize: 20,
 													color: 'var(--admin-accent)',
 													cursor: 'pointer',
+													transition: 'all 0.15s ease',
 												}}
 												onClick={() => setShowIconPicker(true)}
 												title="点击选择图标"
@@ -1053,8 +1054,9 @@ export const NavManagerView: React.FC = () => {
 											/>
 											<button
 												type="button"
-												className="admin-btn btn-secondary btn-sm"
+												className="admin-btn btn-secondary"
 												onClick={() => setShowIconPicker(true)}
+												style={{ padding: '0 12px' }}
 											>
 												<Icon icon="tabler:icons" />
 												<span>选择图标</span>
@@ -1066,11 +1068,12 @@ export const NavManagerView: React.FC = () => {
 						</div>
 
 						<div className="modal-footer">
-							<button type="button" className="admin-btn btn-secondary btn-sm" onClick={() => setShowItemModal(false)}>
+							<button type="button" className="admin-btn btn-secondary" onClick={() => setShowItemModal(false)}>
 								取消
 							</button>
-							<button type="button" className="admin-btn btn-primary btn-sm" onClick={handleSaveModal}>
-								保存确定
+							<button type="button" className="admin-btn btn-primary" onClick={handleSaveModal}>
+								<Icon icon="tabler:check" />
+								<span>保存确定</span>
 							</button>
 						</div>
 					</div>
