@@ -11,7 +11,6 @@ import PostArchive from '@/components/post/PostArchive'
 import ZSecret from '@/components/partial/ZSecret'
 import ZToggle from '@/components/partial/ZToggle'
 import ZSlider from '@/components/partial/ZSlider'
-import BlogHeader from '@/components/blog/BlogHeader'
 import appConfig from '@/app.config'
 import { toZonedTemporal } from '@/utils/time'
 import { getFixedDelay } from '@/utils/anim'
@@ -59,29 +58,24 @@ export default function ArchivePage() {
 	}, [listGrouped])
 
 	return (
-		<>
-			<div className="mobile-only">
-				<BlogHeader as="h1" />
-			</div>
-
-			<div className={`${styles.archive} proper-height`}>
-				<PostOrderToggle
-					isAscending={isAscending}
-					onIsAscendingChange={setIsAscending}
-					sortOrder={sortOrder}
-					onSortOrderChange={setSortOrder}
-					category={category}
-					onCategoryChange={setCategory}
-					categories={categories}
-				>
-					<ZSecret>
-						<ZToggle
-							label="密度调节"
-							value={showTuning}
-							onChange={setShowTuning}
-						/>
-					</ZSecret>
-				</PostOrderToggle>
+		<div className={`${styles.archive} proper-height`}>
+			<PostOrderToggle
+				isAscending={isAscending}
+				onIsAscendingChange={setIsAscending}
+				sortOrder={sortOrder}
+				onSortOrderChange={setSortOrder}
+				category={category}
+				onCategoryChange={setCategory}
+				categories={categories}
+			>
+				<ZSecret>
+					<ZToggle
+						label="密度调节"
+						value={showTuning}
+						onChange={setShowTuning}
+					/>
+				</ZSecret>
+			</PostOrderToggle>
 
 				{listGrouped.map(([year, yearGroup]) => (
 					<section
@@ -140,7 +134,6 @@ export default function ArchivePage() {
 						/>
 					</div>
 				)}
-			</div>
-		</>
+		</div>
 	)
 }

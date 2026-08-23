@@ -34,6 +34,11 @@
 			opacity: 1;
 		}
 	}
+
+	:global(.gradient-card) {
+		flex-grow: 1;
+		min-width: 0;
+	}
 }
 
 .articleLink {
