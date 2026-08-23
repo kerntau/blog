@@ -15,7 +15,13 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import rehypeShikiFromHighlighter from '@shikijs/rehype/core'
 import { createHighlighter, type Highlighter } from 'shiki'
-import { transformerNotationDiff, transformerNotationHighlight } from '@shikijs/transformers'
+import {
+	transformerNotationDiff,
+	transformerNotationHighlight,
+	transformerNotationWordHighlight,
+	transformerNotationFocus,
+	transformerNotationErrorLevel,
+} from '@shikijs/transformers'
 import { visit } from 'unist-util-visit'
 import blogConfig, { myFeed } from '../blog.config'
 import feeds from '../src/feeds'
@@ -183,11 +189,33 @@ async function compileMdxSource(rawSource: string, frontmatterTitle?: string, fi
 					transformers: [
 						transformerNotationDiff(),
 						transformerNotationHighlight(),
+						transformerNotationWordHighlight(),
+						transformerNotationFocus(),
+						transformerNotationErrorLevel(),
 						{
-							name: 'transformer-line-numbers',
+							name: 'transformer-meta-and-lines',
 							line(node: any, line: number) {
 								node.properties = node.properties || {}
 								node.properties['data-line'] = String(line)
+							},
+							pre(node: any) {
+								const rawMeta = this.options?.meta?.__raw || ''
+								node.properties = node.properties || {}
+								if (rawMeta) {
+									node.properties['data-meta'] = rawMeta
+									const filenameMatch = rawMeta.match(/\[(.*?)\]/) || rawMeta.match(/(?:filename|title)=["'](.*?)["']/)
+									if (filenameMatch) {
+										node.properties['data-filename'] = filenameMatch[1]
+									}
+								}
+								if (this.options?.lang) {
+									node.properties['data-language'] = this.options.lang
+								}
+								if (node.children?.[0]?.children) {
+									node.children[0].children = node.children[0].children.filter(
+										(c: any) => c.type !== 'text' || c.value.trim() !== '',
+									)
+								}
 							},
 						},
 					],

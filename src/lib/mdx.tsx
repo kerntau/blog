@@ -66,11 +66,18 @@ function Span(props: any) {
 	return createElement('span', { ...props, style: parseStyle(props.style) }, props.children)
 }
 
+function Code(props: any) {
+	if (props.className?.includes('language-') || props.className?.includes('shiki') || props['data-language']) {
+		return createElement('code', props, props.children)
+	}
+	return createElement(ProseCode, props, props.children)
+}
+
 export const defaultMdxComponents: Record<string, any> = {
 	a: ProseA,
 	span: Span,
 	pre: ProsePre,
-	code: ProseCode,
+	code: Code,
 	table: ProseTable,
 	Alert,
 	Badge,

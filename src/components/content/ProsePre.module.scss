@@ -29,12 +29,43 @@
 		overflow: auto;
 		background: transparent !important;
 		border: none !important;
+		white-space: pre;
 
 		&.wrap {
-			white-space: pre-wrap;
+			white-space: pre-wrap !important;
+
+			code,
+			:global(.line) {
+				white-space: pre-wrap !important;
+			}
+		}
+
+		&:not(.wrap) {
+			white-space: pre !important;
+
+			code,
+			:global(.line) {
+				white-space: pre !important;
+			}
+		}
+
+		> code {
+			all: unset;
+			display: block;
+			background: transparent !important;
+			border: none !important;
+			box-shadow: none !important;
+			padding: 0 !important;
+			margin: 0 !important;
+			font-family: inherit;
+			font-size: inherit;
+			line-height: inherit;
 		}
 
 		:global(.line) {
+			display: block;
+			min-height: 1.4em;
+			background: transparent;
 			&.diff {
 				background-color: var(--ld-bg-active);
 
