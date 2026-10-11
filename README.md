@@ -91,21 +91,6 @@ pnpm build 会依次生成内容索引、sitemap、RSS 并输出 dist/。Vercel 
 
 后台数据保存在浏览器 localStorage。要发布后台修改，请使用导出功能写回 src/content/ 后再重新构建。
 
-## 07. ENGINEERING CONTRACT // 工程协作契约
-
-- 文章和数据修改后运行 pnpm generate:content-index。
-- 生成目录由脚本维护，不要手工编辑。
-- 友链探测只用于维护数据，不要把私密地址或凭据写入内容。
-- 不在生产环境暴露 /admin；提交前运行 typecheck、lint 和 build。
-
-## 08. ROADMAP // 系统演进路线
-
-- [x] 元数据索引与正文按需加载。
-- [x] sitemap、RSS、代码高亮和富文本渲染。
-- [x] 本地管理后台与导入导出。
-- [ ] 增加自动化内容校验和链接报告。
-- [ ] 完善静态托管的缓存与增量发布文档。
-
-## 09. LICENSE // 许可证
+## 07. LICENSE // 许可证
 
 许可证见仓库 LICENSE 文件。
