@@ -1,121 +1,111 @@
-# 序栈 · chent-blog
+<div align="center">
 
-个人数字花园与技术博客，内容以技术文章、日常手记和个人记录为主。
+# 序栈 · BLOG
 
-> 心中有景，花香满径。
+**个人数字花园、技术文章与日常手记。**<br>
+*A static personal garden for engineering notes and everyday records.*
 
-## 技术栈
+[![GitHub](https://img.shields.io/badge/GitHub-kerntau%2Fblog-181717?style=for-the-badge&logo=github)](https://github.com/kerntau/blog)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=111111)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=ffffff)](https://www.typescriptlang.org)
+[![Rsbuild](https://img.shields.io/badge/Rsbuild-Rspack-F97316?style=for-the-badge)](https://rsbuild.dev)
+[![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com)
 
-| 层级 | 选型 |
-|------|------|
-| 框架 | React 19 + TypeScript |
-| 构建 | Rsbuild（Rspack） |
-| 路由 | wouter |
-| 样式 | Tailwind CSS 3 |
-| 内容 | Markdown（gray-matter frontmatter） |
-| 渲染增强 | Shiki / KaTeX / Mermaid / abcjs |
-| 部署 | 静态托管（Vercel / GitHub Pages 等） |
+</div>
 
-## 快速开始
+---
 
-```bash
-# 安装依赖（推荐 pnpm）
+## 01. PROJECT PURPOSE // 项目定位
+
+Blog 是一个纯前端数字花园：文章、手记、说说和友链以 Markdown/JSON 管理，构建时生成索引、站点地图和 RSS，浏览器端按需加载正文。
+
+项目默认面向静态托管，/admin 仅供本机编辑数据，不是线上多用户 CMS。
+
+## 02. TECHNICAL ARCHITECTURE // 技术架构
+
+~~~mermaid
+graph TD
+    A[src/content Markdown and JSON] --> B[generate-content-index]
+    B --> C[content-index and dynamic loaders]
+    C --> D[React + wouter pages]
+    D --> E[Rsbuild dist]
+    E --> F[Static hosting]
+    B --> G[generate-sitemap and generate-rss]
+~~~
+
+- React 19、TypeScript 与 wouter 组成页面和路由。
+- gray-matter 读取 front matter；Shiki、KaTeX、Mermaid、abcjs 在需要时渲染。
+- 生成脚本将列表元数据与正文加载路径分离，减少首屏负担。
+
+## 03. TECHNICAL MATRIX // 技术矩阵
+
+| 模块 | 选型 | 作用 |
+| --- | --- | --- |
+| 页面 | React 19 + TypeScript | 组件化渲染与类型检查 |
+| 构建 | Rsbuild/Rspack | 开发服务器、生产打包和预览 |
+| 路由 | wouter | 轻量客户端路由 |
+| 内容 | Markdown + gray-matter、JSON | 文章、手记、友链和站点配置 |
+| 增强渲染 | Shiki、KaTeX、Mermaid、abcjs | 代码、公式、图表和乐谱 |
+| 搜索 | Fuse.js | 客户端模糊检索 |
+
+## 04. REPOSITORY TOPOLOGY // 源码工程拓扑
+
+~~~text
+.
+├── src/content/
+│   ├── posts/                # 技术文章
+│   ├── diaries/              # 日常手记
+│   ├── records/records.json  # 短记录
+│   ├── pages/friends.json    # 友链
+│   └── config/               # 站点配置
+├── src/                      # 页面、组件和样式
+├── scripts/                  # 索引、RSS、站点地图和封面生成
+├── public/                   # 静态资源、feed、RSS 和 sitemap
+├── start-dev.bat             # Windows 开发启动脚本
+└── package.json              # 脚本与依赖
+~~~
+
+## 05. CLONE & QUICK START // 极速装配指南
+
+环境要求：Node.js 18+；推荐 pnpm 10。
+
+~~~bash
+git clone https://github.com/kerntau/blog.git
+cd blog
 pnpm install
-# 或
-npm install
-```
-
-### 启动开发服务器
-
-三种方式任选其一：
-
-```bash
-# 方式 1：双击或在 cmd 中运行（最省事，自动找 Node）
-start-dev.bat
-
-# 方式 2：npm / pnpm 脚本（需要 PATH 里有可用的 node）
-npm run dev
 pnpm dev
+~~~
 
-# 方式 3：手动两步
-node scripts/generate-content-index.mjs
-node node_modules/@rsbuild/core/bin/rsbuild.js dev
-```
+没有 pnpm 时可使用 npm install 和 npm run dev。默认开发地址为 http://localhost:3000，端口占用时 Rsbuild 会选择可用端口。
 
-启动成功后访问 **http://localhost:3000**（端口被占用会自动切到 3001…）。
+## 06. DEPLOYMENT & VERIFICATION // 部署与验证
 
-```bash
-# 类型检查
-npm run typecheck
+~~~bash
+pnpm typecheck
+pnpm lint
+pnpm build
+pnpm preview
+~~~
 
-# 生产构建（索引 → sitemap → RSS → rsbuild → 404 fallback）
-npm run build
+pnpm build 会依次生成内容索引、sitemap、RSS 并输出 dist/。Vercel 配置已指定 dist/ 和 SPA 回退；其他静态托管平台也需要将非静态路由回退到 index.html。
 
-# 预览构建产物
-npm run preview
-```
+后台数据保存在浏览器 localStorage。要发布后台修改，请使用导出功能写回 src/content/ 后再重新构建。
 
-> 若 `npm run dev` / `pnpm dev` 报 `node` 找不到，或 Node 路径含空格导致脚本失败，请改用 `start-dev.bat`。
+## 07. ENGINEERING CONTRACT // 工程协作契约
 
-## 内容架构
+- 文章和数据修改后运行 pnpm generate:content-index。
+- 生成目录由脚本维护，不要手工编辑。
+- 友链探测只用于维护数据，不要把私密地址或凭据写入内容。
+- 不在生产环境暴露 /admin；提交前运行 typecheck、lint 和 build。
 
-```
-src/content/
-  posts/*.md          # 技术文稿
-  diaries/*.md        # 日常手记
-  records/records.json
-  pages/friends.json
-  config/site.config.json
-  generated/          # 构建期自动生成，勿手改
-    content-index.json   # 元数据索引（标题/摘要/TOC/阅读时长）
-    content-loaders.ts   # 正文动态 import 映射
-```
+## 08. ROADMAP // 系统演进路线
 
-正文 **按需加载**：列表/搜索只依赖元数据索引，进入详情页再拉对应 Markdown chunk。新增或删除文章后请执行：
+- [x] 元数据索引与正文按需加载。
+- [x] sitemap、RSS、代码高亮和富文本渲染。
+- [x] 本地管理后台与导入导出。
+- [ ] 增加自动化内容校验和链接报告。
+- [ ] 完善静态托管的缓存与增量发布文档。
 
-```bash
-pnpm generate:content-index
-```
+## 09. LICENSE // 许可证
 
-（`pnpm dev` / `pnpm build` 会自动执行。）
-
-## 本地管理后台
-
-访问 `http://localhost:<port>/admin`（仅 localhost / 127.0.0.1 可用，线上直接 404）。
-
-支持：文章 / 手记 / 说说 / 友链 / 分类标签 / 站点设置 / 底层 JSON 编辑、草稿暂存、回收站、导入导出。
-
-### CMS 工作流（重要）
-
-后台数据保存在浏览器 **localStorage**，**不会自动写回仓库**。要让改动上线：
-
-1. 在 `/admin` 编辑内容并保存
-2. 使用「导出 / 下载」得到 JSON 或 Markdown
-3. 覆盖写入 `src/content/` 对应文件
-4. 执行 `pnpm generate:content-index`
-5. `git commit` → `git push` 触发部署
-
-换浏览器或清空站点数据会丢失本地后台修改，重要内容请及时导出。
-
-## 常用脚本
-
-| 命令 | 说明 |
-|------|------|
-| `pnpm generate:content-index` | 重新生成正文元数据索引与 loaders |
-| `pnpm generate:sitemap` | 生成 sitemap.xml |
-| `pnpm generate:rss` | 生成 feed.xml / rss.xml |
-| `pnpm generate:covers` | 生成文章封面 SVG |
-| `pnpm detect:friends` | 探测友链可达性 |
-| `pnpm lint` | ESLint |
-| `pnpm format` | Prettier 格式化 |
-
-## 性能相关设计
-
-- 路由级 `React.lazy`：Admin 与非首页栏目不进主包
-- 文章/手记正文动态 `import()`，按篇拆 chunk
-- Mermaid / abcjs / KaTeX / Shiki 均在使用时再加载
-- 中文字体（MiSans）非阻塞加载 + `preconnect`
-
-## 许可
-
-见 [LICENSE](./LICENSE)。
+许可证见仓库 LICENSE 文件。
